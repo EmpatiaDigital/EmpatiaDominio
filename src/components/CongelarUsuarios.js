@@ -8,7 +8,7 @@ const CongelarUsuarios = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/active/accounts')
+    fetch('https://empatia-dominio-back.vercel.app/api/active/accounts')
       .then(res => res.json())
       .then(data => {
         const sociosFiltrados = data.filter(u => u.tipo === 'socio');
@@ -48,7 +48,7 @@ const CongelarUsuarios = () => {
         tiempoFinal = new Date(ahora.getTime() + parseInt(cantidad) * 24 * 60 * 60 * 1000);
       }
 
-      await fetch(`http://localhost:5000/api/active/${socio._id}`, {
+      await fetch(`https://empatia-dominio-back.vercel.app/api/active/${socio._id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ activo: false, hasta: tiempoFinal, tipo: 'socio' })
@@ -70,7 +70,7 @@ const CongelarUsuarios = () => {
     });
 
     if (confirmacion.isConfirmed) {
-      await fetch(`http://localhost:5000/api/active/${socio._id}`, {
+      await fetch(`https://empatia-dominio-back.vercel.app/api/active/${socio._id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ activo: true, tipo: 'socio' })
