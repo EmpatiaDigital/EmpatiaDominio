@@ -83,7 +83,7 @@ const SocioDashboard = () => {
         }
 
         try {
-          const res = await fetch("https://empatia-back.vercel.app/api/socios/obtener", {
+          const res = await fetch("https://empatia-dominio-back.vercel.app/api/socios/obtener", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
@@ -249,7 +249,7 @@ const SocioDashboard = () => {
         formData.append("avatar", selectedImage);
       }
 
-      const res = await fetch("http://localhost:5000/api/socios/editar", {
+      const res = await fetch("https://empatia-dominio-back.vercel.app/api/socios/editar", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
