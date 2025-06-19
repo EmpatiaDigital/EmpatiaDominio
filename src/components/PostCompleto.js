@@ -32,7 +32,7 @@ const PostCompleto = () => {
     const fetchPost = async () => {
       try {
         const res = await fetch(
-          `https://empatia-back.vercel.app/api/posts/${id}`
+          `https://empatia-dominio-back.vercel.app/api/posts/${id}`
         );
         const data = await res.json();
         setPost(data);
