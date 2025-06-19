@@ -15,7 +15,7 @@ export default function Post() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/posts");
+        const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
         const data = await res.json();
         setPosts(data);
         setCargando(false);
