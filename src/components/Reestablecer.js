@@ -14,7 +14,7 @@ const Reestablecer = () => {
     if (!correo) return;
 
     try {
-      const response = await fetch("http://localhost:5000/api/sendCode", {
+      const response = await fetch("https://empatia-dominio-back.vercel.app/api/sendCode", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo }),
@@ -53,7 +53,7 @@ const Reestablecer = () => {
     if (!correo || !code || !nuevaPassword) return;
 
     try {
-      const response = await fetch("http://localhost:5000/api/changePassword", {
+      const response = await fetch("https://empatia-dominio-back.vercel.app/api/changePassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ correo, code, nuevaPassword }),
