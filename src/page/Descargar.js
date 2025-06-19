@@ -232,19 +232,21 @@ export default function Descargar() {
                       width: "100%", // Ancho relativo
                     }}
                   />
-                  {item.type === "libro" ? (
+                {item.type === "libro" ? (
                     <a
-                      href={archivoBase64}
+                      href={`https://wa.me/543413559329?text=${encodeURIComponent(
+                        `Hola, tengo interés en comprar el libro "${item.title}".`
+                      )}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-ver-mas"
                       onClick={() =>
-                        registrarActividad("PDFlibroDescarga", item.title)
+                        registrarActividad("PDFlibroWhatsApp", item.title)
                       }
                     >
-                      Comprar Libro
+                      Comprar por WhatsApp
                     </a>
-                  ) : (
+                  )  : (
                     <a
                       href={archivoBase64}
                       download={item.filename || item.name}
