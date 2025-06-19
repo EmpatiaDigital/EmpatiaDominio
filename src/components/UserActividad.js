@@ -8,7 +8,7 @@ const UserActividad = () => {
 
   const sendActivity = async (data) => {
     try {
-      await fetch("http://localhost:5000/api/user-actividad", {
+      await fetch("https://empatia-dominio-back.vercel.app/api/user-actividad", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
