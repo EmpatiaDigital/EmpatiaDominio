@@ -17,7 +17,7 @@ const UserData = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/user-actividad");
+        const res = await fetch("https://empatia-dominio-back.vercel.app/api/user-actividad");
         if (!res.ok) throw new Error("Error al obtener datos");
         const actividades = await res.json();
         setData(actividades);
@@ -129,7 +129,7 @@ const UserData = () => {
               >
                 <a
                   href={
-                    actividad?.url || `http://localhost:3000/post/${postId}`
+                    actividad?.url || `https://empatiadigital.com.ar/post/${postId}`
                   } // si no hay `actividad.url`, usar un fallback por id
                   rel="noopener noreferrer"
                   style={{
