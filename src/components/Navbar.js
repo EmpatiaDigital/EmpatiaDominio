@@ -24,23 +24,6 @@ export default function Navbar() {
     }
   };
 
-  // useEffect(() => {
-  //   const alertShown = sessionStorage.getItem("loadingAlertShown");
-  //   if (!loading && user && !alertShown) {
-  //     Swal.fire({
-  //       title: "Cargando datos...",
-  //       allowOutsideClick: false,
-  //       didOpen: () => {
-  //         Swal.showLoading();
-  //       },
-  //       timer: 1500,
-  //       timerProgressBar: true,
-  //     }).then(() => {
-  //       sessionStorage.setItem("loadingAlertShown", "true");
-  //     });
-  //   }
-  // }, [loading, user]);
-
   if (loading) {
     return (
       <nav className="navbar">
