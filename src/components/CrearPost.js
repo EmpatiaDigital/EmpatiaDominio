@@ -39,7 +39,7 @@ const CrearPost = () => {
     const formData = new FormData();
     formData.append("image", file);
 
-    const res = await fetch("http://localhost:5000/api/upload", {
+    const res = await fetch("https://empatia-dominio-back.vercel.app/api/upload", {
       method: "POST",
       body: formData,
     });
@@ -132,7 +132,7 @@ const CrearPost = () => {
         },
       });
   
-      const res = await fetch("http://localhost:5000/api/posts", {
+      const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevoPost),
