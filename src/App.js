@@ -111,6 +111,7 @@ function AppContent() {
           {/* <Route path="/reestablecer" element={<Reestablecer />} /> */}
           <Route path="/data-user" element={<UserData />} />
           <Route path="/registro" element={<Register />} />
+          <Route path="/reestablecer" element={<Reestablecer />} />
           <Route path="/descargas" element={<Descargar />} />
           <Route path="/login" element={<Login />} />
           <Route path="/socio/dashboard" element={<Socio />} />
