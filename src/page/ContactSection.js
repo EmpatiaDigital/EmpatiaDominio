@@ -30,7 +30,7 @@ export default function ContactSection() {
               <li>
                 <MessageCircle className="icon" />
                 <a
-                  href="https://wa.me/5493411234567"
+                  href="https://wa.me/5493413559329"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
