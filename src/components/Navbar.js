@@ -3,7 +3,7 @@ import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
-import logoImg from "../assets/logo empatia.jpg";
+import logoImg from "../assets/Empatia Logo.jpg";
 import "../style/Navbar.css";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
