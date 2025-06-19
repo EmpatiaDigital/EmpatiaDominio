@@ -336,7 +336,7 @@ export default function Descargar() {
             experiencia como acompañante terapéutico para convivir mejor con
             pantallas, redes e inteligencia artificial.
           </p>
-          <a href="/registrar" className="link-suscripcion">
+          <a href="/registro" className="link-suscripcion">
             Suscribite para recibir novedades, posts y más.
           </a>
         </div>
