@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (correo, password, username) => {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
+    const res = await fetch("https://empatia-dominio-back.vercel.app/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ correo, password, username }),
