@@ -3,12 +3,12 @@
   "name": "Empatía Digital",
   "icons": [
     {
-      "src": "empatiaDigital.jpg",
+      "src": "favicon.ico",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "empatiaDigital.jpg",
+      "src": "favicon.ico",
       "type": "image/png",
       "sizes": "512x512"
     }
