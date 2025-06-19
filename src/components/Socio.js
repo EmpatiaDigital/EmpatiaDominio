@@ -322,7 +322,7 @@ const SocioDashboard = () => {
         const token = localStorage.getItem("token");
   
         try {
-          const res = await fetch("http://localhost:5000/api/cambiar-password-logueado", {
+          const res = await fetch("https://empatia-dominio-back.vercel.app/api/cambiar-password-logueado", {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
