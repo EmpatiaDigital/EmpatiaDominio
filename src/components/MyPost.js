@@ -16,7 +16,7 @@ export default function MyPost() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/posts");
+        const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
         const data = await res.json();
         const userId = localStorage.getItem("userId");
 
@@ -46,7 +46,7 @@ export default function MyPost() {
 
     if (confirm.isConfirmed) {
       try {
-        const res = await fetch(`http://localhost:5000/api/posts/${id}`, {
+        const res = await fetch(`https://empatia-dominio-back.vercel.app/api/posts/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${user.token}`,
