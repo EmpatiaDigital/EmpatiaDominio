@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../style/ModalActividades.css";
 
-const API_URL = "http://localhost:5000/api/actividades";
+const API_URL = "https://empatia-dominio-back.vercel.app/api/actividades";
 
 function ModalActividades() {
   const [actividad, setActividad] = useState(null);
@@ -66,7 +66,7 @@ function ModalActividades() {
             className="btn-ver-mas"
             onClick={() => {
               cerrarModal();
-              window.location.href = "https://empatia-front.vercel.app/actividades";
+              window.location.href = "https://empatiadigital.com.ar/actividades";
             }}
           >
             Ver más
