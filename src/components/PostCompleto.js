@@ -92,7 +92,38 @@ const PostCompleto = () => {
         className="imagen-fija-1200"
         dangerouslySetInnerHTML={{ __html: post.contenido }}
       />
-
+      <div
+        style={{
+          backgroundColor: "#fff3cd",
+          borderLeft: "6px solid #ffc107",
+          padding: "1rem",
+          borderRadius: "8px",
+          fontFamily: "sans-serif",
+          color: "#856404",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <p style={{ margin: "0 0 0.5rem 0" }}>
+          <strong
+            style={{
+              display: "block",
+              fontSize: "1.1rem",
+              marginBottom: "0.5rem",
+            }}
+          >
+            ⚠️ Aviso importante:
+          </strong>
+          Este contenido es informativo y refleja la experiencia desde el
+          acompañamiento terapéutico. No reemplaza la consulta con profesionales
+          de la salud mental. Si experimentás síntomas persistentes o
+          preocupantes, te recomendamos buscar ayuda especializada.
+        </p>
+        <p style={{ margin: "0.5rem 0 0 0" }}>
+          Si conocés a alguien que le pueda interesar este tema, compartile este
+          post. Además, te invito a descargar la guía gratuita en PDF sobre la
+          introducción de IA en la parte de abajo 👇
+        </p>
+      </div>
       <div
         style={{
           borderLeft: "30px solid #42a5f5",
