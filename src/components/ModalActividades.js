@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../style/ModalActividades.css";
 
-const API_URL = "https://empatia-dominio-back.vercel.app/api/actividades";
+const API_URL = "https://empatia-back.vercel.app/api/actividades";
 
 function ModalActividades() {
   const [actividad, setActividad] = useState(null);
