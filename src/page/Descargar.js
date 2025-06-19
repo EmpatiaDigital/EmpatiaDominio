@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import portadaGuia from "../assets/familiaEMPATIA.jpg";
-import portadaLibro from "../assets/Cuidar.png";
+import portadaLibro from "../assets/Portada3.jpg";
 import guiaPDF from "../assets/Guía Empatía Digital.pdf";
 import avatar from "../assets/avatar.jpg";
 import Swal from "sweetalert2";
