@@ -1,0 +1,14 @@
+
+agregue usesACTIVIDAD TANTO BACK COMO FRONT subirlo
+
+cambie el createPost de backend Y EL FRONT END TAMBIEN subirlos, echo
+
+MODIFICADO APP.JS SUBIRLO echo
+cambie el css de HomePage.css subirlo, echo
+
+CREACION DE UserData y los css correspondientes subrilo - echo
+
+ModalActividades js y css subirlo - echo
+
+18/06/2025
+agregue DIV EN POST COMPLETO PARA LLEVAR A GUÍA DEL 96 A 128

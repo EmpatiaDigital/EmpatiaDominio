@@ -1,0 +1,183 @@
+/* src/style/Actividades.css */
+
+body {
+  margin-top: 150px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f2f9f8; /* celeste muy suave, como footer */
+  color: #222;
+}
+
+.paginacion {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.paginacion button {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #00796b; /* verde azulado */
+  background-color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: bold;
+  color: #00796b;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.paginacion button.pagina-activa {
+  background-color: #00796b; /* verde azulado */
+  color: white;
+  border-color: #004d40; /* verde más oscuro */
+}
+
+.paginacion button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actividades-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+  animation: fadeIn 1s ease-in;
+  color: #222;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.titulo-principal {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #00796b; /* verde azulado */
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 3px solid #004d40; /* verde más oscuro */
+  display: inline-block;
+  padding-bottom: 10px;
+  font-weight: 700;
+}
+
+.grid-actividades {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  padding: 0 20px;
+  margin-left: -40px;
+}
+
+.actividad-card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 121, 107, 0.15); /* verde suave sombra */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 0.6s ease-in-out;
+}
+
+.title-content {
+  font-size: 1.4rem;
+  text-align: center;
+  color: #004d40; /* verde más oscuro */
+  margin-bottom: 10px;
+  font-weight: 700;
+  background: #a5d6a7; /* verde claro de fondo */
+  padding: 8px 0;
+  border-radius: 12px 12px 0 0;
+}
+
+.title-content h2 {
+  font-size: 1.4rem;
+  color: #004d40;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.actividad-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(0, 121, 107, 0.3);
+}
+
+.card-img img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  border-bottom: 4px solid #00796b; /* borde verde */
+}
+
+.card-img img:hover {
+  transform: scale(1.05);
+}
+
+.card-content {
+  padding: 20px;
+  flex-grow: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.card-content p {
+  margin: 0;
+  white-space: nowrap;
+  display: inline-block;
+  color: #444;
+  font-weight: 500;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.card-content h2 {
+  font-size: 1.4rem;
+  color: #00796b; /* verde azulado */
+  margin-bottom: 10px;
+  border-left: 4px solid #004d40; /* verde más oscuro */
+  padding-left: 10px;
+  font-weight: 700;
+}
+
+.card-content strong {
+  color: #004d40; /* verde oscuro */
+}
+
+@media (max-width: 768px) {
+  .titulo-principal {
+    font-size: 2rem;
+  }
+
+  .card-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .card-content p {
+    font-size: 0.9rem;
+  }
+}

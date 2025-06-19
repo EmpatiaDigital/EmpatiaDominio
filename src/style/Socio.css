@@ -1,0 +1,225 @@
+
+.logo-cuadrado {
+  width: 120px;
+  height: 80px;
+  object-fit: contain;
+  margin: 10px auto;
+  display: block;
+  filter: drop-shadow(0 0 2px #ff4d4d) drop-shadow(0 0 5px #ff1a1a) drop-shadow(0 0 8px #ff0000);
+}
+
+
+.socio-dashboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  width: 100%;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.card-header h1 {
+  font-size: 24px;
+  padding: 12px;
+  border-radius: 8px;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Colores para los headers */
+.card-header-green h1 {
+  background-color: #28a745; /* Verde */
+}
+
+.card-header-orange h1 {
+  background-color: #ff9800; /* Naranja */
+}
+
+.card-header-blue h1 {
+  background-color: #007bff; /* Azul */
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-body input {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.card-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 10px auto;
+}
+
+
+.alert-red {
+  color: #d9534f;
+  font-weight: bold;
+}
+
+/* Botones comunes */
+.card-changes,
+.card-footer button {
+  padding: 10px 20px;
+  font-size: 16px;
+  margin-top: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover de botones */
+.card-changes:hover,
+.card-footer button:hover {
+  background-color: #0056b3;
+}
+
+.card-footer {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.card-header-modern {
+  background: linear-gradient(155deg, #111 40%, #b30000 100%);
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  box-shadow: 
+    0 0 20px rgb(64, 14, 14),       /* sombra externa */
+    inset 0 0 10px rgb(100, 3, 3),  /* sombra interna roja */
+    inset 0 0 0 3px white;           /* borde interno blanco */
+}
+
+/* LÍNEA INCLINADA TIPO CIRCUITO */
+.circuit-line {
+  position: absolute;
+  width: 150%;
+  height: 100px;
+  background: repeating-linear-gradient(
+    45deg,
+    white,
+    white 5px,
+    transparent 5px,
+    transparent 10px
+  );
+  transform: rotate(-30deg);
+  bottom: 0%;
+  left: 60px;
+  opacity: 0.6;
+}
+
+.card-header-modern-complete {
+  background: linear-gradient(135deg, #111 40%, #b30000 100%);
+  width: 320px;
+  padding: 20px;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+.card-header-modern h1 {
+  color: #ffffff;
+  margin-bottom: 12px;
+  font-size: 24px;
+  padding: 12px;
+  border-radius: 8px;
+  color: #ffffff;
+  margin: 0;
+  background-color: #b30000;
+}
+
+.card-header-modern img.card-avatar {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid white;
+  background-color: #222;
+  margin: 10px auto;
+}
+
+.card-header-modern h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 10px 0 5px;
+  color: #ffffff;
+}
+
+.card-header-modern strong.activo {
+  color: #00e676;
+  font-weight: bold;
+}
+
+.card-header-modern strong.inactivo {
+  color: #ff1744;
+  font-weight: bold;
+}
+
+.card-header-modern p {
+  margin-top: 8px;
+  color: #ddd;
+  font-size: 14px;
+}
+
+/* Botón captura */
+.btn-captura {
+  margin-top: 12px;
+  padding: 10px 16px;
+  background-color: #b30000;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-captura:hover {
+  background-color: #ff1a1a;
+}

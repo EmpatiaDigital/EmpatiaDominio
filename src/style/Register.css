@@ -1,0 +1,52 @@
+/* Estilos base (los que tenías) pueden quedarse igual */
+
+/* Estilos para formulario sin provincia */
+.socio-form-container.no-provincia {
+  align-items:center;
+  background-color: #e8f5e9; /* verde muy claro */
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 400px;
+  margin: 2rem auto;
+  box-shadow: 0 8px 16px rgba(0, 128, 0, 0.2);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.socio-form.no-provincia input {
+  border-radius: 8px;
+  border: 1px solid #4caf50; /* verde */
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  width:90%;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+.socio-form.no-provincia button {
+  border-radius: 8px;
+  border: 1px solid #4caf50; /* verde */
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  width:100%;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.socio-form.no-provincia input:focus {
+  box-shadow: 0 0 8px #81c784; /* verde claro */
+  border-color: #81c784;
+}
+
+.socio-form.no-provincia button {
+  background-color: #4caf50; /* verde */
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.socio-form.no-provincia button:hover {
+  background-color: #388e3c; /* verde oscuro */
+}

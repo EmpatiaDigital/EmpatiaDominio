@@ -1,0 +1,225 @@
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: linear-gradient(135deg, #324a67, #2a3e58); /* azul grisáceo oscuro */
+}
+
+li {
+  outline: none;
+  background: linear-gradient(135deg, #324a67, #2a3e58); /* azul grisáceo oscuro */
+}
+
+body {
+  margin-top: 120px; /* o la altura real de tu navbar */
+}
+
+/* --- Navbar Base con celeste pastel --- */
+.navbar {
+  background: linear-gradient(135deg, #324a67, #2a3e58); /* azul grisáceo oscuro */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0rem 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%; /* Hace que ocupe todo el ancho */
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 1000;
+}
+
+/* --- Logo en celeste más oscuro --- */
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2f4f7f; /* celeste oscuro */
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 1px rgba(224, 240, 255, 0.4); /* destello beige claro */
+}
+
+/* Animación de aparición */
+.animated-logo {
+  position: relative;
+  animation: fadeInLogo 1s ease forwards;
+  overflow: hidden;
+}
+
+@keyframes fadeInLogo {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Imagen interna del logo */
+.logo-img {
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  border: solid 2px #d7dfe7; /* beige claro */
+  overflow: hidden;
+  background-color: rgba(167, 199, 231, 0.8); /* celeste pastel semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-img img {
+  height: 100%;
+  width: 120%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Haz de luz diagonal */
+.light-shine {
+  position: absolute;
+  top: 100%;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+  transform: rotate(0deg);
+  animation: shineEffect 2s ease-in-out forwards;
+  pointer-events: none;
+}
+
+@keyframes shineEffect {
+  0% {
+    top: 100%;
+  }
+  100% {
+    top: -100%;
+  }
+}
+
+/* --- Botón hamburguesa --- */
+.menu-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: block;
+}
+
+.menu-toggle svg {
+  color: #5f8ecc; /* celeste pastel medio */
+}
+
+/* --- Navegación desplegable móvil --- */
+.nav-links {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+  position: absolute;
+  top: 4.5rem;
+  left: 0;
+  right: 0;
+  background-color: #a7c7e7; /* celeste pastel */
+  padding: 1rem;
+  gap: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.nav-links a,
+.nav-links button {
+  font-size: 1rem;
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.nav-links a:hover,
+.nav-links button:hover {
+  color: #a7c7e7;
+  background: #f0e6d2; /* beige pastel */
+  border-radius: 15px;
+  padding: 5px;
+}
+
+.nav-links.show {
+  display: flex;
+}
+
+/* --- Estilos en desktop --- */
+@media (min-width: 768px) {
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .nav-links {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    position: static;
+    padding: 0;
+    gap: 2rem;
+  }
+}
+
+/* --- Usuario avatar + menú --- */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.user-info img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 2px solid #d7c9b6; /* beige claro */
+  box-shadow: 0 0 6px rgba(167, 196, 223, 0.4); /* azul cielo suave */
+}
+
+.user-menu {
+  position: absolute;
+  top: 3.5rem;
+  right: 1rem;
+  background-color: #5f8ecc; /* celeste pastel */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  display: none;
+  z-index: 999;
+}
+
+.group:hover .user-menu {
+  display: block;
+}
+
+/* --- Botón de login con beige y celeste --- */
+.login-btn {
+  background-color: #f0e6d2; /* beige pastel */
+  color: #2f4f7f; /* celeste oscuro */
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(47, 79, 127, 0.2);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.login-btn:hover {
+  background-color: #d7c9b6; /* beige más oscuro */
+  color: #1d3350; /* celeste más oscuro */
+}

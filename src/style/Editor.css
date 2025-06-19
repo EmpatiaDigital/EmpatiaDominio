@@ -1,0 +1,170 @@
+.editor-container {
+    max-width: 100%;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #f9f9fc;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', sans-serif;
+    overflow-x: auto;
+  }
+  
+  .editor-title {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .editor-input,
+  .editor-textarea,
+  .epigrafe-input {
+    width: 100%;
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border: 2px solid #d0d0e0;
+    border-radius: 12px;
+    font-size: 1rem;
+  }
+  
+  .editor-label {
+    font-weight: bold;
+    display: block;
+    margin-top: 1rem;
+  }
+  
+  .editor-file {
+    margin: 1rem 0;
+  }
+  
+  .preview-portada {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+  }
+  
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white; /* o el fondo que estés usando */
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  
+  .toolbar button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: #e0e0f0;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+  }
+  
+  .toolbar .active {
+    background: #9aa0f0;
+    color: white;
+  }
+  .custom-box {
+    border-left: 30px solid #42a5f5;
+    background-color: #05676e;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+  }
+  .custom-box em,
+  .custom-box i {
+    font-style: italic;
+    border-bottom: 2px solid white;
+  }
+  
+  
+  .tiptap {
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    min-height: 200px;
+    padding: 1rem;
+    background: white;
+    margin-bottom: 1rem;
+    overflow-x: auto; /* permite mostrar scroll si el contenido es más ancho */
+  }
+  
+  /* Mantiene las imágenes a tamaño fijo en pantallas grandes, pero adaptables en móviles */
+  .tiptap img{
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    margin: 20px auto;
+    border-radius: 8px;
+  }
+  
+  .preview-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  
+  .image-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .image-block img {
+    width: 100%;
+    border-radius: 10px;
+  }
+  
+  .uploading-text {
+    color: #888;
+    font-style: italic;
+  }
+  
+  .publish-button {
+    margin-top: 1rem;
+    padding: 0.8rem 1.5rem;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .publish-button:hover {
+    background: #218838;
+  }
+  
+  /* Estilos responsivos */
+  @media screen and (max-width: 600px) {
+    .editor-container {
+      padding: 1rem;
+    }
+  
+    .toolbar {
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+  
+    .imagen-fija-1200 {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+  }
+  

@@ -1,0 +1,243 @@
+/* Compras.css */
+
+.compras-section {
+  padding: 2rem 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+.filtro-container {
+  display: flex;
+  align-items: center;
+  margin: 1rem;
+  gap: 0.5rem;
+}
+
+.post-content-overlay-descargar {
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  justify-content: center; /* Centra verticalmente */
+  align-items: center; /* Centra horizontalmente */
+  text-align: center;
+}
+
+.filtro-container select {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  background-color: #e0f7f4;
+  color: #05676e;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.filtro-container select:hover {
+  background-color: #d4f3ef;
+}
+
+a.btn-ver-mas{
+  text-decoration: none;
+  background:#05676e;
+  color:white;
+  outline: none; /* Opcional, quita el borde de foco */
+}
+a.btn-ver-mas:hover,
+a.btn-ver-mas:focus {
+  text-decoration: none;
+  background:red;
+  color:white;
+  outline: none; /* Opcional, quita el borde de foco */
+}
+
+.upload-container {
+  text-align: center;
+  margin: 1rem;
+}
+.contador-materiales {
+  background-color: #e0f7f4;
+  color: rgb(10, 113, 55);
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  transition: background-color 0.3s ease;
+  margin: 0.5rem;
+}
+
+.contador-materiales:hover {
+  background-color: #d0efeb;
+}
+
+.paginacion-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.paginacion-container button {
+  padding: 0.5rem 1rem;
+  background: #67b7af;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.descripcion-autor {
+  margin-top: 3.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  padding: 0 1rem;
+}
+
+.avatar-autor {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.texto-autor p {
+  font-size: 1.15rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.link-suscripcion {
+  display: inline-block;
+  margin-top: 0.8rem;
+  color: #4caf50;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.link-suscripcion:hover {
+  color: #388e3c;
+  text-decoration: underline;
+}
+
+.tarjeta-autor {
+  background: #e6f2fb; /* celeste muy suave */
+  border-left: 6px solid #4db6ac; /* verde agua */
+  padding: 1.8rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  max-width: 900px;
+  margin: 2rem auto;
+  font-family: "Segoe UI", sans-serif;
+  animation: fadeInUp 0.7s ease;
+}
+
+.contenido-autor p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.contenido-autor b {
+  color: #00796b;
+}
+
+.link-suscripcion {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: white;
+  background-color: #4db6ac;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.link-suscripcion:hover {
+  background-color: #00796b;
+}
+
+/* Animación */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .lista-posts-container {
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .post-card {
+    width: 280px;
+    height: 370px;
+  }
+
+  .titulo-guia {
+    font-size: 1.4rem;
+  }
+
+  .btn-ver-mas {
+    padding: 0.65rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .descripcion-autor {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .avatar-autor {
+    width: 70px;
+    height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-card {
+    width: 100%;
+    max-width: 320px;
+    height: 360px;
+  }
+
+  .titulo-guia {
+    font-size: 1.25rem;
+  }
+
+  .autor {
+    font-size: 0.9rem;
+  }
+
+  .btn-ver-mas {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
