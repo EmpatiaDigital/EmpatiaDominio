@@ -121,7 +121,7 @@ const PostCompleto = () => {
             backgroundColor: "transparent", // Fondo transparente
             cursor: "pointer", // Cursor tipo manito
           }}
-          href={`http://localhost:3000/descargas`}
+          href={`https://empatiadigital.com.ar/descargas`}
         >
           Descarga la guía PDF GRATIS
         </a>
