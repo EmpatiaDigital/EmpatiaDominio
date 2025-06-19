@@ -30,7 +30,7 @@ const EditPost = () => {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/posts/${postId}`);
+        const res = await fetch(`https://empatia-dominio-back.vercel.app/api/posts/${postId}`);
         const data = await res.json();
 
         setTitulo(data.titulo || '');
@@ -55,7 +55,7 @@ const EditPost = () => {
     const formData = new FormData();
     formData.append('image', file);
 
-    const res = await fetch('http://localhost:5000/api/upload', {
+    const res = await fetch('https://empatia-dominio-back.vercel.app/api/upload', {
       method: 'POST',
       body: formData,
     });
@@ -119,7 +119,7 @@ const EditPost = () => {
     };
 
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${postId}`, {
+      const res = await fetch(`https://empatia-dominio-back.vercel.app/api/posts/${postId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postActualizado),
@@ -262,24 +262,6 @@ const EditPost = () => {
 
       {cargando && <p className="uploading-text">Subiendo imágenes...</p>}
 
-      {/* <div className="preview-images">
-        {imagenes.map((url, i) => (
-          <div key={i} className="image-block">
-            <img src={url} alt={`img-${i}`} style={{ maxWidth: '600px', maxHeight: '1200px' }} />
-            <input
-              type="text"
-              placeholder="Epígrafe de la imagen..."
-              value={epigrafes[i]}
-              onChange={(e) => {
-                const nuevos = [...epigrafes];
-                nuevos[i] = e.target.value;
-                setEpigrafes(nuevos);
-              }}
-              className="epigrafe-input"
-            />
-          </div>
-        ))}
-      </div> */}
 
       <button onClick={actualizarPost} className="publish-button" type="button">
         💾 Guardar cambios
