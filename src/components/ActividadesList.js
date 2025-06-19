@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import "../style/CrearActividades.css";
 
-const API_URL = "http://localhost:5000/api/actividades";
+const API_URL = "https://empatia-dominio-back.vercel.app/api/actividades";
 
 const CrearActividades = ({ actividad, onEditar, onBorrar, onVerDetalle }) => {
   const {
