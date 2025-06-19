@@ -55,13 +55,7 @@ function ModalActividades() {
           <h2>Acercate el {formatearFecha(actividad.fecha)}</h2>
           <h3>{actividad.hora} hs</h3>
         </div>
-        <div className="modal-card-img">
-          <img
-            src={actividad.imagen || "https://via.placeholder.com/300x200"}
-            alt={actividad.titulo}
-          />
-        </div>
-        <div className="modal-card-actions">
+          <div className="modal-card-actions">
           <button
             className="btn-ver-mas"
             onClick={() => {
@@ -72,6 +66,13 @@ function ModalActividades() {
             Ver más
           </button>
         </div>
+        <div className="modal-card-img">
+          <img
+            src={actividad.imagen || "https://via.placeholder.com/300x200"}
+            alt={actividad.titulo}
+          />
+        </div>
+        
       </div>
     </div>
   );
