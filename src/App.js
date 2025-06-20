@@ -56,13 +56,14 @@ function AppContent() {
   
   const MySwal = withReactContent(Swal);
   
-  const imagenes = [
-    "https://www.empatiadigital.com.ar/LibroPortada.jpg",
-    "https://www.empatiadigital.com.ar/Portada1.jpg",
-    "https://www.empatiadigital.com.ar/Portada2.jpg",
-    "https://www.empatiadigital.com.ar/Portada3.jpg",
-    "https://www.empatiadigital.com.ar/Portada4.jpg",
-  ];
+const imagenes = [
+  "https://images.unsplash.com/photo-1581093448790-5fc248c636d4", // IA y cerebro
+  "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf", // circuitos y redes neuronales
+  "https://images.unsplash.com/photo-1603791440384-56cd371ee9a7", // robot con fondo azul
+  "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2", // humano + IA
+  "https://images.unsplash.com/photo-1612287661052-0cb06d0a8f20", // cerebro digital
+];
+
   
   useEffect(() => {
     const imagenRandom = imagenes[Math.floor(Math.random() * imagenes.length)];
