@@ -80,7 +80,49 @@ const PostCompleto = () => {
           </div>
         </div>
       </div>
+  <div className="share-section">
+        <h3>Compartir en redes:</h3>
 
+        <div className="share-buttons">
+          <a
+            href={`https://api.whatsapp.com/send?text=${mensaje}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="share-btn whatsapp"
+          >
+            <FaWhatsapp size={30} />
+          </a>
+
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+              currentUrl
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="share-btn facebook"
+          >
+            <FaFacebook size={30} />
+          </a>
+
+          <a
+            onClick={() => {
+              navigator.clipboard.writeText(currentUrl);
+              Swal.fire({
+                icon: "success",
+                title: "¡Link copiado!",
+                text: "Pegalo en tus historias de Instagram.",
+                confirmButtonText: "Ok",
+                timer: 2500,
+                timerProgressBar: true,
+              });
+            }}
+            className="share-btn instagram"
+            title="Copiá el link y compartilo en tus historias"
+          >
+            <FaInstagram size={30} />
+          </a>
+        </div>
+      </div>
       {post.portada && (
         <img src={post.portada} alt="portada" className="preview-portada" />
       )}
