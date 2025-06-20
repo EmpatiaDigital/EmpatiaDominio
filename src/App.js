@@ -55,26 +55,65 @@ function AppContent() {
 
   
   const MySwal = withReactContent(Swal);
-  
-const imagenes = [
-  "https://images.unsplash.com/photo-1581093448790-5fc248c636d4", // IA y cerebro
-  "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf", // circuitos y redes neuronales
-  "https://images.unsplash.com/photo-1603791440384-56cd371ee9a7", // robot con fondo azul
-  "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2", // humano + IA
-  "https://images.unsplash.com/photo-1612287661052-0cb06d0a8f20", // cerebro digital
-];
 
+  const datos = [
+    {
+      texto: (
+        <>
+          La <strong>empatía digital</strong> no se trata solo de entender al otro, sino de{" "}
+          <strong>actuar con respeto</strong> en cada mensaje, comentario o reacción.
+        </>
+      ),
+    },
+    {
+      texto: (
+        <>
+          Pasar tiempo de calidad <strong>sin pantallas</strong> también es una forma de{" "}
+          <strong>cuidar el vínculo</strong> con quienes más querés.
+        </>
+      ),
+    },
+    {
+      texto: (
+        <>
+          En el mundo digital, un simple <strong>“visto” sin respuesta</strong> puede tener un impacto emocional.{" "}
+          <strong>Responder con empatía</strong> también es cuidar.
+        </>
+      ),
+    },
+    {
+      texto: (
+        <>
+          <strong>Compartir fotos o datos de otros sin permiso</strong> rompe la confianza. La empatía digital comienza por{" "}
+          <strong>preguntar antes de publicar</strong>.
+        </>
+      ),
+    },
+    {
+      texto: (
+        <>
+          Usar tecnología con conciencia es un acto de <strong>autocuidado</strong> y también de{" "}
+          <strong>cuidado hacia los demás</strong>.
+        </>
+      ),
+    },
+  ];
+  
+  // const imagenes = [
+  //   "https://picsum.photos/300/200?random=1",
+  //   "https://picsum.photos/300/200?random=2",
+  //   "https://picsum.photos/300/200?random=3",
+  //   "https://picsum.photos/300/200?random=4",
+  //   "https://picsum.photos/300/200?random=5",
+  // ];
   
   useEffect(() => {
-    const imagenRandom = imagenes[Math.floor(Math.random() * imagenes.length)];
+    const itemRandom = datos[Math.floor(Math.random() * datos.length)];
     setLoading(true);
   
     MySwal.fire({
       title: 'Cargando Datos...',
-      imageUrl: imagenRandom,
-      imageWidth: 200,
-      imageHeight: 150,
-      imageAlt: 'Imagen de carga',
+      html: itemRandom.texto,
       allowOutsideClick: false,
       allowEscapeKey: false,
       didOpen: () => {
@@ -82,7 +121,6 @@ const imagenes = [
       },
     });
   
-    // Simulación de carga (ajustalo según tu fetch real)
     const timeout = setTimeout(() => {
       Swal.close();
       setLoading(false);
@@ -90,6 +128,8 @@ const imagenes = [
   
     return () => clearTimeout(timeout);
   }, [location.pathname]);
+  
+  
   
 
   // Reiniciar temporizador por actividad
@@ -105,35 +145,36 @@ const imagenes = [
 
   return (
     <>
-     <UserActividad />
+      <UserActividad />
       <Navbar />
-      {!loading && (
-        <Routes>
-          {/* <Route path="/reestablecer" element={<Reestablecer />} /> */}
-          <Route path="/data-user" element={<UserData />} />
-          <Route path="/registro" element={<Register />} />
-          <Route path="/reestablecer" element={<Reestablecer />} />
-          <Route path="/descargas" element={<Descargar />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/socio/dashboard" element={<Socio />} />
-          <Route path="/superadmin/dashboard" element={<Socio />} />
-          <Route path="/admin/dashboard" element={<Socio />} />
-          <Route path="/crear" element={<CrearPost />} />
-          <Route path="/post/:id" element={<PostCompleto />} />
-          <Route path="/editar-publicaciones" element={<MyPost />} />
-          <Route path="/editar/:postId" element={<EditPost />} />
-          <Route path="/contacto" element={<ContactSection />} />
-          <Route path="/crear-actividades" element={<ActividadesList />} />
-          <Route path="/actividades" element={<Actividades />} />
-          <Route path="/congelar" element={<CongelarUsuarios />} />
-          <Route path="/post" element={<Post />} />
-          <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
-          <Route path="/" element={<HomePage />} />
-        </Routes>
-      )}
+  
+      {/* El SweetAlert se muestra sin bloquear el render de las rutas */}
+      <Routes>
+        <Route path="/data-user" element={<UserData />} />
+        <Route path="/registro" element={<Register />} />
+        <Route path="/reestablecer" element={<Reestablecer />} />
+        <Route path="/descargas" element={<Descargar />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/socio/dashboard" element={<Socio />} />
+        <Route path="/superadmin/dashboard" element={<Socio />} />
+        <Route path="/admin/dashboard" element={<Socio />} />
+        <Route path="/crear" element={<CrearPost />} />
+        <Route path="/post/:id" element={<PostCompleto />} />
+        <Route path="/editar-publicaciones" element={<MyPost />} />
+        <Route path="/editar/:postId" element={<EditPost />} />
+        <Route path="/contacto" element={<ContactSection />} />
+        <Route path="/crear-actividades" element={<ActividadesList />} />
+        <Route path="/actividades" element={<Actividades />} />
+        <Route path="/congelar" element={<CongelarUsuarios />} />
+        <Route path="/post" element={<Post />} />
+        <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
+        <Route path="/" element={<HomePage />} />
+      </Routes>
+  
       <Footer />
     </>
   );
+  
 }
 
 function App() {
@@ -145,3 +186,155 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+// import React, { useEffect, useRef, useState } from 'react';
+// import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+// import { AuthProvider, useAuth } from './context/AuthContext';
+// import Swal from "sweetalert2";
+// import withReactContent from "sweetalert2-react-content";
+
+// // Importaciones de páginas y componentes
+// import HomePage from './page/HomePage.js'; 
+// import Post from './page/Post.js'; 
+// import UserData from './page/UserData.js'; 
+// import Actividades from './page/Actividades.js';
+// import ContactSection from './page/ContactSection.js';
+// import Descargar from './page/Descargar.js';
+
+// //COMPONENTES DE ACA PARA ABAJO
+// import Descargo from './components/Descargo.js';
+// import Login from './components/Login';
+// import Register from './components/Register';
+// import Reestablecer from './components/Reestablecer.js';
+// import Socio from './components/Socio.js';
+// import Navbar from './components/Navbar';
+// import Footer from './components/Footer';
+// import CrearPost from './components/CrearPost.js';
+// import ActividadesList from './components/ActividadesList.js';
+// import UserActividad from './components/UserActividad';
+// import PostCompleto from "./components/PostCompleto";
+// import MyPost from "./components/MyPost.js";
+// import EditPost from "./components/EditPost.js";
+// import CongelarUsuarios from "./components/CongelarUsuarios.js";
+
+// const MySwal = withReactContent(Swal);
+
+// function AppContent() {
+//   const { logout, user } = useAuth();
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const timeoutRef = useRef(null);
+//   const [loading, setLoading] = useState(false);
+
+//   // Manejo del logout por inactividad
+//   const handleLogout = () => {
+//     logout();
+//     navigate('/login');
+//   };
+
+//   const resetTimer = () => {
+//     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+//     if (user) {
+//       timeoutRef.current = setTimeout(() => {
+//         handleLogout();
+//       }, 10 * 60 * 1000); // 10 minutos
+//     }
+//   };
+
+
+  
+//   const MySwal = withReactContent(Swal);
+  
+// const imagenes = [
+//   "https://images.unsplash.com/photo-1581093448790-5fc248c636d4", // IA y cerebro
+//   "https://images.unsplash.com/photo-1633158829585-23ba8f7c8caf", // circuitos y redes neuronales
+//   "https://images.unsplash.com/photo-1603791440384-56cd371ee9a7", // robot con fondo azul
+//   "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2", // humano + IA
+//   "https://images.unsplash.com/photo-1612287661052-0cb06d0a8f20", // cerebro digital
+// ];
+
+  
+//   useEffect(() => {
+//     const imagenRandom = imagenes[Math.floor(Math.random() * imagenes.length)];
+//     setLoading(true);
+  
+//     MySwal.fire({
+//       title: 'Cargando Datos...',
+//       imageUrl: imagenRandom,
+//       imageWidth: 200,
+//       imageHeight: 150,
+//       imageAlt: 'Imagen de carga',
+//       allowOutsideClick: false,
+//       allowEscapeKey: false,
+//       didOpen: () => {
+//         Swal.showLoading();
+//       },
+//     });
+  
+//     // Simulación de carga (ajustalo según tu fetch real)
+//     const timeout = setTimeout(() => {
+//       Swal.close();
+//       setLoading(false);
+//     }, 3000);
+  
+//     return () => clearTimeout(timeout);
+//   }, [location.pathname]);
+  
+
+//   // Reiniciar temporizador por actividad
+//   useEffect(() => {
+//     const events = ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+//     events.forEach(event => window.addEventListener(event, resetTimer));
+//     resetTimer();
+//     return () => {
+//       events.forEach(event => window.removeEventListener(event, resetTimer));
+//       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+//     };
+//   }, [user]);
+
+//   return (
+//     <>
+//      <UserActividad />
+//       <Navbar />
+//       {!loading && (
+//         <Routes>
+//           {/* <Route path="/reestablecer" element={<Reestablecer />} /> */}
+//           <Route path="/data-user" element={<UserData />} />
+//           <Route path="/registro" element={<Register />} />
+//           <Route path="/reestablecer" element={<Reestablecer />} />
+//           <Route path="/descargas" element={<Descargar />} />
+//           <Route path="/login" element={<Login />} />
+//           <Route path="/socio/dashboard" element={<Socio />} />
+//           <Route path="/superadmin/dashboard" element={<Socio />} />
+//           <Route path="/admin/dashboard" element={<Socio />} />
+//           <Route path="/crear" element={<CrearPost />} />
+//           <Route path="/post/:id" element={<PostCompleto />} />
+//           <Route path="/editar-publicaciones" element={<MyPost />} />
+//           <Route path="/editar/:postId" element={<EditPost />} />
+//           <Route path="/contacto" element={<ContactSection />} />
+//           <Route path="/crear-actividades" element={<ActividadesList />} />
+//           <Route path="/actividades" element={<Actividades />} />
+//           <Route path="/congelar" element={<CongelarUsuarios />} />
+//           <Route path="/post" element={<Post />} />
+//           <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
+//           <Route path="/" element={<HomePage />} />
+//         </Routes>
+//       )}
+//       <Footer />
+//     </>
+//   );
+// }
+
+// function App() {
+//   return (
+//     <AuthProvider>
+//       <AppContent />
+//     </AuthProvider>
+//   );
+// }
+
+// export default App;
