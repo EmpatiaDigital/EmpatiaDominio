@@ -57,11 +57,11 @@ function AppContent() {
   const MySwal = withReactContent(Swal);
   
   const imagenes = [
-    "https://picsum.photos/300/200?random=1",
-    "https://picsum.photos/300/200?random=2",
-    "https://picsum.photos/300/200?random=3",
-    "https://picsum.photos/300/200?random=4",
-    "https://picsum.photos/300/200?random=5",
+    "https://www.empatiadigital.com.ar/LibroPortada.jpg",
+    "https://www.empatiadigital.com.ar/Portada1.jpg",
+    "https://www.empatiadigital.com.ar/Portada2.jpg",
+    "https://www.empatiadigital.com.ar/Portada3.jpg",
+    "https://www.empatiadigital.com.ar/Portada4.jpg",
   ];
   
   useEffect(() => {
