@@ -1,14 +1,16 @@
-// HomePage.js
-import React, { useEffect, useState } from "react";
+// HomePageOptimizado.js
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/HomePage.css";
 import fondo1 from "../assets/Portada1.jpg";
 import fondo2 from "../assets/Portada2.jpg";
-import fondo3 from "../assets/conexion.jpg";
-import ModalActividades from "../components/ModalActividades";
+import fondo3 from "../assets/Portada3.jpg";
 
-const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
-export default function HomePage() {
+const ModalActividades = lazy(() => import("../components/ModalActividades"));
+
+const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/64/64/64572.png";
+
+export default function HomePageOptimizado() {
   const [posts, setPosts] = useState([]);
   const [cargando, setCargando] = useState(true);
   const navigate = useNavigate();
@@ -19,23 +21,22 @@ export default function HomePage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setSlideIndex((prev) => (prev + 1) % slides.length);
-    }, 5000);
+    }, 8000); // menos frecuencia
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  const fetchPosts = async () => {
-    try {
-      const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
-      const data = await res.json();
-      setPosts(data);
-      setCargando(false);
-    } catch (error) {
-      console.error("Error al obtener posts:", error);
-      setCargando(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
+        const data = await res.json();
+        setPosts(data);
+        setCargando(false);
+      } catch (error) {
+        console.error("Error al obtener posts:", error);
+        setCargando(false);
+      }
+    };
     fetchPosts();
   }, []);
 
@@ -51,24 +52,26 @@ export default function HomePage() {
 
   return (
     <>
-      <ModalActividades />
+      <Suspense fallback={<div>Cargando actividades...</div>}>
+        <ModalActividades />
+      </Suspense>
 
       <div className="homepage">
         <div className="carousel-wrapper">
-          {slides.map((slide, i) => (
-            <img
-              key={i}
-              src={slide}
-              className={`carousel-image ${i === slideIndex ? "active" : ""}`}
-              alt={`Slide ${i}`}
-            />
-          ))}
+          <img
+            src={slides[slideIndex]}
+            className="carousel-image active"
+            alt={`Slide ${slideIndex}`}
+            loading="lazy"
+          />
+
           <button className="carousel-btn left" onClick={handlePrev}>
             ❮
           </button>
           <button className="carousel-btn right" onClick={handleNext}>
             ❯
           </button>
+
           <div className="carousel-dots">
             {slides.map((_, i) => (
               <span
@@ -77,19 +80,17 @@ export default function HomePage() {
               ></span>
             ))}
           </div>
+
           <div className="overlay">
             <h1>Crianza Digital con Empatía</h1>
-            <button className="btn-ver-mas" onClick={() => navigate("/post")}>
-              Ver más
-            </button>
+            <button className="btn-ver-mas" onClick={() => navigate("/post")}>Ver más</button>
           </div>
         </div>
 
         {/* SECCIÓN DE POSTS */}
         <section className="posts-section">
-          <div>
-            <h2 className="titulo-principal">Publicaciones Recientes</h2>
-          </div>
+          <h2 className="titulo-principal">Publicaciones Recientes</h2>
+
           {cargando ? (
             <p>Cargando posts...</p>
           ) : postsToShow.length === 0 ? (
@@ -98,58 +99,38 @@ export default function HomePage() {
             <div className="lista-posts-container">
               {postsToShow.map((post) => {
                 let categoria = "Sentidos";
-
-                if (
-                  Array.isArray(post.categoria) &&
-                  post.categoria.length > 0
-                ) {
-                  const catPrimero = post.categoria[0];
-                  if (
-                    typeof catPrimero === "string" &&
-                    catPrimero.trim() !== ""
-                  ) {
-                    categoria = catPrimero.trim();
-                  }
-                } else if (
-                  typeof post.categoria === "string" &&
-                  post.categoria.trim() !== ""
-                ) {
+                if (Array.isArray(post.categoria) && post.categoria.length > 0) {
+                  categoria = post.categoria[0].trim();
+                } else if (typeof post.categoria === "string" && post.categoria.trim() !== "") {
                   categoria = post.categoria.trim();
                 }
 
-                const backgroundImage = post.portada
-                  ? `url(${post.portada})`
-                  : `url(${fondo1})`;
-
                 return (
-                  <div
-                    key={post._id}
-                    className="post-card"
-                    style={{
-                      backgroundImage: backgroundImage,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                  >
+                  <div key={post._id} className="post-card">
+                    <img
+                      src={post.portada || fondo1}
+                      alt={post.titulo}
+                      className="post-img"
+                      loading="lazy"
+                    />
                     <div className="post-content-overlay-home">
                       <img
                         src={post.avatar || DEFAULT_AVATAR}
                         alt="avatar"
                         className="avatar"
+                        width={40}
+                        height={40}
                       />
                       <div className="autor-div">
                         <h3>{post.titulo}</h3>
                         <h4 className="autor">Por: {post.autor}</h4>
                       </div>
-                      <div>
-                        <button
-                          className="btn-ver-mas"
-                          onClick={() => navigate(`/post/${post._id}`)}
-                        >
-                          Ver más
-                        </button>
-                      </div>
+                      <button
+                        className="btn-ver-mas"
+                        onClick={() => navigate(`/post/${post._id}`)}
+                      >
+                        Ver más
+                      </button>
                     </div>
                   </div>
                 );
