@@ -14,16 +14,19 @@ const PostCompleto = () => {
   const [post, setPost] = useState(null);
   const [cargando, setCargando] = useState(true);
 
-  const currentUrl = `${window.location.origin}/post/${id}`;
-  const mensaje = post
-  ? encodeURIComponent(`\`\`\`${post.titulo}\`\`\` – Leé este post en Empatía Digital: ${currentUrl}`)
+  // const currentUrl = `${window.location.origin}/post/${id}`;
+  // const mensaje = post
+  // ? encodeURIComponent(`\`\`\`${post.titulo}\`\`\` – Leé este post en Empatía Digital: ${currentUrl}`)
+  // : "";
+
+const currentUrl = `${window.location.origin}/post/${id}`; // Esta es la del frontend
+
+const backendPreviewUrl = `https://empatia-dominio-back.vercel.app/post/${id}`; // Esta es la que genera los metadatos
+
+const mensaje = post
+  ? encodeURIComponent(`*${post.titulo}*\n${post.epigrafe || ''}\n\nLeé este post en Empatía Digital: ${backendPreviewUrl}`)
   : "";
 
-  // const backendUrl = "https://empatia-dominio-back.vercel.app/";
-  // const currentUrl = `${backendUrl}/post/${id}`;   const mensaje = post
-  // ? encodeURIComponent(` Leé este post en Empatía Digital: ${currentUrl}`) 
-  // : "";
- 
   useEffect(() => {
     const enlaces = document.querySelectorAll(".post-content a");
 
