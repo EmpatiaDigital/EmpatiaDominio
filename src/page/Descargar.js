@@ -244,7 +244,7 @@ export default function Descargar() {
                         registrarActividad("PDFlibroWhatsApp", item.title)
                       }
                     >
-                      Comprar por WhatsApp
+                      Si deseas colaborar
                     </a>
                   )  : (
                     <a
