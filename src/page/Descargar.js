@@ -235,7 +235,7 @@ export default function Descargar() {
                 {item.type === "libro" ? (
                     <a
                       href={`https://wa.me/543413559329?text=${encodeURIComponent(
-                        `Hola, tengo interés en comprar el libro "${item.title}".`
+                        `Hola, tengo interés en donar para que puedas seguir adelante "${item.title}".`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -333,10 +333,15 @@ export default function Descargar() {
         />
         <div className="tarjeta-autor">
           <p>
-            Creado por <b>Gabriel Reynoso</b>, acompañando a las familias en los
-            desafíos que trae la tecnología. Comparte herramientas desde su
-            experiencia como acompañante terapéutico para convivir mejor con
-            pantallas, redes e inteligencia artificial.
+       Desde 2014 comencé a explorar el mundo digital creando aplicaciones educativas con App Inventor del MIT, y en 2017 leí por primera vez sobre los modelos "transformer", lo que despertó en mí un profundo interés por el desarrollo de la inteligencia artificial. Ese recorrido técnico se fue integrando con mi vocación por el acompañamiento en salud mental.
+
+En 2024 unifiqué mis conocimientos en IA y programación con mi formación como acompañante terapéutico, una modalidad de intervención en salud mental avalada por la Universidad Nacional de Rosario (UNR) y que ejerzo empíricamente desde 2012.
+
+Además, desde 2021 soy diplomado en lógica algorítmica y fundamentos de la programación por Egg Cooperation, lo que me permite tender puentes entre el mundo emocional y el digital.
+
+Trabajé en la gestión de redes sociales para Amfac, una Mutual avocados a diferentes servicios, y también participé en programas radiales en horarios centrales donde abordé temas sobre tecnología, salud mental e inteligencia artificial. Esa experiencia me permitió ofrecer charlas en diferentes centros comunitario y espacios de reflexión sobre el impacto digital en nuestras vidas y el avance de la IA.
+
+Hoy acompaño a personas y familias a tomar decisiones más conscientes frente a la tecnología, combinando calidez humana con comprensión técnica.
           </p>
           <a href="/registro" className="link-suscripcion">
             Suscribite para recibir novedades, posts y más.
