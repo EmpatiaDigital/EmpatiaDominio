@@ -6,6 +6,8 @@ import LogoSentidos from "../assets/Portada2.jpg";
 import "../style/Socio.css";
 import html2canvas from "html2canvas";
 
+
+
 const SocioDashboard = () => {
   const { user } = useAuth();
   const [socioData, setSocioData] = useState(null);
@@ -546,5 +548,6 @@ const SocioDashboard = () => {
 };
 
 export default SocioDashboard;
+
 
 
