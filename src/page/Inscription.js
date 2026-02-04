@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './Inscription.css';
+import '../style/Inscription.css';
 
 const Inscription = () => {
   const [course, setCourse] = useState(null);
