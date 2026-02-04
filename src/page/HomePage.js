@@ -87,7 +87,7 @@ export default function HomePage() {
         {/* SECCIÓN DE POSTS */}
         <section className="posts-section">
           <div>
-            <h2 className="titulo-principal">Publicaciones Recientes</h2>
+            <h2 className="titulo-principal">Publicaciones recientes</h2>
           </div>
           {cargando ? (
             <p>Cargando posts...</p>
@@ -155,3 +155,4 @@ export default function HomePage() {
     </>
   );
 }
+
