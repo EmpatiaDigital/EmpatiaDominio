@@ -64,7 +64,7 @@ export default function Navbar() {
           <Link to="/" onClick={handleLinkClick}>Inicio</Link>
         </li>
         <li>
-          <Link to="/actividades" onClick={handleLinkClick}>Eventos</Link>
+          <Link to="/actividades" onClick={handleLinkClick}>Cursos</Link>
         </li>
         <li>
           <Link to="/contacto" onClick={handleLinkClick}>Contacto</Link>
@@ -133,3 +133,4 @@ export default function Navbar() {
     </nav>
   );
 }
+
