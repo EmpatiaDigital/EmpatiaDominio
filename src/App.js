@@ -166,7 +166,7 @@ function AppContent() {
         <Route path="/contacto" element={<ContactSection />} />
         <Route path="/crear-actividades" element={<ActividadesList />} />
         <Route path="/actividades" element={<Actividades />} />
-        <Route path="/inscription" element={<Incription />} />
+        <Route path="/inscription" element={<Inscription />} />
         <Route path="/congelar" element={<CongelarUsuarios />} />
         <Route path="/post" element={<Post />} />
         <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
