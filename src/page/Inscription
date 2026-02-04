@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../style/Inscription.css';
 
-const InscriptionForm = () => {
+const Inscription = () => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -351,4 +351,4 @@ const InscriptionForm = () => {
   );
 };
 
-export default InscriptionForm;
+export default Inscription;
