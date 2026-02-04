@@ -9,6 +9,8 @@
   --white: #FFFFFF;
   --success: #2ECC71;
   --error: #E74C3C;
+  --warning: #F39C12;
+  --info: #3498DB;
   --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
@@ -30,6 +32,31 @@ body {
 .inscription-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  position: relative;
+}
+
+/* Admin Access Button */
+.admin-access-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+  font-family: 'Syne', sans-serif;
+}
+
+.admin-access-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .loading, .error-message {
@@ -69,6 +96,54 @@ body {
   padding: 2rem;
   max-width: 900px;
   animation: fadeInUp 1s ease;
+}
+
+/* Course Status Badge */
+.course-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(10px);
+  animation: slideDown 0.5s ease;
+}
+
+.course-status-badge.status-success {
+  background: rgba(46, 204, 113, 0.9);
+  color: var(--white);
+}
+
+.course-status-badge.status-warning {
+  background: rgba(243, 156, 18, 0.9);
+  color: var(--white);
+}
+
+.course-status-badge.status-info {
+  background: rgba(52, 152, 219, 0.9);
+  color: var(--white);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--white);
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
 }
 
 .course-title {
@@ -111,12 +186,40 @@ body {
   top: 2rem;
 }
 
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
 .course-info h2 {
   font-family: 'Syne', sans-serif;
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 2rem;
   color: var(--secondary);
+}
+
+/* Active Badge */
+.active-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+  color: var(--white);
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  animation: fadeIn 0.5s ease;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--white);
+  animation: pulse 2s ease infinite;
 }
 
 .info-grid {
@@ -154,9 +257,23 @@ body {
   color: var(--dark);
 }
 
+.low-stock {
+  color: var(--error);
+  font-size: 0.9rem;
+  font-weight: 700;
+  animation: blink 1.5s ease infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 /* Gallery */
 .gallery {
   margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e9ecef;
 }
 
 .gallery h3 {
@@ -184,6 +301,59 @@ body {
 .gallery-image:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Admin Quick Panel */
+.admin-quick-panel {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  color: var(--white);
+}
+
+.admin-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.admin-panel-header span {
+  font-size: 1.5rem;
+}
+
+.admin-panel-header h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.admin-quick-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.quick-action-btn {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: var(--white);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Syne', sans-serif;
+}
+
+.quick-action-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 /* Form Container */
@@ -239,6 +409,12 @@ body {
   box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
 }
 
+.form-group input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .form-group input.error {
   border-color: var(--error);
 }
@@ -269,9 +445,14 @@ body {
   font-weight: 400;
 }
 
-.radio-label:hover {
+.radio-label:hover:not(:has(input:disabled)) {
   border-color: var(--primary);
   background: rgba(255, 107, 53, 0.05);
+}
+
+.radio-label:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .radio-label input[type="radio"] {
@@ -280,6 +461,10 @@ body {
   height: 20px;
   cursor: pointer;
   accent-color: var(--primary);
+}
+
+.radio-label input[type="radio"]:disabled {
+  cursor: not-allowed;
 }
 
 .radio-label input[type="radio"]:checked + span {
@@ -299,6 +484,11 @@ body {
   font-weight: 400;
 }
 
+.checkbox-label:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .checkbox-label input[type="checkbox"] {
   margin-right: 0.75rem;
   margin-top: 0.25rem;
@@ -306,6 +496,10 @@ body {
   height: 20px;
   cursor: pointer;
   accent-color: var(--primary);
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+  cursor: not-allowed;
 }
 
 .checkbox-label span {
@@ -338,6 +532,7 @@ body {
 .btn-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* Alert */
@@ -346,12 +541,21 @@ body {
   border-radius: 12px;
   margin-bottom: 1.5rem;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .alert-error {
   background: #fee;
   color: var(--error);
   border-left: 4px solid var(--error);
+}
+
+.alert-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border-left: 4px solid var(--warning);
 }
 
 /* Success Card */
@@ -424,6 +628,26 @@ body {
   }
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes scaleIn {
   from {
     opacity: 0;
@@ -460,6 +684,13 @@ body {
   .course-title {
     font-size: 2.5rem;
   }
+
+  .admin-access-btn {
+    top: 10px;
+    right: 10px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -482,5 +713,13 @@ body {
   .form-container,
   .course-info {
     padding: 1.5rem;
+  }
+
+  .admin-quick-actions {
+    flex-direction: column;
+  }
+
+  .quick-action-btn {
+    min-width: 100%;
   }
 }
