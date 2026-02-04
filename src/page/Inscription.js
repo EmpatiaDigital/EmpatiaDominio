@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import '../style/Inscription.css';
 
-
 const Inscription = () => {
+  const { user } = useAuth(); // Obtenemos el usuario autenticado
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [editedCourse, setEditedCourse] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -18,6 +21,9 @@ const Inscription = () => {
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Verificar si el usuario es superadmin
+  const isSuperAdmin = user && user.role === 'superadmin';
+
   useEffect(() => {
     fetchActiveCourse();
   }, []);
@@ -28,6 +34,7 @@ const Inscription = () => {
       if (response.ok) {
         const data = await response.json();
         setCourse(data);
+        setEditedCourse(data);
       } else {
         setErrorMessage('No hay cursos disponibles en este momento');
       }
@@ -44,9 +51,55 @@ const Inscription = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    // Limpiar error del campo al modificarlo
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // Manejar cambios en el modo de edición del curso
+  const handleCourseEdit = (e) => {
+    const { name, value } = e.target;
+    
+    // Manejar campos anidados como horarios
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setEditedCourse(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value
+        }
+      }));
+    } else {
+      setEditedCourse(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  // Guardar cambios del curso
+  const handleSaveCourse = async () => {
+    try {
+      const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${course._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Asumiendo que guardas el token
+        },
+        body: JSON.stringify(editedCourse)
+      });
+
+      if (response.ok) {
+        const updatedCourse = await response.json();
+        setCourse(updatedCourse);
+        setEditMode(false);
+        alert('Curso actualizado correctamente');
+      } else {
+        alert('Error al actualizar el curso');
+      }
+    } catch (error) {
+      alert('Error de conexión al actualizar el curso');
     }
   };
 
@@ -164,17 +217,70 @@ const Inscription = () => {
 
   return (
     <div className="inscription-container">
+      {/* Botón de edición para superadmin */}
+      {isSuperAdmin && (
+        <div className="admin-controls">
+          {!editMode ? (
+            <button 
+              className="btn-edit-admin"
+              onClick={() => setEditMode(true)}
+            >
+              ✏️ Editar Curso
+            </button>
+          ) : (
+            <div className="admin-buttons">
+              <button 
+                className="btn-save-admin"
+                onClick={handleSaveCourse}
+              >
+                💾 Guardar Cambios
+              </button>
+              <button 
+                className="btn-cancel-admin"
+                onClick={() => {
+                  setEditMode(false);
+                  setEditedCourse(course);
+                }}
+              >
+                ❌ Cancelar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="course-hero">
         {course.imagenPrincipal && (
           <img 
-            src={course.imagenPrincipal} 
-            alt={course.titulo}
+            src={editMode ? editedCourse.imagenPrincipal : course.imagenPrincipal} 
+            alt={editMode ? editedCourse.titulo : course.titulo}
             className="course-hero-image"
           />
         )}
         <div className="course-hero-overlay">
-          <h1 className="course-title">{course.titulo}</h1>
-          <p className="course-description">{course.descripcion}</p>
+          {editMode ? (
+            <input
+              type="text"
+              name="titulo"
+              value={editedCourse.titulo}
+              onChange={handleCourseEdit}
+              className="edit-title-input"
+            />
+          ) : (
+            <h1 className="course-title">{course.titulo}</h1>
+          )}
+          
+          {editMode ? (
+            <textarea
+              name="descripcion"
+              value={editedCourse.descripcion}
+              onChange={handleCourseEdit}
+              className="edit-description-input"
+              rows="3"
+            />
+          ) : (
+            <p className="course-description">{course.descripcion}</p>
+          )}
         </div>
       </div>
 
@@ -184,23 +290,96 @@ const Inscription = () => {
           <div className="info-grid">
             <div className="info-item">
               <span className="info-label">Duración</span>
-              <span className="info-value">{course.duracion}</span>
+              {editMode ? (
+                <input
+                  type="text"
+                  name="duracion"
+                  value={editedCourse.duracion}
+                  onChange={handleCourseEdit}
+                  className="edit-info-input"
+                />
+              ) : (
+                <span className="info-value">{course.duracion}</span>
+              )}
             </div>
+            
             <div className="info-item">
               <span className="info-label">Modalidad</span>
-              <span className="info-value">{course.modalidad}</span>
+              {editMode ? (
+                <input
+                  type="text"
+                  name="modalidad"
+                  value={editedCourse.modalidad}
+                  onChange={handleCourseEdit}
+                  className="edit-info-input"
+                />
+              ) : (
+                <span className="info-value">{course.modalidad}</span>
+              )}
             </div>
+            
             <div className="info-item">
               <span className="info-label">Precio</span>
-              <span className="info-value">{course.precio}</span>
+              {editMode ? (
+                <input
+                  type="text"
+                  name="precio"
+                  value={editedCourse.precio}
+                  onChange={handleCourseEdit}
+                  className="edit-info-input"
+                />
+              ) : (
+                <span className="info-value">{course.precio}</span>
+              )}
             </div>
-            {course.cuposDisponibles && (
+            
+            {(course.cuposDisponibles || editMode) && (
               <div className="info-item">
                 <span className="info-label">Cupos</span>
-                <span className="info-value">{course.cuposDisponibles} disponibles</span>
+                {editMode ? (
+                  <input
+                    type="number"
+                    name="cuposDisponibles"
+                    value={editedCourse.cuposDisponibles}
+                    onChange={handleCourseEdit}
+                    className="edit-info-input"
+                  />
+                ) : (
+                  <span className="info-value">{course.cuposDisponibles} disponibles</span>
+                )}
               </div>
             )}
           </div>
+
+          {editMode && (
+            <div className="edit-horarios">
+              <h3>Horarios</h3>
+              <div className="horarios-edit-grid">
+                <div>
+                  <label>Mañana:</label>
+                  <input
+                    type="text"
+                    name="horarios.manana"
+                    value={editedCourse.horarios?.manana || ''}
+                    onChange={handleCourseEdit}
+                    placeholder="9:00 - 12:00"
+                    className="edit-info-input"
+                  />
+                </div>
+                <div>
+                  <label>Tarde:</label>
+                  <input
+                    type="text"
+                    name="horarios.tarde"
+                    value={editedCourse.horarios?.tarde || ''}
+                    onChange={handleCourseEdit}
+                    placeholder="14:00 - 17:00"
+                    className="edit-info-input"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {course.imagenesGaleria && course.imagenesGaleria.length > 0 && (
             <div className="gallery">
