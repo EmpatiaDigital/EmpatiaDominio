@@ -11,6 +11,7 @@ import UserData from './page/UserData.js';
 import Actividades from './page/Actividades.js';
 import ContactSection from './page/ContactSection.js';
 import Descargar from './page/Descargar.js';
+import Inscription from './page/Inscription.js';
 
 //COMPONENTES DE ACA PARA ABAJO
 import Descargo from './components/Descargo.js';
@@ -165,6 +166,7 @@ function AppContent() {
         <Route path="/contacto" element={<ContactSection />} />
         <Route path="/crear-actividades" element={<ActividadesList />} />
         <Route path="/actividades" element={<Actividades />} />
+        <Route path="/inscription" element={<Incription />} />
         <Route path="/congelar" element={<CongelarUsuarios />} />
         <Route path="/post" element={<Post />} />
         <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
