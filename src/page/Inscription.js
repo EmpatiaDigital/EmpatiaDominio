@@ -8,6 +8,7 @@ const Inscription = () => {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [editedCourse, setEditedCourse] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -34,8 +35,8 @@ const Inscription = () => {
         const data = await response.json();
         setCourse(data);
         setEditedCourse(data);
+        setImagePreview(data.imagenPrincipal || '');
       } else {
-        // Si no hay curso activo y es superadmin, crear uno temporal
         if (isSuperAdmin) {
           const emptyCourse = {
             titulo: 'Curso sin configurar',
@@ -59,7 +60,6 @@ const Inscription = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      // Si hay error y es superadmin, mostrar curso vacío para editar
       if (isSuperAdmin) {
         const emptyCourse = {
           titulo: 'Curso sin configurar',
@@ -113,6 +113,11 @@ const Inscription = () => {
         ...prev,
         [name]: value
       }));
+      
+      // Actualizar preview de imagen
+      if (name === 'imagenPrincipal') {
+        setImagePreview(value);
+      }
     }
   };
 
@@ -120,7 +125,6 @@ const Inscription = () => {
     try {
       const token = localStorage.getItem('token');
       
-      // Si el curso no tiene _id, es nuevo (crear)
       const isNewCourse = !course._id;
       const url = isNewCourse 
         ? 'https://empatia-dominio-back.vercel.app/api/courses'
@@ -304,6 +308,7 @@ const Inscription = () => {
                 onClick={() => {
                   setEditMode(false);
                   setEditedCourse(course);
+                  setImagePreview(course.imagenPrincipal || '');
                 }}
               >
                 ❌ Cancelar
@@ -314,36 +319,66 @@ const Inscription = () => {
       )}
 
       <div className="course-hero">
-        {(course.imagenPrincipal || editMode) && (
-          <div className="hero-image-wrapper">
-            {editMode ? (
-              <div className="edit-image-section">
-                <input
-                  type="text"
-                  name="imagenPrincipal"
-                  value={editedCourse.imagenPrincipal || ''}
-                  onChange={handleCourseEdit}
-                  placeholder="URL de la imagen principal"
-                  className="edit-image-input"
+        {editMode ? (
+          <div className="edit-image-container">
+            <div className="edit-image-input-group">
+              <label htmlFor="imagenPrincipal" className="edit-image-label">
+                🖼️ URL de Imagen Principal
+              </label>
+              <input
+                type="url"
+                id="imagenPrincipal"
+                name="imagenPrincipal"
+                value={editedCourse.imagenPrincipal || ''}
+                onChange={handleCourseEdit}
+                placeholder="https://ejemplo.com/imagen.jpg"
+                className="edit-image-url-input"
+              />
+              <small className="input-hint">
+                Pega aquí la URL completa de la imagen (debe empezar con http:// o https://)
+              </small>
+            </div>
+            
+            {imagePreview && (
+              <div className="image-preview-container">
+                <p className="preview-label">Vista previa:</p>
+                <img 
+                  src={imagePreview} 
+                  alt="Preview"
+                  className="course-hero-image preview-image"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
                 />
-                {editedCourse.imagenPrincipal && (
-                  <img 
-                    src={editedCourse.imagenPrincipal} 
-                    alt="Preview"
-                    className="course-hero-image"
-                    onError={(e) => e.target.style.display = 'none'}
-                  />
-                )}
+                <div className="image-error-message" style={{display: 'none'}}>
+                  ⚠️ No se pudo cargar la imagen. Verifica que la URL sea correcta.
+                </div>
               </div>
-            ) : course.imagenPrincipal ? (
+            )}
+            
+            {!imagePreview && (
+              <div className="no-image-placeholder">
+                <p>📷 No hay imagen. Agrega una URL arriba para ver la vista previa.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            {course.imagenPrincipal ? (
               <img 
                 src={course.imagenPrincipal} 
                 alt={course.titulo}
                 className="course-hero-image"
               />
-            ) : null}
-          </div>
+            ) : (
+              <div className="no-image-placeholder-public">
+                <div className="placeholder-icon">🎓</div>
+              </div>
+            )}
+          </>
         )}
+        
         <div className="course-hero-overlay">
           {editMode ? (
             <input
