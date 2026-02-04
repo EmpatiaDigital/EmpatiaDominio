@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import '../style/Inscription.css';
 
 const Inscription = () => {
-  const { user } = useAuth(); // Obtenemos el usuario autenticado
+  const { user } = useAuth();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -21,7 +21,6 @@ const Inscription = () => {
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Verificar si el usuario es superadmin
   const isSuperAdmin = user && user.role === 'superadmin';
 
   useEffect(() => {
@@ -36,10 +35,51 @@ const Inscription = () => {
         setCourse(data);
         setEditedCourse(data);
       } else {
-        setErrorMessage('No hay cursos disponibles en este momento');
+        // Si no hay curso activo y es superadmin, crear uno temporal
+        if (isSuperAdmin) {
+          const emptyCourse = {
+            titulo: 'Curso sin configurar',
+            descripcion: 'Edita esta información para configurar el curso',
+            duracion: '0 semanas',
+            modalidad: 'Por definir',
+            precio: '$0',
+            cuposDisponibles: 0,
+            horarios: {
+              manana: '9:00 - 12:00',
+              tarde: '14:00 - 17:00'
+            },
+            imagenPrincipal: '',
+            imagenesGaleria: []
+          };
+          setCourse(emptyCourse);
+          setEditedCourse(emptyCourse);
+        } else {
+          setErrorMessage('No hay cursos disponibles en este momento');
+        }
       }
     } catch (error) {
-      setErrorMessage('Error al cargar información del curso');
+      console.error('Error:', error);
+      // Si hay error y es superadmin, mostrar curso vacío para editar
+      if (isSuperAdmin) {
+        const emptyCourse = {
+          titulo: 'Curso sin configurar',
+          descripcion: 'Edita esta información para configurar el curso',
+          duracion: '0 semanas',
+          modalidad: 'Por definir',
+          precio: '$0',
+          cuposDisponibles: 0,
+          horarios: {
+            manana: '9:00 - 12:00',
+            tarde: '14:00 - 17:00'
+          },
+          imagenPrincipal: '',
+          imagenesGaleria: []
+        };
+        setCourse(emptyCourse);
+        setEditedCourse(emptyCourse);
+      } else {
+        setErrorMessage('Error al cargar información del curso. Por favor, intenta más tarde.');
+      }
     } finally {
       setLoading(false);
     }
@@ -56,11 +96,9 @@ const Inscription = () => {
     }
   };
 
-  // Manejar cambios en el modo de edición del curso
   const handleCourseEdit = (e) => {
     const { name, value } = e.target;
     
-    // Manejar campos anidados como horarios
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setEditedCourse(prev => ({
@@ -78,14 +116,23 @@ const Inscription = () => {
     }
   };
 
-  // Guardar cambios del curso
   const handleSaveCourse = async () => {
     try {
-      const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${course._id}`, {
-        method: 'PUT',
+      const token = localStorage.getItem('token');
+      
+      // Si el curso no tiene _id, es nuevo (crear)
+      const isNewCourse = !course._id;
+      const url = isNewCourse 
+        ? 'https://empatia-dominio-back.vercel.app/api/courses'
+        : `https://empatia-dominio-back.vercel.app/api/courses/${course._id}`;
+      
+      const method = isNewCourse ? 'POST' : 'PUT';
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}` // Asumiendo que guardas el token
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(editedCourse)
       });
@@ -93,13 +140,16 @@ const Inscription = () => {
       if (response.ok) {
         const updatedCourse = await response.json();
         setCourse(updatedCourse);
+        setEditedCourse(updatedCourse);
         setEditMode(false);
-        alert('Curso actualizado correctamente');
+        alert(isNewCourse ? 'Curso creado correctamente' : 'Curso actualizado correctamente');
       } else {
-        alert('Error al actualizar el curso');
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message || 'No se pudo guardar el curso'}`);
       }
     } catch (error) {
-      alert('Error de conexión al actualizar el curso');
+      console.error('Error:', error);
+      alert('Error de conexión al guardar el curso');
     }
   };
 
@@ -144,6 +194,11 @@ const Inscription = () => {
       return;
     }
 
+    if (!course._id) {
+      setErrorMessage('No se puede inscribir a un curso que aún no está configurado');
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -183,15 +238,25 @@ const Inscription = () => {
   if (loading) {
     return (
       <div className="inscription-container">
-        <div className="loading">Cargando...</div>
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>Cargando curso...</p>
+        </div>
       </div>
     );
   }
 
-  if (!course) {
+  if (!course && !isSuperAdmin) {
     return (
       <div className="inscription-container">
-        <div className="error-message">{errorMessage}</div>
+        <div className="no-course-card">
+          <div className="no-course-icon">📚</div>
+          <h2>No hay cursos disponibles</h2>
+          <p>Lo sentimos, actualmente no hay cursos activos para inscripción.</p>
+          <p className="contact-text">
+            Si tienes alguna consulta, puedes contactarnos o volver más tarde.
+          </p>
+        </div>
       </div>
     );
   }
@@ -217,7 +282,6 @@ const Inscription = () => {
 
   return (
     <div className="inscription-container">
-      {/* Botón de edición para superadmin */}
       {isSuperAdmin && (
         <div className="admin-controls">
           {!editMode ? (
@@ -250,12 +314,35 @@ const Inscription = () => {
       )}
 
       <div className="course-hero">
-        {course.imagenPrincipal && (
-          <img 
-            src={editMode ? editedCourse.imagenPrincipal : course.imagenPrincipal} 
-            alt={editMode ? editedCourse.titulo : course.titulo}
-            className="course-hero-image"
-          />
+        {(course.imagenPrincipal || editMode) && (
+          <div className="hero-image-wrapper">
+            {editMode ? (
+              <div className="edit-image-section">
+                <input
+                  type="text"
+                  name="imagenPrincipal"
+                  value={editedCourse.imagenPrincipal || ''}
+                  onChange={handleCourseEdit}
+                  placeholder="URL de la imagen principal"
+                  className="edit-image-input"
+                />
+                {editedCourse.imagenPrincipal && (
+                  <img 
+                    src={editedCourse.imagenPrincipal} 
+                    alt="Preview"
+                    className="course-hero-image"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                )}
+              </div>
+            ) : course.imagenPrincipal ? (
+              <img 
+                src={course.imagenPrincipal} 
+                alt={course.titulo}
+                className="course-hero-image"
+              />
+            ) : null}
+          </div>
         )}
         <div className="course-hero-overlay">
           {editMode ? (
@@ -265,6 +352,7 @@ const Inscription = () => {
               value={editedCourse.titulo}
               onChange={handleCourseEdit}
               className="edit-title-input"
+              placeholder="Título del curso"
             />
           ) : (
             <h1 className="course-title">{course.titulo}</h1>
@@ -277,6 +365,7 @@ const Inscription = () => {
               onChange={handleCourseEdit}
               className="edit-description-input"
               rows="3"
+              placeholder="Descripción del curso"
             />
           ) : (
             <p className="course-description">{course.descripcion}</p>
@@ -297,6 +386,7 @@ const Inscription = () => {
                   value={editedCourse.duracion}
                   onChange={handleCourseEdit}
                   className="edit-info-input"
+                  placeholder="Ej: 8 semanas"
                 />
               ) : (
                 <span className="info-value">{course.duracion}</span>
@@ -312,6 +402,7 @@ const Inscription = () => {
                   value={editedCourse.modalidad}
                   onChange={handleCourseEdit}
                   className="edit-info-input"
+                  placeholder="Ej: Presencial, Online"
                 />
               ) : (
                 <span className="info-value">{course.modalidad}</span>
@@ -327,28 +418,30 @@ const Inscription = () => {
                   value={editedCourse.precio}
                   onChange={handleCourseEdit}
                   className="edit-info-input"
+                  placeholder="Ej: $15,000"
                 />
               ) : (
                 <span className="info-value">{course.precio}</span>
               )}
             </div>
             
-            {(course.cuposDisponibles || editMode) && (
-              <div className="info-item">
-                <span className="info-label">Cupos</span>
-                {editMode ? (
-                  <input
-                    type="number"
-                    name="cuposDisponibles"
-                    value={editedCourse.cuposDisponibles}
-                    onChange={handleCourseEdit}
-                    className="edit-info-input"
-                  />
-                ) : (
-                  <span className="info-value">{course.cuposDisponibles} disponibles</span>
-                )}
-              </div>
-            )}
+            <div className="info-item">
+              <span className="info-label">Cupos</span>
+              {editMode ? (
+                <input
+                  type="number"
+                  name="cuposDisponibles"
+                  value={editedCourse.cuposDisponibles}
+                  onChange={handleCourseEdit}
+                  className="edit-info-input"
+                  placeholder="0"
+                />
+              ) : (
+                <span className="info-value">
+                  {course.cuposDisponibles ? `${course.cuposDisponibles} disponibles` : 'Consultar'}
+                </span>
+              )}
+            </div>
           </div>
 
           {editMode && (
@@ -401,6 +494,12 @@ const Inscription = () => {
         <div className="form-container">
           <h2>Inscribite Ahora</h2>
           
+          {!course._id && !isSuperAdmin && (
+            <div className="alert alert-warning">
+              Las inscripciones estarán disponibles próximamente.
+            </div>
+          )}
+
           {errorMessage && (
             <div className="alert alert-error">
               {errorMessage}
@@ -418,6 +517,7 @@ const Inscription = () => {
                 onChange={handleChange}
                 className={errors.nombre ? 'error' : ''}
                 placeholder="Tu nombre"
+                disabled={!course._id}
               />
               {errors.nombre && <span className="error-text">{errors.nombre}</span>}
             </div>
@@ -432,6 +532,7 @@ const Inscription = () => {
                 onChange={handleChange}
                 className={errors.apellido ? 'error' : ''}
                 placeholder="Tu apellido"
+                disabled={!course._id}
               />
               {errors.apellido && <span className="error-text">{errors.apellido}</span>}
             </div>
@@ -446,6 +547,7 @@ const Inscription = () => {
                 onChange={handleChange}
                 className={errors.email ? 'error' : ''}
                 placeholder="tu@email.com"
+                disabled={!course._id}
               />
               {errors.email && <span className="error-text">{errors.email}</span>}
             </div>
@@ -460,6 +562,7 @@ const Inscription = () => {
                 onChange={handleChange}
                 className={errors.celular ? 'error' : ''}
                 placeholder="+54 341 123 4567"
+                disabled={!course._id}
               />
               {errors.celular && <span className="error-text">{errors.celular}</span>}
             </div>
@@ -474,6 +577,7 @@ const Inscription = () => {
                     value="mañana"
                     checked={formData.turnoPreferido === 'mañana'}
                     onChange={handleChange}
+                    disabled={!course._id}
                   />
                   <span>Mañana ({course.horarios?.manana || '9:00 - 12:00'})</span>
                 </label>
@@ -484,6 +588,7 @@ const Inscription = () => {
                     value="tarde"
                     checked={formData.turnoPreferido === 'tarde'}
                     onChange={handleChange}
+                    disabled={!course._id}
                   />
                   <span>Tarde ({course.horarios?.tarde || '14:00 - 17:00'})</span>
                 </label>
@@ -494,6 +599,7 @@ const Inscription = () => {
                     value="indistinto"
                     checked={formData.turnoPreferido === 'indistinto'}
                     onChange={handleChange}
+                    disabled={!course._id}
                   />
                   <span>Indistinto</span>
                 </label>
@@ -508,6 +614,7 @@ const Inscription = () => {
                   name="aceptaTerminos"
                   checked={formData.aceptaTerminos}
                   onChange={handleChange}
+                  disabled={!course._id}
                 />
                 <span>
                   Acepto los términos y condiciones y el tratamiento de mis datos personales 
@@ -520,7 +627,7 @@ const Inscription = () => {
             <button 
               type="submit" 
               className="btn-submit"
-              disabled={submitting}
+              disabled={submitting || !course._id}
             >
               {submitting ? 'Enviando...' : 'Inscribirme'}
             </button>
