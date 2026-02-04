@@ -8,33 +8,6 @@ import LogoSentidos from "../assets/Portada2.jpg";
 import "../style/Socio.css";
 import html2canvas from "html2canvas";
 
-const provincias = [
-  "Buenos Aires",
-  "CABA",
-  "Catamarca",
-  "Chaco",
-  "Chubut",
-  "Córdoba",
-  "Corrientes",
-  "Entre Ríos",
-  "Formosa",
-  "Jujuy",
-  "La Pampa",
-  "La Rioja",
-  "Mendoza",
-  "Misiones",
-  "Neuquén",
-  "Río Negro",
-  "Salta",
-  "San Juan",
-  "San Luis",
-  "Santa Cruz",
-  "Santa Fe",
-  "Santiago del Estero",
-  "Tierra del Fuego",
-  "Tucumán",
-];
-
 const SocioDashboard = () => {
   const { user } = useAuth();
   const [socioData, setSocioData] = useState(null);
@@ -43,93 +16,21 @@ const SocioDashboard = () => {
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({});
-  const [isAdmin, setIsAdmin] = useState(user?.role === "superadmin");
   const [isNearEndOfMonth, setIsNearEndOfMonth] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
 
-  const handleCaptureCarnet = () => {
-    const carnetElement = document.getElementById("carnet-socio");
+  const MySwal = withReactContent(Swal);
 
-    if (!carnetElement) return;
-
-    const allImgs = carnetElement.querySelectorAll("img");
-    for (let img of allImgs) {
-      if (!img.complete) {
-        img.onload = () => handleCaptureCarnet();
-        return;
-      }
-    }
-
-    html2canvas(carnetElement, {
-      useCORS: true,
-      scale: 2,
-      backgroundColor: "#b30000",
-    }).then((canvas) => {
-      const link = document.createElement("a");
-      link.download = `Carnet Socio:${socioData.nombre}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    });
+  const sendWhatsAppMessage = () => {
+    const phoneNumber = "3462529718";
+    const message =
+      "Hola, me sale un mensaje que dice, estas inhabilitado, ¿a qué se debe, esto?";
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(whatsappUrl, "_blank");
   };
-
-  useEffect(() => {
-    if (user) {
-      const fetchSocioData = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setLoading(false);
-          return;
-        }
-
-        try {
-          const res = await fetch("https://empatia-dominio-back.vercel.app/api/socios/obtener", {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Correo: user.username,
-            },
-          });
-
-          const data = await res.json();
-          if (data.success && data.socio) {
-            setSocioData({
-              ...data.socio,
-              _id: data.socio._id,
-            });
-            setCuotaStatus(data.socio.cuotaEstado);
-            setIsNearEndOfMonth(new Date().getDate() > 25);
-
-            localStorage.setItem("nombre", data.socio.nombre);
-
-            // Set initial editedData
-            setEditedData(data.socio);
-
-            // Set preview image if user has one
-            if (data.socio.avatar) {
-              setPreviewImage(data.socio.avatar);
-            }
-
-            // Verificar si el socio está inactivo y mostrar alerta
-            if (!data.socio.active) {
-              showInactiveAlert();
-            }
-          } else {
-            setError("Socio no encontrado");
-          }
-        } catch (error) {
-          console.error("Error al obtener datos del socio:", error);
-          setError("Ocurrió un error al obtener los datos");
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchSocioData();
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
 
   const showInactiveAlert = () => {
     Swal.fire({
@@ -159,63 +60,105 @@ const SocioDashboard = () => {
     });
   };
 
-  const sendWhatsAppMessage = () => {
-    const phoneNumber = "3462529718";
-    const message =
-      "Hola, me sale un mensaje que dice, estas inhabilitado, ¿a qué se debe, esto?";
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
-    window.open(whatsappUrl, "_blank");
+  useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchSocioData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          "https://empatia-dominio-back.vercel.app/api/socios/obtener",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Correo: user.username,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (data.success && data.socio) {
+          setSocioData({ ...data.socio, _id: data.socio._id });
+          setCuotaStatus(data.socio.cuotaEstado);
+          setIsNearEndOfMonth(new Date().getDate() > 25);
+          setEditedData(data.socio);
+
+          if (data.socio.avatar) {
+            setPreviewImage(data.socio.avatar);
+          }
+
+          if (!data.socio.active) {
+            showInactiveAlert();
+          }
+        } else {
+          setError("Socio no encontrado");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Ocurrió un error al obtener los datos");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSocioData();
+  }, [user, showInactiveAlert]);
+
+  const handleCaptureCarnet = () => {
+    const carnetElement = document.getElementById("carnet-socio");
+    if (!carnetElement) return;
+
+    const imgs = carnetElement.querySelectorAll("img");
+    for (let img of imgs) {
+      if (!img.complete) {
+        img.onload = handleCaptureCarnet;
+        return;
+      }
+    }
+
+    html2canvas(carnetElement, {
+      useCORS: true,
+      scale: 2,
+      backgroundColor: "#b30000",
+    }).then((canvas) => {
+      const link = document.createElement("a");
+      link.download = `Carnet-${socioData.nombre}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
   };
 
   const handleFunctionBlocked = () => {
     Swal.fire({
       title: "Función Bloqueada",
-      html: `
-        <div style="text-align: center;">
-          <p style="color: red; font-weight: bold; margin-bottom: 20px;">
-            Estás inactivo. Contacta con soporte por favor.
-          </p>
-        </div>
-      `,
       icon: "error",
-      showCancelButton: true,
       confirmButtonText: "Enviar WhatsApp",
-      cancelButtonText: "Cerrar",
-      confirmButtonColor: "#25D366",
-      cancelButtonColor: "#d33",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        sendWhatsAppMessage();
-      }
-    });
+    }).then(() => sendWhatsAppMessage());
   };
 
   const handleEditClick = () => {
-    if (!socioData?.active) {
-      handleFunctionBlocked();
-      return;
-    }
+    if (!socioData?.active) return handleFunctionBlocked();
     setIsEditing(true);
     setEditedData({ ...socioData });
   };
 
   const handleChange = (e) => {
-    if (!socioData?.active) {
-      handleFunctionBlocked();
-      return;
-    }
+    if (!socioData?.active) return handleFunctionBlocked();
     setEditedData({ ...editedData, [e.target.name]: e.target.value });
   };
 
   const handleImageChange = (e) => {
-    if (!socioData?.active) {
-      handleFunctionBlocked();
-      return;
-    }
+    if (!socioData?.active) return handleFunctionBlocked();
     const file = e.target.files[0];
     if (file) {
       setSelectedImage(file);
@@ -224,161 +167,37 @@ const SocioDashboard = () => {
   };
 
   const handleSaveChanges = async () => {
-    if (!socioData?.active) {
-      handleFunctionBlocked();
-      return;
-    }
+    if (!socioData?.active) return handleFunctionBlocked();
 
     const token = localStorage.getItem("token");
-    if (!token) {
-      return Swal.fire("Error", "No estás autenticado", "error");
-    }
+    const formData = new FormData();
 
-    try {
-      const formData = new FormData();
+    Object.keys(editedData).forEach((key) =>
+      formData.append(key, editedData[key])
+    );
 
-      // Agregar campos editados
-      for (const key in editedData) {
-        if (Object.hasOwnProperty.call(editedData, key)) {
-          formData.append(key, editedData[key]);
-        }
-      }
+    if (selectedImage) formData.append("avatar", selectedImage);
 
-      // Agregar imagen si hay
-      if (selectedImage) {
-        formData.append("avatar", selectedImage);
-      }
-
-      const res = await fetch("https://empatia-dominio-back.vercel.app/api/socios/editar", {
+    const res = await fetch(
+      "https://empatia-dominio-back.vercel.app/api/socios/editar",
+      {
         method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // No poner Content-Type aquí para que fetch maneje el multipart boundary
-        },
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        Swal.fire("Success", "Datos actualizados correctamente", "success");
-        setIsEditing(false);
-        setSocioData(data.socio); // actualizar con la data nueva del backend
-        setSelectedImage(null);
-        if (data.socio.fotoPerfilUrl) {
-          setPreviewImage(data.socio.fotoPerfilUrl);
-        }
-      } else {
-        Swal.fire("Error", "Ocurrió un error al actualizar los datos", "error");
       }
-    } catch (error) {
-      console.error("Error al editar datos:", error);
-      Swal.fire("Error", "Ocurrió un error en el servidor", "error");
+    );
+
+    const data = await res.json();
+    if (data.success) {
+      setSocioData(data.socio);
+      setIsEditing(false);
+      Swal.fire("Éxito", "Datos actualizados", "success");
     }
   };
 
-
-  
-  const MySwal = withReactContent(Swal);
-  
-  const handleConfirmPasswordChange = () => {
-    if (!socioData?.active) {
-      handleFunctionBlocked();
-      return;
-    }
-  
-    let showPassword = false;
-  
-    Swal.fire({
-      title: "¿Seguro que quieres cambiar la contraseña?",
-      html: `
-        <input id="swal-input-password" type="password" class="swal2-input" placeholder="Nueva contraseña" />
-        <button type="button" id="toggle-password" class="swal2-styled" style="margin-top: 10px;">
-          👁️ Mostrar
-        </button>
-      `,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: "Cambiar",
-      cancelButtonText: "Cancelar",
-      showLoaderOnConfirm: true,
-      didOpen: () => {
-        const passwordInput = Swal.getPopup().querySelector("#swal-input-password");
-        const toggleBtn = Swal.getPopup().querySelector("#toggle-password");
-  
-        toggleBtn.addEventListener("click", () => {
-          showPassword = !showPassword;
-          passwordInput.type = showPassword ? "text" : "password";
-          toggleBtn.textContent = showPassword ? "🙈 Ocultar" : "👁️ Mostrar";
-        });
-      },
-      preConfirm: async () => {
-        const newPassword = Swal.getPopup().querySelector("#swal-input-password").value;
-  
-        if (!newPassword || newPassword.length < 6) {
-          Swal.showValidationMessage("La contraseña debe tener al menos 6 caracteres");
-          return false;
-        }
-  
-        const token = localStorage.getItem("token");
-  
-        try {
-          const res = await fetch("https://empatia-dominio-back.vercel.app/api/cambiar-password-logueado", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ nuevaPassword: newPassword }),
-          });
-  
-          const data = await res.json();
-  
-          if (!res.ok || !data.success) {
-            throw new Error(data.error || "Error al cambiar la contraseña");
-          }
-  
-          return true;
-        } catch (error) {
-          Swal.showValidationMessage(`Error: ${error.message}`);
-        }
-      },
-      allowOutsideClick: () => !Swal.isLoading(),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Éxito", "Contraseña cambiada correctamente", "success");
-      }
-    });
-  };
-  
-  const handleConfirmPayQuota = () => {
-    if (!socioData?.active) {
-      handleFunctionBlocked();
-      return;
-    }
-
-    Swal.fire({
-      title: "¿Confirmas el pago de la cuota?",
-      showCancelButton: true,
-      confirmButtonText: "Pagar cuota",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Success", "Cuota pagada correctamente", "success");
-      }
-    });
-  };
-
-  if (loading) {
-    return <p>Cargando datos del socio...</p>;
-  }
-
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  if (!socioData) {
-    return <p>No se encontraron datos del socio que se busca.</p>;
-  }
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>{error}</p>;
+  if (!socioData) return <p>No hay datos</p>;
 
   return (
     <div className="socio-dashboard-container">
@@ -687,3 +506,4 @@ const SocioDashboard = () => {
 };
 
 export default SocioDashboard;
+
