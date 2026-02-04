@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../style/Inscription.css';
 
+
 const Inscription = () => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
