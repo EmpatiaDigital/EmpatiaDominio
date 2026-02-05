@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import '../styles/SuperAdminCourses.css';
+import '../style/SuperAdminCourses.css';
 
 const SuperAdminCourses = () => {
   const { user } = useAuth();
