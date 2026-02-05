@@ -233,9 +233,20 @@ body {
   max-width: 800px;
   margin: 0 auto;
   line-height: 1.6;
-  color: var(--white);
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(20px);   /* arranca más abajo */
+  animation: fadeUp 0.8s ease-out forwards;
+  animation-delay: 0.3s;
 }
 
+/* Animación */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* Form Wrapper mejorado */
 .form-wrapper {
   max-width: 1400px;
@@ -828,9 +839,21 @@ body {
     margin-bottom: var(--spacing-md);
   }
 
-  .course-description {
-    font-size: clamp(0.9375rem, 3vw, 1.125rem);
+.course-description {
+  font-size: clamp(0.9375rem, 3vw, 1.125rem);
+  color: #ffffff;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
 
   .form-wrapper {
     padding: 0 var(--spacing-md);
