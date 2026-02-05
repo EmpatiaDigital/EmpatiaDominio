@@ -15,6 +15,7 @@ import Inscription from './page/Inscription.js';
 
 //COMPONENTES DE ACA PARA ABAJO
 import Descargo from './components/Descargo.js';
+import SuperAdminCourses from './components/SuperAdminCourses.js';
 import Login from './components/Login';
 import Register from './components/Register';
 import Reestablecer from './components/Reestablecer.js';
@@ -167,6 +168,7 @@ function AppContent() {
         <Route path="/crear-actividades" element={<ActividadesList />} />
         <Route path="/actividades" element={<Actividades />} />
         <Route path="/inscription" element={<Inscription />} />
+        <Route path="/superadmincourses" element={<SuperAdminCourses />} />
         <Route path="/congelar" element={<CongelarUsuarios />} />
         <Route path="/post" element={<Post />} />
         <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
