@@ -103,6 +103,9 @@ export default function Navbar() {
                 <li>
                   <Link to="/data-user" onClick={handleLinkClick}>Data user</Link>
                 </li>
+                <li>
+                  <Link to="/superadmincourses" onClick={handleLinkClick}>Super cursos</Link>
+                </li>
               </>
             )}
             <li className="user group">
@@ -133,6 +136,7 @@ export default function Navbar() {
     </nav>
   );
 }
+
 
 
 
