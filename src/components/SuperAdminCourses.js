@@ -3,7 +3,102 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../style/Superadmincourses.css';
+// Función mejorada para enviar reporte por WhatsApp
+const sendEnrollmentReportWhatsApp = async (courseId) => {
+  try {
+    // Fetch enrollments for the course
+    const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${courseId}/enrollments`);
+    
+    if (!response.ok) {
+      throw new Error('No se pudieron obtener los inscritos');
+    }
 
+    const enrollments = await response.json();
+    const course = courses.find(c => c._id === courseId);
+    
+    if (!course) {
+      throw new Error('Curso no encontrado');
+    }
+
+    // Construir mensaje
+    let message = `📊 *REPORTE DE INSCRIPCIONES*\n\n`;
+    message += `📚 *Curso:* ${course.titulo}\n`;
+    message += `📅 *Fecha:* ${new Date().toLocaleDateString('es-AR')}\n`;
+    message += `⏰ *Hora:* ${new Date().toLocaleTimeString('es-AR')}\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    if (enrollments.length === 0) {
+      message += `ℹ️ *No hay inscripciones registradas*\n\n`;
+    } else {
+      message += `👥 *TOTAL INSCRITOS: ${enrollments.length}*\n\n`;
+      
+      // Agrupar por turno
+      const porTurno = {
+        'mañana': enrollments.filter(e => e.turnoPreferido === 'mañana'),
+        'tarde': enrollments.filter(e => e.turnoPreferido === 'tarde'),
+        'indistinto': enrollments.filter(e => e.turnoPreferido === 'indistinto')
+      };
+
+      // Mostrar inscritos por turno
+      if (porTurno['mañana'].length > 0) {
+        message += `🌅 *TURNO MAÑANA (${porTurno['mañana'].length}):*\n\n`;
+        porTurno['mañana'].forEach((enrollment, index) => {
+          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
+          message += `   📞 ${enrollment.celular}\n`;
+          message += `   📧 ${enrollment.email}\n`;
+          message += `   ✅ ${enrollment.estado.toUpperCase()}\n\n`;
+        });
+      }
+
+      if (porTurno['tarde'].length > 0) {
+        message += `🌆 *TURNO TARDE (${porTurno['tarde'].length}):*\n\n`;
+        porTurno['tarde'].forEach((enrollment, index) => {
+          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
+          message += `   📞 ${enrollment.celular}\n`;
+          message += `   📧 ${enrollment.email}\n`;
+          message += `   ✅ ${enrollment.estado.toUpperCase()}\n\n`;
+        });
+      }
+
+      if (porTurno['indistinto'].length > 0) {
+        message += `🔄 *TURNO INDISTINTO (${porTurno['indistinto'].length}):*\n\n`;
+        porTurno['indistinto'].forEach((enrollment, index) => {
+          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
+          message += `   📞 ${enrollment.celular}\n`;
+          message += `   📧 ${enrollment.email}\n`;
+          message += `   ✅ ${enrollment.estado.toUpperCase()}\n\n`;
+        });
+      }
+    }
+
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    message += `📊 *RESUMEN:*\n`;
+    message += `• Inscritos: ${enrollments.length}\n`;
+    message += `• Cupos disponibles: ${course.cuposDisponibles}\n`;
+    message += `• Precio: ${course.precio}\n`;
+    message += `• Duración: ${course.duracion}\n`;
+    message += `• Modalidad: ${course.modalidad}\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `_Reporte generado automáticamente_`;
+
+    // Codificar mensaje para URL
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappNumber = '5493413559329';
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+    // Abrir WhatsApp
+    window.open(whatsappURL, '_blank');
+
+  } catch (error) {
+    console.error('Error:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: error.message || 'No se pudo generar el reporte de inscripciones',
+      confirmButtonColor: '#667eea'
+    });
+  }
+};
 const SuperAdminCourses = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -266,65 +361,116 @@ const SuperAdminCourses = () => {
   };
 
   // NUEVA FUNCIÓN: Enviar reporte por WhatsApp
-  const sendEnrollmentReportWhatsApp = async (courseId) => {
-    try {
-      // Fetch enrollments for the course
-      const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${courseId}/enrollments`);
-      
-      if (!response.ok) {
-        throw new Error('No se pudieron obtener los inscritos');
-      }
+ // Función mejorada para enviar reporte por WhatsApp
+const sendEnrollmentReportWhatsApp = async (courseId) => {
+  try {
+    // Fetch enrollments for the course
+    const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${courseId}/enrollments`);
+    
+    if (!response.ok) {
+      throw new Error('No se pudieron obtener los inscritos');
+    }
 
-      const enrollments = await response.json();
-      const course = courses.find(c => c._id === courseId);
-      
-      if (!course) {
-        throw new Error('Curso no encontrado');
-      }
+    const enrollments = await response.json();
+    const course = courses.find(c => c._id === courseId);
+    
+    if (!course) {
+      throw new Error('Curso no encontrado');
+    }
 
-      // Construir mensaje
-      let message = `📊 *REPORTE DE INSCRIPCIONES*\n\n`;
-      message += `📚 *Curso:* ${course.titulo}\n`;
-      message += `📅 *Fecha:* ${new Date().toLocaleDateString('es-AR')}\n\n`;
-      message += `━━━━━━━━━━━━━━━━━━\n\n`;
+    // Construir mensaje
+    let message = `📊 *REPORTE DE INSCRIPCIONES*\n\n`;
+    message += `📚 *Curso:* ${course.titulo}\n`;
+    message += `📅 *Fecha:* ${new Date().toLocaleDateString('es-AR')}\n`;
+    message += `⏰ *Hora:* ${new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    if (enrollments.length === 0) {
+      message += `ℹ️ *No hay inscripciones registradas*\n\n`;
+    } else {
+      message += `👥 *TOTAL INSCRITOS: ${enrollments.length}*\n\n`;
       
-      if (enrollments.length === 0) {
-        message += `ℹ️ No hay inscripciones registradas\n\n`;
-      } else {
-        message += `👥 *INSCRITOS (${enrollments.length}):*\n\n`;
-        
-        enrollments.forEach((enrollment, index) => {
-          message += `${index + 1}. ${enrollment.nombre || 'Sin nombre'}\n`;
-          message += `   📞 ${enrollment.telefono || 'Sin teléfono'}\n`;
-          message += `   🕐 Turno: ${enrollment.turno || 'No especificado'}\n`;
-          message += `   📧 ${enrollment.email || 'Sin email'}\n\n`;
+      // Agrupar por turno
+      const porTurno = {
+        'mañana': enrollments.filter(e => e.turnoPreferido === 'mañana'),
+        'tarde': enrollments.filter(e => e.turnoPreferido === 'tarde'),
+        'indistinto': enrollments.filter(e => e.turnoPreferido === 'indistinto')
+      };
+
+      // Mostrar inscritos por turno MAÑANA
+      if (porTurno['mañana'].length > 0) {
+        message += `🌅 *TURNO MAÑANA (${porTurno['mañana'].length}):*\n\n`;
+        porTurno['mañana'].forEach((enrollment, index) => {
+          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
+          message += `   📞 ${enrollment.celular || 'Sin teléfono'}\n`;
+          message += `   📧 ${enrollment.email || 'Sin email'}\n`;
+          message += `   ✅ Estado: ${enrollment.estado.toUpperCase()}\n\n`;
         });
       }
 
-      message += `━━━━━━━━━━━━━━━━━━\n\n`;
-      message += `📈 *CUPOS DISPONIBLES:* ${course.cuposDisponibles}\n`;
-      message += `💰 *Precio:* ${course.precio}\n`;
-      message += `📅 *Duración:* ${course.duracion}\n`;
+      // Mostrar inscritos por turno TARDE
+      if (porTurno['tarde'].length > 0) {
+        message += `🌆 *TURNO TARDE (${porTurno['tarde'].length}):*\n\n`;
+        porTurno['tarde'].forEach((enrollment, index) => {
+          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
+          message += `   📞 ${enrollment.celular || 'Sin teléfono'}\n`;
+          message += `   📧 ${enrollment.email || 'Sin email'}\n`;
+          message += `   ✅ Estado: ${enrollment.estado.toUpperCase()}\n\n`;
+        });
+      }
 
-      // Codificar mensaje para URL
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappNumber = '5493413559329'; // Tu número con código de país
-      const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
-      // Abrir WhatsApp
-      window.open(whatsappURL, '_blank');
-
-    } catch (error) {
-      console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo generar el reporte de inscripciones',
-        confirmButtonColor: '#667eea'
-      });
+      // Mostrar inscritos por turno INDISTINTO
+      if (porTurno['indistinto'].length > 0) {
+        message += `🔄 *TURNO INDISTINTO (${porTurno['indistinto'].length}):*\n\n`;
+        porTurno['indistinto'].forEach((enrollment, index) => {
+          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
+          message += `   📞 ${enrollment.celular || 'Sin teléfono'}\n`;
+          message += `   📧 ${enrollment.email || 'Sin email'}\n`;
+          message += `   ✅ Estado: ${enrollment.estado.toUpperCase()}\n\n`;
+        });
+      }
     }
-  };
 
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    message += `📊 *RESUMEN DEL CURSO:*\n`;
+    message += `• Total inscritos: ${enrollments.length}\n`;
+    message += `• Cupos disponibles: ${course.cuposDisponibles}\n`;
+    message += `• Precio: ${course.precio}\n`;
+    message += `• Duración: ${course.duracion}\n`;
+    message += `• Modalidad: ${course.modalidad}\n\n`;
+    
+    // Estadísticas por turno
+    const mananaCount = enrollments.filter(e => e.turnoPreferido === 'mañana').length;
+    const tardeCount = enrollments.filter(e => e.turnoPreferido === 'tarde').length;
+    const indistintoCount = enrollments.filter(e => e.turnoPreferido === 'indistinto').length;
+    
+    message += `📈 *DISTRIBUCIÓN POR TURNO:*\n`;
+    if (mananaCount > 0) message += `• Mañana: ${mananaCount}\n`;
+    if (tardeCount > 0) message += `• Tarde: ${tardeCount}\n`;
+    if (indistintoCount > 0) message += `• Indistinto: ${indistintoCount}\n`;
+    
+    message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `_Reporte generado automáticamente_\n`;
+    message += `_Sistema de Gestión Empatía Digital_`;
+
+    // Codificar mensaje para URL
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappNumber = '5493413559329';
+    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+    // Abrir WhatsApp
+    window.open(whatsappURL, '_blank');
+
+  } catch (error) {
+    console.error('Error:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: error.message || 'No se pudo generar el reporte de inscripciones',
+      confirmButtonColor: '#667eea'
+    });
+  }
+};
   if (loading) {
     return (
       <div className="loading-container">
