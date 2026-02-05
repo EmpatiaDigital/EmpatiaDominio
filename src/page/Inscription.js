@@ -173,7 +173,7 @@ const Inscription = () => {
         )}
         <div className="course-hero-overlay">
           <h1 className="course-title">{course.titulo}</h1>
-          <p className="course-description">{course.descripcion}</p>
+          
         </div>
       </div>
 
