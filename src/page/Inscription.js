@@ -172,7 +172,7 @@ const Inscription = () => {
           />
         )}
         <div className="course-hero-overlay">
-          <h1 class="course-title">{course.titulo}</h3>
+          <h1 class="course-title">{course.titulo}</h1>
           <h3
           className="course-description"
           style={{ color: "#ffffff" }}>
