@@ -104,7 +104,7 @@ export default function Navbar() {
                   <Link to="/data-user" onClick={handleLinkClick}>Data user</Link>
                 </li>
                 <li>
-                  <Link to="/superadmincourses" onClick={handleLinkClick}>Super cursos</Link>
+                  <Link to="/superadmincourses" onClick={handleLinkClick}>Tutor</Link>
                 </li>
               </>
             )}
@@ -136,6 +136,7 @@ export default function Navbar() {
     </nav>
   );
 }
+
 
 
 
