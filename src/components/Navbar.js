@@ -91,17 +91,17 @@ export default function Navbar() {
                   <Link to="/crear" onClick={handleLinkClick}>Crear</Link>
                 </li>
                 <li>
-                  <Link to="/crear-actividades" onClick={handleLinkClick}>Crear Act.</Link>
+                  <Link to="/crear-actividades" onClick={handleLinkClick}>Act.</Link>
                 </li>
               </>
             )}
             {user.role === "superadmin" && (
               <>
                 <li>
-                  <Link to="/congelar" onClick={handleLinkClick}>Congelar</Link>
+                  <Link to="/congelar" onClick={handleLinkClick}>Freeze</Link>
                 </li>
                 <li>
-                  <Link to="/data-user" onClick={handleLinkClick}>Data user</Link>
+                  <Link to="/data-user" onClick={handleLinkClick}>Data</Link>
                 </li>
                 <li>
                   <Link to="/superadmincourses" onClick={handleLinkClick}>Tutor</Link>
@@ -136,6 +136,7 @@ export default function Navbar() {
     </nav>
   );
 }
+
 
 
 
