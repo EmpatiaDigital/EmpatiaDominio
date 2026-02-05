@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../style/Superadmincourses.css';
 
+
 const SuperAdminCourses = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
