@@ -609,9 +609,13 @@
 }
 
 .price-includes {
-  margin-top: 1rem;
+  list-style: none;
 }
-
+.price-includes {
+  margin-top: 1rem;
+  margin-bottom: var(--spacing-lg);
+  text-align: left;
+}
 .price-item {
   display: flex;
   align-items: flex-start;
@@ -646,35 +650,6 @@
   margin-top: 2px;
   stroke: rgba(255, 255, 255, 0.8);
   flex-shrink: 0;
-}
-
-
-
-.price-includes {
-  list-style: none;
-  margin-bottom: var(--spacing-lg);
-  text-align: left;
-}
-
-.price-includes li {
-  padding: var(--spacing-sm) 0;
-  padding-left: var(--spacing-lg);
-  position: relative;
-  color: var(--color-dark);
-  border-bottom: 1px solid var(--color-gray-light);
-}
-
-.price-includes li:last-child {
-  border-bottom: none;
-}
-
-.price-includes li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--color-primary);
-  font-weight: bold;
-  font-size: 1.25rem;
 }
 
 .cta-button {
