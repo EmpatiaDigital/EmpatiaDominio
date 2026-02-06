@@ -376,6 +376,11 @@ const handleInscription = () => {
           </div>
         </div>
       </section>
+
+      {/* Botón flotante de inscripción */}
+      <button className="floating-inscription-btn" onClick={handleInscription}>
+        Inscribirme
+      </button>
     </div>
   );
 };
