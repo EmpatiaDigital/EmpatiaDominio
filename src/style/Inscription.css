@@ -170,9 +170,10 @@ body {
   z-index: 2;
   text-align: center;
   color: var(--white);
-  padding: var(--spacing-2xl);
+  padding: var(--spacing-2xl) var(--spacing-2xl) var(--spacing-2xl);
   max-width: 1000px;
   animation: fadeInUp 0.8s ease;
+  padding-bottom: 4rem;
 }
 
 /* Sección de Avaladores - NUEVO */
@@ -298,13 +299,13 @@ body {
 /* Form Wrapper mejorado */
 .form-wrapper {
   max-width: 1400px;
-  margin: -100px auto 4rem;
+  margin: -80px auto 4rem;
   padding: 0 var(--spacing-xl);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-2xl);
   position: relative;
-  z-index: 3;
+  z-index: 10;
 }
 
 /* Course Info Card mejorado */
@@ -317,6 +318,7 @@ body {
   position: sticky;
   top: 2rem;
   border: 1px solid var(--gray-200);
+  z-index: 5;
 }
 
 .info-header {
