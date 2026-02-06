@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
-
+import Swal from 'sweetalert2';
 import '../style/Inscription.css';
 import { Link } from "react-router-dom";
 
@@ -10,7 +10,9 @@ const Inscription = () => {
   const [loading, setLoading] = useState(true);
   const [inscriptionsStats, setInscriptionsStats] = useState({
     manana: 0,
-    tarde: 0
+    tarde: 0,
+    indistinto: 0,
+    total: 0
   });
   const [formData, setFormData] = useState({
     nombre: '',
@@ -22,8 +24,7 @@ const Inscription = () => {
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+
 
   // Logos de instituciones que avalan el curso
  const avaladores = [
@@ -57,10 +58,20 @@ const Inscription = () => {
         const data = await response.json();
         setCourse(data);
       } else {
-        setErrorMessage('No hay cursos disponibles en este momento');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No hay cursos disponibles en este momento',
+          confirmButtonColor: '#3085d6'
+        });
       }
     } catch (error) {
-      setErrorMessage('Error al cargar información del curso');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al cargar información del curso',
+        confirmButtonColor: '#3085d6'
+      });
     } finally {
       setLoading(false);
     }
@@ -125,9 +136,14 @@ const Inscription = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage('');
 
     if (!validateForm()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formulario incompleto',
+        text: 'Por favor complete todos los campos requeridos',
+        confirmButtonColor: '#3085d6'
+      });
       return;
     }
 
@@ -148,25 +164,83 @@ const Inscription = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess(true);
-        setFormData({
-          nombre: '',
-          apellido: '',
-          email: '',
-          celular: '',
-          turnoPreferido: '',
-          aceptaTerminos: false
+        // Mostrar modal de éxito con SweetAlert2
+        await Swal.fire({
+          icon: 'success',
+          title: '¡Inscripción Exitosa!',
+          html: `
+            <div style="text-align: left; padding: 20px;">
+              <p style="font-size: 16px; margin-bottom: 15px;">
+                ¡Gracias por inscribirte al curso <strong>${course.titulo}</strong>!
+              </p>
+              <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p style="margin-bottom: 10px;">
+                  Te hemos enviado un <strong>correo electrónico</strong> a <strong>${formData.email}</strong> con:
+                </p>
+                <div style="margin-left: 20px;">
+                  <p style="margin: 5px 0;">✓ Confirmación de tu inscripción</p>
+                  <p style="margin: 5px 0;">✓ Detalles del curso</p>
+                  <p style="margin: 5px 0;">✓ <strong>Enlace al grupo de WhatsApp</strong> del curso</p>
+                </div>
+              </div>
+              <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p style="text-align: center; font-size: 30px; margin: 0;">📱</p>
+                <p style="margin-top: 10px;">
+                  <strong>¡No olvides revisar tu correo y unirte al grupo de WhatsApp!</strong>
+                  <br />
+                  Allí compartiremos información importante sobre el curso.
+                </p>
+              </div>
+              <p style="font-size: 14px; color: #666; text-align: center;">
+                Serás redirigido al inicio en 5 segundos...
+              </p>
+            </div>
+          `,
+          confirmButtonText: 'Volver al Inicio Ahora',
+          confirmButtonColor: '#3085d6',
+          showCancelButton: true,
+          cancelButtonText: 'Nueva Inscripción',
+          cancelButtonColor: '#6c757d',
+          allowOutsideClick: false,
+          timer: 10000,
+          timerProgressBar: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/');
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // Limpiar formulario para nueva inscripción
+            setFormData({
+              nombre: '',
+              apellido: '',
+              email: '',
+              celular: '',
+              turnoPreferido: '',
+              aceptaTerminos: false
+            });
+            setErrors({});
+            fetchInscriptionsStats(); // Actualizar estadísticas
+          }
         });
-        
-        // Redirigir al inicio después de 5 segundos
+
+        // Si no interactúa, redirigir automáticamente después de 10 segundos
         setTimeout(() => {
           navigate('/');
         }, 10000);
       } else {
-        setErrorMessage(data.message || 'Error al enviar la inscripción');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al inscribirse',
+          text: data.message || 'Error al enviar la inscripción. Por favor, intente nuevamente.',
+          confirmButtonColor: '#3085d6'
+        });
       }
     } catch (error) {
-      setErrorMessage('Error de conexión. Por favor, intente nuevamente.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de conexión',
+        text: 'Error de conexión. Por favor, intente nuevamente.',
+        confirmButtonColor: '#3085d6'
+      });
     } finally {
       setSubmitting(false);
     }
@@ -176,20 +250,23 @@ const Inscription = () => {
     navigate('/');
   };
 
-  const handleConocerMas = () => {
- console.log('/')
-  };
-
   // Función para verificar si un turno está lleno
+  // REGLA: Un turno está lleno cuando alcanza la MITAD de los cupos totales
+  // Solo cuenta los inscritos específicos de ese turno (NO cuenta indistinto)
   const isTurnoLleno = (turno) => {
     if (!course || !course.cuposDisponibles) return false;
+    
+    // Calcular la mitad de los cupos (redondeado hacia arriba)
     const mitadCupos = Math.ceil(course.cuposDisponibles / 2);
     
     if (turno === 'manana') {
+      // Solo se bloquea si las inscripciones de MAÑANA llegan a la mitad
       return inscriptionsStats.manana >= mitadCupos;
     } else if (turno === 'tarde') {
+      // Solo se bloquea si las inscripciones de TARDE llegan a la mitad
       return inscriptionsStats.tarde >= mitadCupos;
     }
+    
     return false;
   };
 
@@ -205,6 +282,21 @@ const Inscription = () => {
     return turnoNombre;
   };
 
+  // Función para obtener cupos disponibles por turno
+  const getCuposDisponiblesPorTurno = (turno) => {
+    if (!course || !course.cuposDisponibles) return 0;
+    
+    const mitadCupos = Math.ceil(course.cuposDisponibles / 2);
+    
+    if (turno === 'manana') {
+      return mitadCupos - inscriptionsStats.manana;
+    } else if (turno === 'tarde') {
+      return mitadCupos - inscriptionsStats.tarde;
+    }
+    
+    return 0;
+  };
+
   if (loading) {
     return (
       <div className="inscription-container">
@@ -216,62 +308,7 @@ const Inscription = () => {
   if (!course) {
     return (
       <div className="inscription-container">
-        <div className="error-message">{errorMessage}</div>
-      </div>
-    );
-  }
-
-  if (success) {
-    return (
-      <div className="inscription-container">
-        <div className="success-modal-overlay">
-          <div className="success-modal">
-            <h2>¡Inscripción Exitosa!</h2>
-            <div className="success-content">
-              <p className="success-main-text">
-                ¡Gracias por inscribirte al curso <strong>{course.titulo}</strong>!
-              </p>
-              <div className="email-notification">
-                <p>
-                  Te hemos enviado un <strong>correo electrónico</strong> a <strong>{formData.email}</strong> con:
-                </p>
-              <div className="email-details">
-                <p>✓ Confirmación de tu inscripción</p>
-                <p>✓ Detalles del curso</p>
-               <p>✓ <strong>Enlace al grupo de WhatsApp</strong> del curso</p>
-              </div>
-              </div>
-
-              <div className="whatsapp-reminder">
-                <div className="whatsapp-icon">📱</div>
-                <p>
-                  <strong>¡No olvides revisar tu correo y unirte al grupo de WhatsApp!</strong>
-                  <br />
-                  Allí compartiremos información importante sobre el curso.
-                </p>
-              </div>
-
-              <div className="redirect-notice">
-                <p className="small-text">Serás redirigido al inicio en 5 segundos...</p>
-              </div>
-            </div>
-
-            <div className="success-actions">
-              <button 
-                className="btn-primary"
-                onClick={handleVolverInicio}
-              >
-                Volver al Inicio Ahora
-              </button>
-              <button 
-                className="btn-secondary"
-                onClick={() => setSuccess(false)}
-              >
-                Nueva Inscripción
-              </button>
-            </div>
-          </div>
-        </div>
+        <div className="error-message">No hay cursos disponibles</div>
       </div>
     );
   }
@@ -293,11 +330,18 @@ const Inscription = () => {
             <div className="avaladores-logos">
               {avaladores.map((avalador, index) => (
                 <div key={index} className="avalador-item">
-                  <img 
-                    src={avalador.logo} 
-                    alt={avalador.nombre}
-                    className="avalador-logo"
-                  />
+                  {avalador.logo && (
+                    <img 
+                      src={avalador.logo} 
+                      alt={avalador.nombre}
+                      className="avalador-logo"
+                    />
+                  )}
+                  {!avalador.logo && (
+                    <div className="avalador-placeholder">
+                      {avalador.nombre}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -307,15 +351,12 @@ const Inscription = () => {
           <h4 className="course-description" style={{ color: "#ffffff" }}>
             {course.descripcion}
           </h4>
-                {/* Botón Conocer Más */}
-<Link
-  to="/informacion"
-  className="btn-conocer-mas"
->
-  Conocer Más
-</Link>
+          
+          {/* Botón Conocer Más */}
+          <Link to="/informacion" className="btn-conocer-mas">
+            Conocer Más
+          </Link>
         </div>
-        
       </div>
 
       <div className="form-wrapper">
@@ -336,11 +377,38 @@ const Inscription = () => {
             </div>
             {course.cuposDisponibles && (
               <div className="info-item">
-                <span className="info-label">Cupos</span>
+                <span className="info-label">Cupos Totales</span>
                 <span className="info-value">{course.cuposDisponibles} disponibles</span>
               </div>
             )}
           </div>
+
+          {/* Mostrar estadísticas de cupos por turno */}
+          {course.cuposDisponibles && (
+            <div className="cupos-info">
+              <h3>Disponibilidad por Turno</h3>
+              <div className="cupos-grid">
+                <div className="cupo-item">
+                  <span className="cupo-label">Mañana:</span>
+                  <span className={`cupo-value ${isTurnoLleno('manana') ? 'lleno' : 'disponible'}`}>
+                    {getCuposDisponiblesPorTurno('manana')} de {Math.ceil(course.cuposDisponibles / 2)} disponibles
+                  </span>
+                </div>
+                <div className="cupo-item">
+                  <span className="cupo-label">Tarde:</span>
+                  <span className={`cupo-value ${isTurnoLleno('tarde') ? 'lleno' : 'disponible'}`}>
+                    {getCuposDisponiblesPorTurno('tarde')} de {Math.ceil(course.cuposDisponibles / 2)} disponibles
+                  </span>
+                </div>
+                <div className="cupo-item">
+                  <span className="cupo-label">Indistinto:</span>
+                  <span className="cupo-value disponible">
+                    {inscriptionsStats.indistinto} inscripciones
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {course.imagenesGaleria && course.imagenesGaleria.length > 0 && (
             <div className="gallery">
@@ -361,12 +429,6 @@ const Inscription = () => {
 
         <div className="form-container">
           <h2>Inscribite Ahora</h2>
-          
-          {errorMessage && (
-            <div className="alert alert-error">
-              {errorMessage}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="inscription-form">
             <div className="form-group">
@@ -438,6 +500,11 @@ const Inscription = () => {
                     disabled={isTurnoLleno('manana')}
                   />
                   <span>{renderTurnoText('manana')}</span>
+                  {!isTurnoLleno('manana') && (
+                    <span className="cupos-restantes">
+                      ({getCuposDisponiblesPorTurno('manana')} cupos)
+                    </span>
+                  )}
                 </label>
                 <label className={`radio-label ${isTurnoLleno('tarde') ? 'turno-lleno' : ''}`}>
                   <input
@@ -449,6 +516,11 @@ const Inscription = () => {
                     disabled={isTurnoLleno('tarde')}
                   />
                   <span>{renderTurnoText('tarde')}</span>
+                  {!isTurnoLleno('tarde') && (
+                    <span className="cupos-restantes">
+                      ({getCuposDisponiblesPorTurno('tarde')} cupos)
+                    </span>
+                  )}
                 </label>
                 <label className="radio-label">
                   <input
@@ -459,7 +531,7 @@ const Inscription = () => {
                     onChange={handleChange}
                   />
                   <span>Indistinto</span>
-               </label>
+                </label>
               </div>
               {errors.turnoPreferido && <span className="error-text">{errors.turnoPreferido}</span>}
             </div>
