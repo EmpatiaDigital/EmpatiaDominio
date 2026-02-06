@@ -12,6 +12,7 @@ import Actividades from './page/Actividades.js';
 import ContactSection from './page/ContactSection.js';
 import Descargar from './page/Descargar.js';
 import Inscription from './page/Inscription.js';
+import Informacion from './page/Informacion.js';
 
 //COMPONENTES DE ACA PARA ABAJO
 import Descargo from './components/Descargo.js';
