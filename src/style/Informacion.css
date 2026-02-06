@@ -41,7 +41,7 @@
   padding: 0;
   box-sizing: border-box;
 }
-a {
+.linkCel {
   color: #000;                 
   background-color: rgba(255, 255, 255, 0.15); 
   text-decoration: none;
@@ -75,7 +75,7 @@ a {
   stroke: #ffffff;
 }
 
-a:hover {
+.linkCel:hover {
   background-color: rgba(255, 255, 255, 0.3);
   text-decoration: underline;
 }
