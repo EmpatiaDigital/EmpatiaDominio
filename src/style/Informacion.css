@@ -189,6 +189,7 @@
   height: 4px;
   background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-soft) 100%);
   border-radius: 2px;
+  box-shadow: none;
 }
 
 /* Learning Grid */
@@ -325,12 +326,13 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-md);
-  background-color: var(--color-gray-light);
+  background-color: #FFF3E0;
   border-radius: var(--radius-md);
   margin-top: var(--spacing-md);
   font-family: var(--font-mono);
   font-size: 0.875rem;
   color: var(--color-dark);
+  border-left: 4px solid var(--color-accent);
 }
 
 .disclaimer svg {
