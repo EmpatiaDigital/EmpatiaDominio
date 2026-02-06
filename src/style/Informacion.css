@@ -609,6 +609,48 @@
 }
 
 .price-includes {
+  margin-top: 1rem;
+}
+
+.price-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.price-item svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  stroke: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}    .certificate-list { 
+  margin-top: 1.5rem;
+}
+
+.certificate-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.certificate-item svg {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  stroke: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+
+
+.price-includes {
   list-style: none;
   margin-bottom: var(--spacing-lg);
   text-align: left;
