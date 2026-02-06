@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/informacion.css';
+import '../style/Informacion.css';
 
 const Informacion = () => {
   const [showModal, setShowModal] = useState(false);
