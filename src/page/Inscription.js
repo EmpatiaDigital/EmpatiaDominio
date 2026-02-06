@@ -280,10 +280,10 @@ const Inscription = () => {
               <span className="info-label">Modalidad</span>
               <span className="info-value">{course.modalidad}</span>
             </div>
-            <div className="info-item">
-              <span className="info-label">Precio</span>
-              <span className="info-value">{course.precio}</span>
-            </div>
+            //<div className="info-item">
+              //<span className="info-label">Precio</span>
+              //<span className="info-value">{course.precio}</span>
+            //</div>
             {course.cuposDisponibles && (
               <div className="info-item">
                 <span className="info-label">Cupos</span>
@@ -356,7 +356,7 @@ const Inscription = () => {
                 value={formData.email}
                 onChange={handleChange}
                 className={errors.email ? 'error' : ''}
-                placeholder="tu@email.com"
+                placeholder="@email.com"
               />
               {errors.email && <span className="error-text">{errors.email}</span>}
             </div>
@@ -370,7 +370,7 @@ const Inscription = () => {
                 value={formData.celular}
                 onChange={handleChange}
                 className={errors.celular ? 'error' : ''}
-                placeholder="+54 341 123 4567"
+                placeholder="+54 xxx xxxx xxxx"
               />
               {errors.celular && <span className="error-text">{errors.celular}</span>}
             </div>
@@ -386,7 +386,7 @@ const Inscription = () => {
                     checked={formData.turnoPreferido === 'mañana'}
                     onChange={handleChange}
                   />
-                  <span>Mañana ({course.horarios?.manana || '9:00 - 12:00'})</span>
+                  <span>Mañana ({course.horarios?.manana || ''})</span>
                 </label>
                 <label className="radio-label">
                   <input
@@ -396,18 +396,18 @@ const Inscription = () => {
                     checked={formData.turnoPreferido === 'tarde'}
                     onChange={handleChange}
                   />
-                  <span>Tarde ({course.horarios?.tarde || '14:00 - 17:00'})</span>
+                  <span>Tarde ({course.horarios?.tarde || ''})</span>
                 </label>
-                <label className="radio-label">
-                  <input
-                    type="radio"
-                    name="turnoPreferido"
-                    value="indistinto"
-                    checked={formData.turnoPreferido === 'indistinto'}
-                    onChange={handleChange}
-                  />
-                  <span>Indistinto</span>
-                </label>
+                //<label className="radio-label">
+                  //<input
+                    //type="radio"
+                    //name="turnoPreferido"
+                    //value="indistinto"
+                    //checked={formData.turnoPreferido === 'indistinto'}
+                    //onChange={handleChange}
+                 // />
+                  //<span>Indistinto</span>
+               //</label>
               </div>
               {errors.turnoPreferido && <span className="error-text">{errors.turnoPreferido}</span>}
             </div>
