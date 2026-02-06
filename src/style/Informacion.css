@@ -359,6 +359,7 @@
   padding: var(--spacing-lg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
+  border: 1px solid #E8E8E8;
 }
 
 .certification-badge {
@@ -390,6 +391,7 @@
   font-weight: 600;
   color: var(--color-dark);
   margin-bottom: var(--spacing-sm);
+  text-shadow: none;
 }
 
 .certification-list {
@@ -401,7 +403,7 @@
   padding-left: var(--spacing-md);
   margin-bottom: var(--spacing-xs);
   position: relative;
-  color: var(--color-gray);
+  color: var(--color-dark);
 }
 
 .certification-list li::before {
@@ -414,7 +416,7 @@
 
 .certification-note {
   font-size: 0.95rem;
-  color: var(--color-gray);
+  color: var(--color-dark);
   line-height: 1.6;
 }
 
