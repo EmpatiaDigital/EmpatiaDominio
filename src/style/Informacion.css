@@ -51,6 +51,30 @@ a {
   transition: all 0.3s ease;
 }
 
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  padding: 6px 14px;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.badge-icon {
+  width: 20px;
+  height: 20px;
+  stroke: #ffffff;
+}
+
 a:hover {
   background-color: rgba(255, 255, 255, 0.3);
   text-decoration: underline;
