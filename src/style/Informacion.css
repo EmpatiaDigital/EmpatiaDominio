@@ -42,12 +42,17 @@
   box-sizing: border-box;
 }
 a {
-  color: inherit;
+  color: #000;                 
+  background-color: rgba(255, 255, 255, 0.15); 
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 700;     
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
 }
 
 a:hover {
+  background-color: rgba(255, 255, 255, 0.3);
   text-decoration: underline;
 }
 .informacion-container {
