@@ -6,6 +6,10 @@ const Inscription = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [inscriptionsStats, setInscriptionsStats] = useState({
+    manana: 0,
+    tarde: 0
+  });
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -41,6 +45,7 @@ const Inscription = () => {
 
   useEffect(() => {
     fetchActiveCourse();
+    fetchInscriptionsStats();
   }, []);
 
   const fetchActiveCourse = async () => {
@@ -56,6 +61,18 @@ const Inscription = () => {
       setErrorMessage('Error al cargar información del curso');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchInscriptionsStats = async () => {
+    try {
+      const response = await fetch('https://empatia-dominio-back.vercel.app/api/inscriptions/stats');
+      if (response.ok) {
+        const data = await response.json();
+        setInscriptionsStats(data);
+      }
+    } catch (error) {
+      console.error('Error al cargar estadísticas de inscripciones');
     }
   };
 
@@ -155,6 +172,40 @@ const Inscription = () => {
 
   const handleVolverInicio = () => {
     navigate('/');
+  };
+
+  const handleConocerMas = () => {
+    navigate('/informacion');
+  };
+
+  // Función para verificar si un turno está lleno
+  const isTurnoLleno = (turno) => {
+    if (!course || !course.cuposDisponibles) return false;
+    const mitadCupos = Math.ceil(course.cuposDisponibles / 2);
+    
+    if (turno === 'manana') {
+      return inscriptionsStats.manana >= mitadCupos;
+    } else if (turno === 'tarde') {
+      return inscriptionsStats.tarde >= mitadCupos;
+    }
+    return false;
+  };
+
+  // Función para renderizar el texto del turno
+  const renderTurnoText = (turno, horario) => {
+    const lleno = isTurnoLleno(turno);
+    const turnoNombre = turno === 'manana' ? 'Mañana' : 'Tarde';
+    
+    if (lleno) {
+      return `${turnoNombre} - Cupo Lleno`;
+    }
+    
+    // Solo mostrar horario si existe y no es el valor por defecto
+    if (horario && horario !== '00 - 00') {
+      return `${turnoNombre} (${horario})`;
+    }
+    
+    return turnoNombre;
   };
 
   if (loading) {
@@ -260,11 +311,17 @@ const Inscription = () => {
           </div>
 
           <h1 className="course-title">{course.titulo}</h1>
-          <h3
-            className="course-description"
-            style={{ color: "#ffffff" }}>
+          <h3 className="course-description" style={{ color: "#ffffff" }}>
             {course.descripcion}
           </h3>
+          
+          {/* Botón Conocer Más */}
+          <button 
+            className="btn-conocer-mas"
+            onClick={handleConocerMas}
+          >
+            Conocer Más
+          </button>
         </div>
       </div>
 
@@ -378,25 +435,27 @@ const Inscription = () => {
             <div className="form-group">
               <label>Turno Preferido *</label>
               <div className="radio-group">
-                <label className="radio-label">
+                <label className={`radio-label ${isTurnoLleno('manana') ? 'turno-lleno' : ''}`}>
                   <input
                     type="radio"
                     name="turnoPreferido"
                     value="mañana"
                     checked={formData.turnoPreferido === 'mañana'}
                     onChange={handleChange}
+                    disabled={isTurnoLleno('manana')}
                   />
-                  <span>Mañana ({course.horarios?.manana || '00 - 00'})</span>
+                  <span>{renderTurnoText('manana', course.horarios?.manana)}</span>
                 </label>
-                <label className="radio-label">
+                <label className={`radio-label ${isTurnoLleno('tarde') ? 'turno-lleno' : ''}`}>
                   <input
                     type="radio"
                     name="turnoPreferido"
                     value="tarde"
                     checked={formData.turnoPreferido === 'tarde'}
                     onChange={handleChange}
+                    disabled={isTurnoLleno('tarde')}
                   />
-                  <span>Tarde ({course.horarios?.tarde || '00 - 00'})</span>
+                  <span>{renderTurnoText('tarde', course.horarios?.tarde)}</span>
                 </label>
                 <label className="radio-label">
                   <input
