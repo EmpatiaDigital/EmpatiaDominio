@@ -466,7 +466,7 @@ const handleInscription = () => {
 
       {/* Botón flotante de inscripción */}
       <button className="floating-inscription-btn" onClick={handleInscription}>
-        Inscribirme
+         Inscribirme Ahora
       </button>
     </div>
   );
