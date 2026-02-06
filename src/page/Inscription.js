@@ -280,10 +280,10 @@ const Inscription = () => {
               <span className="info-label">Modalidad</span>
               <span className="info-value">{course.modalidad}</span>
             </div>
-            //<div className="info-item">
-              //<span className="info-label">Precio</span>
-              //<span className="info-value">{course.precio}</span>
-            //</div>
+            <div className="info-item">
+              <span className="info-label">Precio</span>
+              <span className="info-value">{course.precio}</span>
+            </div>
             {course.cuposDisponibles && (
               <div className="info-item">
                 <span className="info-label">Cupos</span>
