@@ -24,7 +24,7 @@ const Inscription = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   // Logos de instituciones que avalan el curso
-  const avaladores = [
+ const avaladores = [
     {
       nombre: 'Institución 1',
       logo: 'data:image/png;base64,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'
@@ -192,17 +192,12 @@ const Inscription = () => {
   };
 
   // Función para renderizar el texto del turno
-  const renderTurnoText = (turno, horario) => {
+  const renderTurnoText = (turno) => {
     const lleno = isTurnoLleno(turno);
     const turnoNombre = turno === 'manana' ? 'Mañana' : 'Tarde';
     
     if (lleno) {
       return `${turnoNombre} - Cupo Lleno`;
-    }
-    
-    // Solo mostrar horario si existe y no es el valor por defecto
-    if (horario && horario !== '00 - 00') {
-      return `${turnoNombre} (${horario})`;
     }
     
     return turnoNombre;
@@ -444,7 +439,7 @@ const Inscription = () => {
                     onChange={handleChange}
                     disabled={isTurnoLleno('manana')}
                   />
-                  <span>{renderTurnoText('manana', course.horarios?.manana)}</span>
+                  <span>{renderTurnoText('manana')}</span>
                 </label>
                 <label className={`radio-label ${isTurnoLleno('tarde') ? 'turno-lleno' : ''}`}>
                   <input
@@ -455,7 +450,7 @@ const Inscription = () => {
                     onChange={handleChange}
                     disabled={isTurnoLleno('tarde')}
                   />
-                  <span>{renderTurnoText('tarde', course.horarios?.tarde)}</span>
+                  <span>{renderTurnoText('tarde')}</span>
                 </label>
                 <label className="radio-label">
                   <input
