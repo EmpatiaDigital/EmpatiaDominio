@@ -92,40 +92,35 @@ body {
 }
 
 
-/* Botón Conocer Más */
+/* Botón Conocer Más - MODIFICADO */
 .btn-conocer-mas {
-  margin-top: 20px;
-  padding: 12px 30px;
+  margin-top: 30px;
+  padding: 14px 40px;
   background-color: #ffffff;
   color: #333;
   border: none;
   border-radius: 8px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 10;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .btn-conocer-mas:hover {
-  background-color: #f0f0f0;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilo para turnos llenos */
-.radio-label.turno-lleno {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.radio-label.turno-lleno input[type="radio"]:disabled {
-  cursor: not-allowed;
-}
-
-.radio-label.turno-lleno span {
-  color: #999;
-  text-decoration: line-through;
+.btn-conocer-mas:active {
+  transform: translateY(-1px);
 }
 
 /* Admin Access Button mejorado */
@@ -202,16 +197,17 @@ body {
   filter: brightness(0.5) contrast(1.1);
 }
 
+
 .course-hero-overlay {
   position: relative;
   z-index: 2;
   text-align: center;
   color: var(--white);
-  padding: var(--spacing-2xl) var(--spacing-2xl) var(--spacing-2xl);
+  padding: var(--spacing-2xl) var(--spacing-2xl) 5rem; /* Aumentado el padding inferior */
   max-width: 1000px;
   animation: fadeInUp 0.8s ease;
-  padding-bottom: 4rem;
 }
+
 
 /* Sección de Avaladores - NUEVO */
 .avaladores-section {
