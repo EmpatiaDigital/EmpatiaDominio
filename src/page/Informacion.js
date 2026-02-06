@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../style/Informacion.css';
+import { useNavigate } from "react-router-dom";
 
 const Informacion = () => {
   const [showModal, setShowModal] = useState(false);
@@ -12,10 +13,11 @@ const Informacion = () => {
     }
   };
 
-  const handleInscription = () => {
-    // Aquí puedes agregar la lógica de inscripción
-    console.log('Iniciar proceso de inscripción');
-  };
+ const navigate = useNavigate();
+ 
+const handleInscription = () => {
+  navigate("/inscription");
+};
 
   return (
     <div className="informacion-container">
@@ -201,7 +203,7 @@ const Informacion = () => {
           </div>
           <p className="price-description">Valor total por las 4 semanas</p>
           <ul className="price-includes">
-            <li>Todas las clases presenciales</li>
+            <li>Todas las clases Online</li>
             <li>Material de estudio</li>
             <li>Certificación avalada</li>
           </ul>
