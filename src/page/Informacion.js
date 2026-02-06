@@ -36,8 +36,7 @@ const handleInscription = () => {
       <section className="hero-section">
         <div className="hero-content">
           <h1 className="hero-title">
-            Introducción a la Inteligencia Artificial
-            <span className="hero-subtitle">y Cuidados Digitales</span>
+            Introducción a la Inteligencia Artificial y Cuidados Digitales
           </h1>
           <p className="hero-description">
             Vivimos en una época donde la tecnología avanza rápido, y muchas veces sentimos que quedamos afuera o no entendemos del todo qué está pasando.
@@ -204,7 +203,7 @@ const handleInscription = () => {
           </div>
           <p className="price-description">Valor total por las 4 semanas</p>
 <div className="price-includes">
-  <p>Todas las clases presenciales</p>
+  <p>Todas las clases Online</p>
   <p>Material de estudio</p>
   <p>Certificación avalada</p>
 </div>
@@ -331,10 +330,22 @@ const handleInscription = () => {
                 Para ejercer tus derechos o realizar consultas sobre el tratamiento de tus datos 
                 personales, podés contactarnos a través de los siguientes medios:
               </p>
-              <p>• Email: [correo de contacto]</p>
-              <p>• Teléfono: [número de contacto]</p>
-              <p>• Dirección: [dirección física si aplica]</p>
-            </div>
+             <p>
+     • Email:{" "}
+      <a href="mailto:empatiadigital2025@gmail.com">
+          empatiadigital2025@gmail.com
+      </a>
+     </p>
+     <p>
+    • Teléfono:{" "}
+      <a
+      href="https://wa.me/5493413559329"
+      target="_blank"
+      rel="noopener noreferrer" >
+          +54 3413 55-9329
+      </a>
+     </p>
+    </div>
 
             <div className="privacy-footer">
               <p>Última actualización: Febrero 2026</p>
