@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../style/Inscription.css';
 
+import '../style/Inscription.css';
+import { Link } from "react-router-dom";
 
 const Inscription = () => {
-  const navigate = useNavigate();
+
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [inscriptionsStats, setInscriptionsStats] = useState({
@@ -160,7 +160,7 @@ const Inscription = () => {
         // Redirigir al inicio después de 5 segundos
         setTimeout(() => {
           navigate('/');
-        }, 5000);
+        }, 10000);
       } else {
         setErrorMessage(data.message || 'Error al enviar la inscripción');
       }
@@ -176,7 +176,7 @@ const Inscription = () => {
   };
 
   const handleConocerMas = () => {
-    navigate('/informacion');
+ consolo.log('/')
   };
 
   // Función para verificar si un turno está lleno
@@ -307,12 +307,12 @@ const Inscription = () => {
             {course.descripcion}
           </h4>
                 {/* Botón Conocer Más */}
-          <button 
-            className="btn-conocer-mas"
-            onClick={handleConocerMas}
-          >
-            Conocer Más
-          </button>
+<Link
+  to="/informacion"
+  className="btn-conocer-mas"
+>
+  Conocer Más
+</Link>
         </div>
         
       </div>
