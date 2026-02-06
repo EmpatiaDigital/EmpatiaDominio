@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 
 import '../style/Inscription.css';
 import { Link } from "react-router-dom";
 
 const Inscription = () => {
-
+  const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [inscriptionsStats, setInscriptionsStats] = useState({
@@ -176,7 +177,7 @@ const Inscription = () => {
   };
 
   const handleConocerMas = () => {
- consolo.log('/')
+ console.log('/')
   };
 
   // Función para verificar si un turno está lleno
