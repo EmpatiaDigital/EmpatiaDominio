@@ -186,11 +186,57 @@ const handleInscription = () => {
           </div>
           <div className="certification-details">
             <h3>Al finalizar el curso se entrega:</h3>
-<div className="certification-list">
-  <p>Certificado de aprobación</p>
-  <p>Avalado por la Comisión Psicosocial Latinoamericana (ONG)</p>
-  <p>Con sellos, firmas y verificación</p>
+
+        <div className="certification-list">
+  <p className="certificate-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 3v18m6-12H6"
+      />
+    </svg>
+    Certificado de aprobación
+  </p>
+
+  <p className="certificate-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 6l7 4-7 4-7-4 7-4z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M5 10v4c0 2.5 7 5 7 5s7-2.5 7-5v-4"
+      />
+    </svg>
+    Avalado por la Comisión Psicosocial Latinoamericana (ONG)
+  </p>
+
+  <p className="certificate-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 12l2 2 4-4"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 3l7 4v6c0 5-7 8-7 8s-7-3-7-8V7l7-4z"
+      />
+    </svg>
+    Con sellos, firmas y verificación
+  </p>
 </div>
+      
             <p className="certification-note">
               Este certificado funciona como constancia formal de capacitación y respaldo curricular.
               <strong> No habilita profesionalmente</strong>, pero acredita la formación realizada y suma valor al CV.
@@ -224,11 +270,52 @@ const handleInscription = () => {
             <span className="amount">35.000</span>
           </div>
           <p className="price-description">Valor total por las 4 semanas</p>
-<div className="price-includes">
-  <p>Todas las clases Online</p>
-  <p>Material de estudio</p>
-  <p>Certificación avalada</p>
+        
+   <div className="price-includes">
+
+  <p className="price-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 6h16M4 12h16M4 18h16"
+      />
+    </svg>
+    Todas las clases Online
+  </p>
+
+  <p className="price-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 6v12m6-6H6"
+      />
+    </svg>
+    Material de estudio
+  </p>
+
+  <p className="price-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 12l2 2 4-4"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 3l7 4v6c0 5-7 8-7 8s-7-3-7-8V7l7-4z"
+      />
+    </svg>
+    Certificación avalada
+  </p>
 </div>
+        
           <button className="cta-button" onClick={handleInscription}>
             Inscribirme Ahora
           </button>
