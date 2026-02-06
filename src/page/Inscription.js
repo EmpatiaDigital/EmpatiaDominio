@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../style/Inscription.css';
 
+
 const Inscription = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
