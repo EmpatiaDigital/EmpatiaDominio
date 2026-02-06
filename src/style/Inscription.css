@@ -91,32 +91,140 @@ body {
   position: relative;
 }
 
+/* Hero Section CORREGIDO */
+.course-hero {
+  position: relative;
+  min-height: 75vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-900);
+  padding: var(--spacing-2xl) 0;
+}
 
-/* Botón Conocer Más - MODIFICADO */
+.course-hero-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.35) contrast(1.1);
+}
+
+.course-hero-overlay {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: var(--white);
+  padding: 3rem var(--spacing-xl);
+  max-width: 1100px;
+  width: 100%;
+  animation: fadeInUp 0.8s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xl);
+}
+
+/* Sección de Avaladores MEJORADA */
+.avaladores-section {
+  width: 100%;
+  animation: slideDown 0.6s ease;
+  margin-bottom: var(--spacing-md);
+}
+
+.avaladores-title {
+  color: var(--white);
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.avaladores-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.avalador-item {
+  background: rgba(255, 255, 255, 0.98);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-base);
+  border: 1px solid var(--gray-200);
+}
+
+.avalador-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary-light);
+}
+
+.avalador-logo {
+  height: 50px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Títulos MEJORADOS */
+.course-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  margin-bottom: var(--spacing-md);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  width: 100%;
+}
+
+.course-description {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 400;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  max-width: 850px;
+  margin: 0 auto;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.95);
+  opacity: 1;
+  width: 100%;
+}
+
+/* Botón Conocer Más CORREGIDO */
 .btn-conocer-mas {
-  margin-top: 30px;
-  padding: 14px 40px;
-  background-color: #ffffff;
-  color: #333;
+  margin-top: var(--spacing-xl);
+  padding: 1rem 2.5rem;
+  background-color: var(--white);
+  color: var(--gray-900);
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: var(--radius-lg);
+  font-size: 1.0625rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-xl);
   position: relative;
   z-index: 10;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
   font-family: 'Space Grotesk', sans-serif;
+  align-self: center;
 }
 
 .btn-conocer-mas:hover {
   background-color: var(--primary);
-  color: #ffffff;
+  color: var(--white);
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-2xl);
 }
 
 .btn-conocer-mas:active {
@@ -176,86 +284,6 @@ body {
   padding: var(--spacing-xl);
 }
 
-/* Hero Section mejorado */
-.course-hero {
-  position: relative;
-  height: 60vh;
-  min-height: 500px;
-  max-height: 700px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gray-900);
-}
-
-.course-hero-image {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: brightness(0.5) contrast(1.1);
-}
-
-
-.course-hero-overlay {
-  position: relative;
-  z-index: 2;
-  text-align: center;
-  color: var(--white);
-  padding: var(--spacing-2xl) var(--spacing-2xl) 5rem; /* Aumentado el padding inferior */
-  max-width: 1000px;
-  animation: fadeInUp 0.8s ease;
-}
-
-
-/* Sección de Avaladores - NUEVO */
-.avaladores-section {
-  margin-bottom: var(--spacing-xl);
-  animation: slideDown 0.6s ease;
-}
-
-.avaladores-title {
-  color: var(--white);
-  font-size: 0.875rem;
-  font-weight: 700;
-  margin-bottom: var(--spacing-lg);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.avaladores-logos {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--spacing-lg);
-  flex-wrap: wrap;
-}
-
-.avalador-item {
-  background: rgba(255, 255, 255, 0.98);
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  transition: all var(--transition-base);
-  border: 1px solid var(--gray-200);
-}
-
-.avalador-item:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--primary-light);
-}
-
-.avalador-logo {
-  height: 50px;
-  width: auto;
-  max-width: 120px;
-  object-fit: contain;
-  display: block;
-}
-
 /* Status Badge mejorado */
 .course-status-badge {
   display: inline-flex;
@@ -294,39 +322,6 @@ body {
   border-radius: 50%;
   background: var(--white);
   animation: pulse 2s ease infinite;
-}
-
-/* Títulos mejorados */
-.course-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: clamp(2rem, 5vw, 4rem);
-  font-weight: 800;
-  margin-bottom: var(--spacing-lg);
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
-
-.course-description {
-  font-size: clamp(1rem, 2vw, 1.25rem);
-  font-weight: 400;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  max-width: 800px;
-  margin: 0 auto;
-  line-height: 1.6;
-  color: #ffffff;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeUp 0.8s ease-out forwards;
-  animation-delay: 0.3s;
-}
-
-/* Animación */
-@keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* Form Wrapper mejorado */
@@ -812,7 +807,7 @@ body {
 }
 
 /* ========================================
-   MODAL DE ÉXITO - NUEVO
+   MODAL DE ÉXITO
    ======================================== */
 
 .success-modal-overlay {
@@ -1062,7 +1057,7 @@ body {
   50% { opacity: 0.4; }
 }
 
-/* Responsive optimizado */
+/* Responsive MEJORADO */
 @media (max-width: 1280px) {
   .form-wrapper {
     max-width: 1200px;
@@ -1100,26 +1095,23 @@ body {
   }
 
   .course-hero {
-    height: 50vh;
-    min-height: 400px;
+    min-height: 70vh;
+    padding: var(--spacing-xl) 0;
   }
 
   .course-hero-overlay {
-    padding: var(--spacing-xl);
+    padding: 2rem var(--spacing-md);
+    gap: var(--spacing-lg);
   }
 
   .course-title {
-    font-size: clamp(1.5rem, 6vw, 2.5rem);
-    margin-bottom: var(--spacing-md);
+    font-size: clamp(1.5rem, 6vw, 2.25rem);
+    margin-bottom: var(--spacing-sm);
   }
 
   .course-description {
     font-size: clamp(0.9375rem, 3vw, 1.125rem);
-    color: #ffffff;
     line-height: 1.6;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeUp 0.8s ease-out forwards;
   }
 
   /* Avaladores responsive */
@@ -1139,6 +1131,15 @@ body {
   .avalador-logo {
     height: 35px;
     max-width: 90px;
+  }
+
+  /* Botón Conocer Más mobile */
+  .btn-conocer-mas {
+    margin-top: var(--spacing-lg);
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    width: auto;
+    display: inline-block;
   }
 
   .form-wrapper {
@@ -1270,6 +1271,12 @@ body {
   .avalador-logo {
     height: 28px;
     max-width: 70px;
+  }
+
+  /* Botón Conocer Más mobile pequeño */
+  .btn-conocer-mas {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
   }
 
   /* Modal mobile pequeño */
