@@ -165,11 +165,11 @@ const handleInscription = () => {
           </div>
           <div className="certification-details">
             <h3>Al finalizar el curso se entrega:</h3>
-            <ul className="certification-list">
-              <li>Certificado de aprobación</li>
-              <li>Avalado por la Comisión Psicosocial Latinoamericana (ONG)</li>
-              <li>Con sellos, firmas y verificación</li>
-            </ul>
+<div className="certification-list">
+  <p>Certificado de aprobación</p>
+  <p>Avalado por la Comisión Psicosocial Latinoamericana (ONG)</p>
+  <p>Con sellos, firmas y verificación</p>
+</div>
             <p className="certification-note">
               Este certificado funciona como constancia formal de capacitación y respaldo curricular.
               <strong> No habilita profesionalmente</strong>, pero acredita la formación realizada y suma valor al CV.
