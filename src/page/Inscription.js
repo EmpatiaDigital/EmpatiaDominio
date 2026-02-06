@@ -311,14 +311,15 @@ const Inscription = () => {
             {course.descripcion}
           </h3>
           
-          {/* Botón Conocer Más */}
+        
+        </div>
+              {/* Botón Conocer Más */}
           <button 
             className="btn-conocer-mas"
             onClick={handleConocerMas}
           >
             Conocer Más
           </button>
-        </div>
       </div>
 
       <div className="form-wrapper">
