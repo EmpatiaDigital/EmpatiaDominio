@@ -33,19 +33,38 @@ const handleInscription = () => {
       </div>
 
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1 className="hero-title">
-            Introducción a la Inteligencia Artificial y Cuidados Digitales
-          </h1>
-          <p className="hero-description">
-            Vivimos en una época donde la tecnología avanza rápido, y muchas veces sentimos que quedamos afuera o no entendemos del todo qué está pasando.
-          </p>
-          <p className="hero-philosophy">
-            Este curso nace con una idea simple: <strong>acercar la Inteligencia Artificial a las personas</strong>, sin miedo, sin tecnicismos y con sentido humano.
-          </p>
-        </div>
-      </section>
+  <section className="hero-section">
+  {/* Sello de certificación */}
+  <div className="hero-badge">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      className="badge-icon"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+      />
+    </svg>
+    <span>Certificación Avalada</span>
+  </div>
+
+  <div className="hero-content">
+    <h1 className="hero-title">
+      Introducción a la Inteligencia Artificial y Cuidados Digitales
+    </h1>
+    <p className="hero-description">
+      Vivimos en una época donde la tecnología avanza rápido, y muchas veces sentimos que quedamos afuera o no entendemos del todo qué está pasando.
+    </p>
+    <p className="hero-philosophy">
+      Este curso nace con una idea simple:{" "}
+      <strong>acercar la Inteligencia Artificial a las personas</strong>, sin miedo, sin tecnicismos y con sentido humano.
+    </p>
+  </div>
+</section>
 
       {/* Course Content */}
       <section className="course-content">
