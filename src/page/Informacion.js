@@ -200,11 +200,11 @@ const Informacion = () => {
             <span className="amount">35.000</span>
           </div>
           <p className="price-description">Valor total por las 4 semanas</p>
-          <ul className="price-includes">
-            <li>Todas las clases presenciales</li>
-            <li>Material de estudio</li>
-            <li>Certificación avalada</li>
-          </ul>
+<div className="price-includes">
+  <p>Todas las clases presenciales</p>
+  <p>Material de estudio</p>
+  <p>Certificación avalada</p>
+</div>
           <button className="cta-button" onClick={handleInscription}>
             Inscribirme Ahora
           </button>
@@ -231,11 +231,11 @@ const Informacion = () => {
             <div className="privacy-block">
               <h3>2. Uso de la Información</h3>
               <p>Los datos personales recopilados serán utilizados exclusivamente para:</p>
-              <p>• Gestionar tu inscripción y participación en el curso</p>
-              <p>• Emitir el certificado de aprobación al finalizar la capacitación</p>
-              <p>• Comunicarte información relevante sobre el desarrollo del curso</p>
-              <p>• Enviarte material educativo y recursos relacionados con el programa</p>
-              <p>• Mantener registros administrativos y estadísticos del curso</p>
+              <p>Gestionar tu inscripción y participación en el curso</p>
+              <p>Emitir el certificado de aprobación al finalizar la capacitación</p>
+              <p>Comunicarte información relevante sobre el desarrollo del curso</p>
+              <p>Enviarte material educativo y recursos relacionados con el programa</p>
+              <p>Mantener registros administrativos y estadísticos del curso</p>
             </div>
 
             <div className="privacy-block">
