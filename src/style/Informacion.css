@@ -51,6 +51,36 @@
   transition: all 0.3s ease;
 }
 
+.floating-inscription-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #ff6b35;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.floating-inscription-btn:hover {
+  background-color: #ff8555;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+}
+
+.floating-inscription-btn:active {
+  transform: translateY(-1px);
+}
 
 .hero-badge {
   display: inline-flex;
