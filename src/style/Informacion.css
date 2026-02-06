@@ -651,18 +651,21 @@
 
 .privacy-block p {
   margin-bottom: var(--spacing-sm);
-  color: var(--color-gray);
+  color: var(--color-dark);
 }
 
 .privacy-block ul {
   margin-left: var(--spacing-md);
   margin-bottom: var(--spacing-sm);
+  background-color: transparent;
+  list-style-type: disc;
 }
 
 .privacy-block li {
   margin-bottom: var(--spacing-xs);
-  color: var(--color-gray);
+  color: var(--color-dark);
   line-height: 1.7;
+  background-color: transparent;
 }
 
 .privacy-footer {
