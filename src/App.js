@@ -16,6 +16,7 @@ import Informacion from './page/Informacion.js';
 
 //COMPONENTES DE ACA PARA ABAJO
 import Descargo from './components/Descargo.js';
+import Cursantes from './components/Cursantes.js';
 import SuperAdminCourses from './components/SuperAdminCourses.js';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -171,6 +172,7 @@ function AppContent() {
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/informacion" element={<Informacion />} />
         <Route path="/superadmincourses" element={<SuperAdminCourses />} />
+        <Route path="/cursantes" element={<Cursantes />} />
         <Route path="/congelar" element={<CongelarUsuarios />} />
         <Route path="/post" element={<Post />} />
         <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
