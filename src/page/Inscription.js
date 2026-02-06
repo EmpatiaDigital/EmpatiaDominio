@@ -225,24 +225,20 @@ const Inscription = () => {
       <div className="inscription-container">
         <div className="success-modal-overlay">
           <div className="success-modal">
-            <div className="success-icon-large">📧</div>
             <h2>¡Inscripción Exitosa!</h2>
-            
             <div className="success-content">
               <p className="success-main-text">
                 ¡Gracias por inscribirte al curso <strong>{course.titulo}</strong>!
               </p>
-              
               <div className="email-notification">
-                <div className="email-icon">✉️</div>
                 <p>
                   Te hemos enviado un <strong>correo electrónico</strong> a <strong>{formData.email}</strong> con:
                 </p>
-                <ul className="email-details">
-                  <li>✓ Confirmación de tu inscripción</li>
-                  <li>✓ Detalles del curso</li>
-                  <li>✓ <strong>Enlace al grupo de WhatsApp</strong> del curso</li>
-                </ul>
+              <div className="email-details">
+                <p>✓ Confirmación de tu inscripción</p>
+                <p>✓ Detalles del curso</p>
+               <p>✓ <strong>Enlace al grupo de WhatsApp</strong> del curso</p>
+              </div>
               </div>
 
               <div className="whatsapp-reminder">
