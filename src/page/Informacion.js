@@ -352,13 +352,13 @@ const handleInscription = () => {
               </p>
              <p>
      • Email:{" "}
-      <a href="mailto:empatiadigital2025@gmail.com">
+      <a className="linkCel" href="mailto:empatiadigital2025@gmail.com">
           empatiadigital2025@gmail.com
       </a>
      </p>
      <p>
     • Teléfono:{" "}
-      <a
+      <a className="linkCel"
       href="https://wa.me/5493413559329"
       target="_blank"
       rel="noopener noreferrer" >
