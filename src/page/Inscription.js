@@ -307,19 +307,18 @@ const Inscription = () => {
           </div>
 
           <h1 className="course-title">{course.titulo}</h1>
-          <h3 className="course-description" style={{ color: "#ffffff" }}>
+          <h4 className="course-description" style={{ color: "#ffffff" }}>
             {course.descripcion}
-          </h3>
-          
-        
-        </div>
-              {/* Botón Conocer Más */}
+          </h4>
+                {/* Botón Conocer Más */}
           <button 
             className="btn-conocer-mas"
             onClick={handleConocerMas}
           >
             Conocer Más
           </button>
+        </div>
+        
       </div>
 
       <div className="form-wrapper">
