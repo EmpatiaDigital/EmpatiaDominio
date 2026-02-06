@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../style/Inscription.css';
 
 const Inscription = () => {
+  const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -16,6 +18,26 @@ const Inscription = () => {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Logos de instituciones que avalan el curso
+  const avaladores = [
+    {
+      nombre: 'Institución 1',
+      logo: 'https://via.placeholder.com/150x80/4A90E2/ffffff?text=Avalador+1'
+    },
+    {
+      nombre: 'Institución 2',
+      logo: 'https://via.placeholder.com/150x80/27AE60/ffffff?text=Avalador+2'
+    },
+    {
+      nombre: 'Institución 3',
+      logo: 'https://via.placeholder.com/150x80/E74C3C/ffffff?text=Avalador+3'
+    },
+    {
+      nombre: 'Institución 4',
+      logo: 'https://via.placeholder.com/150x80/F39C12/ffffff?text=Avalador+4'
+    }
+  ];
 
   useEffect(() => {
     fetchActiveCourse();
@@ -116,6 +138,11 @@ const Inscription = () => {
           turnoPreferido: '',
           aceptaTerminos: false
         });
+        
+        // Redirigir al inicio después de 5 segundos
+        setTimeout(() => {
+          navigate('/');
+        }, 5000);
       } else {
         setErrorMessage(data.message || 'Error al enviar la inscripción');
       }
@@ -124,6 +151,10 @@ const Inscription = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleVolverInicio = () => {
+    navigate('/');
   };
 
   if (loading) {
@@ -145,17 +176,57 @@ const Inscription = () => {
   if (success) {
     return (
       <div className="inscription-container">
-        <div className="success-card">
-          <div className="success-icon">✓</div>
-          <h2>¡Inscripción Exitosa!</h2>
-          <p>Hemos recibido tu solicitud para el curso <strong>{course.titulo}</strong></p>
-          <p>Te contactaremos pronto a tu email <strong>{formData.email}</strong></p>
-          <button 
-            className="btn-primary"
-            onClick={() => setSuccess(false)}
-          >
-            Nueva Inscripción
-          </button>
+        <div className="success-modal-overlay">
+          <div className="success-modal">
+            <div className="success-icon-large">📧</div>
+            <h2>¡Inscripción Exitosa!</h2>
+            
+            <div className="success-content">
+              <p className="success-main-text">
+                ¡Gracias por inscribirte al curso <strong>{course.titulo}</strong>!
+              </p>
+              
+              <div className="email-notification">
+                <div className="email-icon">✉️</div>
+                <p>
+                  Te hemos enviado un <strong>correo electrónico</strong> a <strong>{formData.email}</strong> con:
+                </p>
+                <ul className="email-details">
+                  <li>✓ Confirmación de tu inscripción</li>
+                  <li>✓ Detalles del curso</li>
+                  <li>✓ <strong>Enlace al grupo de WhatsApp</strong> del curso</li>
+                </ul>
+              </div>
+
+              <div className="whatsapp-reminder">
+                <div className="whatsapp-icon">📱</div>
+                <p>
+                  <strong>¡No olvides revisar tu correo y unirte al grupo de WhatsApp!</strong>
+                  <br />
+                  Allí compartiremos información importante sobre el curso.
+                </p>
+              </div>
+
+              <div className="redirect-notice">
+                <p className="small-text">Serás redirigido al inicio en 5 segundos...</p>
+              </div>
+            </div>
+
+            <div className="success-actions">
+              <button 
+                className="btn-primary"
+                onClick={handleVolverInicio}
+              >
+                Volver al Inicio Ahora
+              </button>
+              <button 
+                className="btn-secondary"
+                onClick={() => setSuccess(false)}
+              >
+                Nueva Inscripción
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -172,11 +243,28 @@ const Inscription = () => {
           />
         )}
         <div className="course-hero-overlay">
-          <h1 class="course-title">{course.titulo}</h1>
+          {/* Sección de avaladores */}
+          <div className="avaladores-section">
+            <p className="avaladores-title">Curso avalado por:</p>
+            <div className="avaladores-logos">
+              {avaladores.map((avalador, index) => (
+                <div key={index} className="avalador-item">
+                  <img 
+                    src={avalador.logo} 
+                    alt={avalador.nombre}
+                    className="avalador-logo"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <h1 className="course-title">{course.titulo}</h1>
           <h3
-          className="course-description"
-          style={{ color: "#ffffff" }}>
-          {course.descripcion}</h3>
+            className="course-description"
+            style={{ color: "#ffffff" }}>
+            {course.descripcion}
+          </h3>
         </div>
       </div>
 
