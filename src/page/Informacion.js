@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import '../style/Informacion.css';
-import { useNavigate } from "react-router-dom";
+import '../styles/informacion.css';
 
 const Informacion = () => {
   const [showModal, setShowModal] = useState(false);
@@ -13,11 +12,10 @@ const Informacion = () => {
     }
   };
 
- const navigate = useNavigate();
- 
-const handleInscription = () => {
-  navigate("/inscription");
-};
+  const handleInscription = () => {
+    // Aquí puedes agregar la lógica de inscripción
+    console.log('Iniciar proceso de inscripción');
+  };
 
   return (
     <div className="informacion-container">
@@ -203,7 +201,7 @@ const handleInscription = () => {
           </div>
           <p className="price-description">Valor total por las 4 semanas</p>
           <ul className="price-includes">
-            <li>Todas las clases Online</li>
+            <li>Todas las clases presenciales</li>
             <li>Material de estudio</li>
             <li>Certificación avalada</li>
           </ul>
@@ -233,13 +231,11 @@ const handleInscription = () => {
             <div className="privacy-block">
               <h3>2. Uso de la Información</h3>
               <p>Los datos personales recopilados serán utilizados exclusivamente para:</p>
-              <ul>
-                <li>Gestionar tu inscripción y participación en el curso</li>
-                <li>Emitir el certificado de aprobación al finalizar la capacitación</li>
-                <li>Comunicarte información relevante sobre el desarrollo del curso</li>
-                <li>Enviarte material educativo y recursos relacionados con el programa</li>
-                <li>Mantener registros administrativos y estadísticos del curso</li>
-              </ul>
+              <p>• Gestionar tu inscripción y participación en el curso</p>
+              <p>• Emitir el certificado de aprobación al finalizar la capacitación</p>
+              <p>• Comunicarte información relevante sobre el desarrollo del curso</p>
+              <p>• Enviarte material educativo y recursos relacionados con el programa</p>
+              <p>• Mantener registros administrativos y estadísticos del curso</p>
             </div>
 
             <div className="privacy-block">
@@ -258,23 +254,19 @@ const handleInscription = () => {
                 Tus datos personales no serán vendidos, alquilados ni compartidos con terceros, 
                 excepto en los siguientes casos:
               </p>
-              <ul>
-                <li>Cuando sea necesario para la emisión del certificado avalado por la Comisión Psicosocial Latinoamericana</li>
-                <li>Cuando sea requerido por ley o por autoridades competentes</li>
-                <li>Con tu consentimiento expreso previo</li>
-              </ul>
+              <p>• Cuando sea necesario para la emisión del certificado avalado por la Comisión Psicosocial Latinoamericana</p>
+              <p>• Cuando sea requerido por ley o por autoridades competentes</p>
+              <p>• Con tu consentimiento expreso previo</p>
             </div>
 
             <div className="privacy-block">
               <h3>5. Derechos del Usuario</h3>
               <p>Como titular de tus datos personales, tenés derecho a:</p>
-              <ul>
-                <li>Acceder a la información que tenemos sobre vos</li>
-                <li>Solicitar la corrección de datos incorrectos o desactualizados</li>
-                <li>Solicitar la eliminación de tus datos personales</li>
-                <li>Oponerte al tratamiento de tus datos para fines específicos</li>
-                <li>Revocar tu consentimiento en cualquier momento</li>
-              </ul>
+              <p>• Acceder a la información que tenemos sobre vos</p>
+              <p>• Solicitar la corrección de datos incorrectos o desactualizados</p>
+              <p>• Solicitar la eliminación de tus datos personales</p>
+              <p>• Oponerte al tratamiento de tus datos para fines específicos</p>
+              <p>• Revocar tu consentimiento en cualquier momento</p>
             </div>
 
             <div className="privacy-block">
@@ -336,16 +328,14 @@ const handleInscription = () => {
                 Para ejercer tus derechos o realizar consultas sobre el tratamiento de tus datos 
                 personales, podés contactarnos a través de los siguientes medios:
               </p>
-              <ul>
-                <li>Email: [correo de contacto]</li>
-                <li>Teléfono: [número de contacto]</li>
-                <li>Dirección: [dirección física si aplica]</li>
-              </ul>
+              <p>• Email: [correo de contacto]</p>
+              <p>• Teléfono: [número de contacto]</p>
+              <p>• Dirección: [dirección física si aplica]</p>
             </div>
 
             <div className="privacy-footer">
               <p>Última actualización: Febrero 2026</p>
-              <p>Comisión Psicosocial Latinoamericana - ONG</p>
+              <p>Empatía Digital</p>
             </div>
           </div>
         </div>
