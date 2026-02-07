@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import '../style/Superadmincourses.css';
+import '../style/Superadmincourses.css'; 
+import { Link } from "react-router-dom";
 
 
 const SuperAdminCourses = () => {
@@ -482,6 +483,8 @@ const sendEnrollmentReportWhatsApp = async (courseId) => {
                 >
                   📱 Enviar Reporte
                 </button>
+
+          <Link to="/cursantes" >Post</Link>
               </div>
 
               <div className="image-uploads">
