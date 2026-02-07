@@ -206,7 +206,7 @@ const Inscription = () => {
           timerProgressBar: true
         }).then((result) => {
           if (result.isConfirmed) {
-            navigate('/');
+            navigate('/informacion');
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             // Limpiar formulario para nueva inscripción
             setFormData({
