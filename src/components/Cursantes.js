@@ -1,55 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import '../style/Cursantes.css';
 
-interface Inscripcion {
-  _id: string;
-  nombre: string;
-  apellido: string;
-  email: string;
-  celular: string;
-  turnoPreferido: 'mañana' | 'tarde' | 'indistinto';
-  estado: 'pendiente' | 'confirmado' | 'cancelado';
-  notas: string;
-  createdAt: string;
-  courseId: {
-    _id: string;
-    titulo: string;
-  };
-}
-
-
-interface Estadisticas {
-  totalInscripciones: number;
-  activos: number;
-  confirmados: number;
-  pendientes: number;
-  cancelados: number;
-  cuposDisponibles: number;
-  cuposTotales: number;
-  porTurno: {
-    manana: number;
-    tarde: number;
-    indistinto: number;
-  };
-}
-
-interface FormData {
-  nombre: string;
-  apellido: string;
-  email: string;
-  celular: string;
-  turnoPreferido: 'mañana' | 'tarde' | 'indistinto';
-  notas: string;
-}
-
-const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
-  const [inscripciones, setInscripciones] = useState<Inscripcion[]>([]);
-  const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
-  const [showModal, setShowModal] = useState<boolean>(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<FormData>({
+const Cursantes = ({ cursoId }) => {
+  const [inscripciones, setInscripciones] = useState([]);
+  const [estadisticas, setEstadisticas] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
     email: '',
@@ -62,6 +22,7 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
 
   useEffect(() => {
     cargarDatos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cursoId]);
 
   const cargarDatos = async () => {
@@ -84,14 +45,22 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
       setInscripciones(inscripcionesData.data);
       setEstadisticas(estadisticasData.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+      const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
+      setError(errorMsg);
       console.error('Error al cargar datos:', err);
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al cargar datos',
+        text: errorMsg,
+        confirmButtonColor: '#3085d6'
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -99,7 +68,7 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
@@ -128,14 +97,28 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
 
       await cargarDatos();
       cerrarModal();
-      alert(editingId ? 'Inscripción actualizada exitosamente' : 'Inscripción registrada exitosamente');
+      
+      Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: editingId ? 'Inscripción actualizada exitosamente' : 'Inscripción registrada exitosamente',
+        confirmButtonColor: '#3085d6',
+        timer: 2000
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al guardar inscripción');
+      const errorMsg = err instanceof Error ? err.message : 'Error al guardar inscripción';
       console.error('Error:', err);
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMsg,
+        confirmButtonColor: '#3085d6'
+      });
     }
   };
 
-  const cambiarEstado = async (id: string, estadoActual: string) => {
+  const cambiarEstado = async (id, estadoActual) => {
     const estados = ['pendiente', 'confirmado', 'cancelado'];
     const indexActual = estados.indexOf(estadoActual);
     const nuevoEstado = estados[(indexActual + 1) % estados.length];
@@ -154,15 +137,40 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
       }
 
       await cargarDatos();
-      alert(`Estado cambiado a ${nuevoEstado}`);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Estado actualizado',
+        text: `Estado cambiado a ${nuevoEstado}`,
+        confirmButtonColor: '#3085d6',
+        timer: 1500
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al cambiar estado');
+      const errorMsg = err instanceof Error ? err.message : 'Error al cambiar estado';
       console.error('Error:', err);
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMsg,
+        confirmButtonColor: '#3085d6'
+      });
     }
   };
 
-  const cancelarInscripcion = async (id: string, nombreCompleto: string) => {
-    if (!window.confirm(`¿Estás seguro de que deseas cancelar la inscripción de ${nombreCompleto}? Se liberará un cupo.`)) {
+  const cancelarInscripcion = async (id, nombreCompleto) => {
+    const result = await Swal.fire({
+      title: '¿Cancelar inscripción?',
+      html: `¿Estás seguro de que deseas cancelar la inscripción de <strong>${nombreCompleto}</strong>?<br><br>Se liberará un cupo.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, cancelar',
+      cancelButtonText: 'No, volver'
+    });
+
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -177,15 +185,39 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
 
       const data = await response.json();
       await cargarDatos();
-      alert(`Inscripción cancelada. Cupos disponibles: ${data.cuposDisponibles}`);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Inscripción cancelada',
+        text: `Cupos disponibles: ${data.cuposDisponibles}`,
+        confirmButtonColor: '#3085d6'
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al cancelar inscripción');
+      const errorMsg = err instanceof Error ? err.message : 'Error al cancelar inscripción';
       console.error('Error:', err);
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMsg,
+        confirmButtonColor: '#3085d6'
+      });
     }
   };
 
-  const eliminarInscripcion = async (id: string, nombreCompleto: string) => {
-    if (!window.confirm(`¿ELIMINAR PERMANENTEMENTE la inscripción de ${nombreCompleto}? Esta acción no se puede deshacer.`)) {
+  const eliminarInscripcion = async (id, nombreCompleto) => {
+    const result = await Swal.fire({
+      title: '¿ELIMINAR PERMANENTEMENTE?',
+      html: `¿Eliminar la inscripción de <strong>${nombreCompleto}</strong>?<br><br><span style="color: red;">Esta acción NO se puede deshacer.</span>`,
+      icon: 'error',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -199,14 +231,28 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
       }
 
       await cargarDatos();
-      alert(`${nombreCompleto} eliminado permanentemente`);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Eliminado',
+        text: `${nombreCompleto} eliminado permanentemente`,
+        confirmButtonColor: '#3085d6',
+        timer: 2000
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al eliminar inscripción');
+      const errorMsg = err instanceof Error ? err.message : 'Error al eliminar inscripción';
       console.error('Error:', err);
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMsg,
+        confirmButtonColor: '#3085d6'
+      });
     }
   };
 
-  const editarInscripcion = (inscripcion: Inscripcion) => {
+  const editarInscripcion = (inscripcion) => {
     setEditingId(inscripcion._id);
     setFormData({
       nombre: inscripcion.nombre,
@@ -243,10 +289,24 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
       }
 
       await cargarDatos();
-      alert('Cupos sincronizados correctamente');
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Sincronizado',
+        text: 'Cupos sincronizados correctamente',
+        confirmButtonColor: '#3085d6',
+        timer: 1500
+      });
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error al sincronizar');
+      const errorMsg = err instanceof Error ? err.message : 'Error al sincronizar';
       console.error('Error:', err);
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: errorMsg,
+        confirmButtonColor: '#3085d6'
+      });
     }
   };
 
