@@ -17,6 +17,7 @@ interface Inscripcion {
   };
 }
 
+
 interface Estadisticas {
   totalInscripciones: number;
   activos: number;
