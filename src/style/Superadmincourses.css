@@ -116,6 +116,7 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
+  color: #1a1a2e; /* AGREGADO: texto oscuro */
 }
 
 .active-course-banner::before {
@@ -215,8 +216,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 650px; /* AUMENTADO: más altura para evitar compresión */
-  padding-bottom: 1.5rem; /* AGREGADO: padding inferior para los botones */
+  min-height: 800px; /* AUMENTADO MUCHO MÁS: para PC */
+  padding-bottom: 2rem; /* AUMENTADO: más padding inferior */
+  color: #1a1a2e; /* AGREGADO: color de texto oscuro por defecto */
 }
 
 .course-card:hover {
@@ -267,12 +269,13 @@
 }
 
 .course-content {
-  padding: 1.5rem;
+  padding: 2rem; /* AUMENTADO: más padding */
   padding-bottom: 0; /* AGREGADO: sin padding inferior aquí */
   display: flex;
   flex-direction: column;
   flex-grow: 1; /* AGREGADO: ocupa el espacio disponible */
   overflow: hidden; /* AGREGADO: para que el contenido no se desborde */
+  gap: 1.5rem; /* AGREGADO: espacio entre elementos */
 }
 
 .course-content h3 {
@@ -286,21 +289,23 @@
 .course-description {
   color: #64748b;
   font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
+  margin-bottom: 2rem; /* AUMENTADO */
+  line-height: 1.8; /* AUMENTADO: más espacio entre líneas */
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4; /* AUMENTADO: permitir más líneas */
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex-shrink: 0;
+  min-height: 80px; /* AGREGADO: altura mínima */
 }
 
 .course-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 1.5rem; /* AUMENTADO */
+  margin-bottom: 2rem; /* AUMENTADO */
   flex-shrink: 0;
+  padding: 1rem 0; /* AGREGADO: padding vertical */
 }
 
 .detail-item {
@@ -326,26 +331,27 @@
 /* Course Actions - CORREGIDO PARA VISIBILIDAD */
 .course-actions {
   display: flex;
-  gap: 0.75rem;
-  margin: 1rem 1.5rem 0 1.5rem; /* MODIFICADO: margin horizontal */
-  padding-top: 1rem; /* AGREGADO: espacio superior */
-  padding-bottom: 0.5rem; /* AGREGADO: espacio inferior */
+  gap: 1rem; /* AUMENTADO */
+  margin: 1.5rem 2rem 0 2rem; /* AUMENTADO: más margen */
+  padding-top: 1.5rem; /* AUMENTADO: más espacio superior */
+  padding-bottom: 1rem; /* AUMENTADO: espacio inferior */
   flex-shrink: 0;
-  width: calc(100% - 3rem); /* AGREGADO: para que respete los márgenes */
+  width: calc(100% - 4rem); /* AJUSTADO: para nuevos márgenes */
 }
 
 .course-actions button {
   flex: 1;
-  padding: 0.875rem 0.5rem; /* AUMENTADO padding vertical */
+  padding: 1rem 0.75rem; /* AUMENTADO: más padding */
   border: none;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1rem; /* AUMENTADO */
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Poppins', sans-serif;
   white-space: nowrap;
-  min-height: 44px; /* AGREGADO: altura mínima para fácil clic */
+  min-height: 50px; /* AUMENTADO: mayor altura mínima */
+  line-height: 1.4; /* AGREGADO: mejor espaciado de texto */
 }
 
 .btn-toggle {
@@ -386,26 +392,26 @@
 /* Image Upload - CORREGIDO */
 .image-upload-section {
   display: flex;
-  gap: 0.75rem;
-  margin: 0 1.5rem 1rem 1.5rem; /* MODIFICADO: márgenes laterales */
-  padding-top: 1rem;
+  gap: 1rem; /* AUMENTADO */
+  margin: 0 2rem 1.5rem 2rem; /* AUMENTADO: más márgenes */
+  padding-top: 1.5rem; /* AUMENTADO */
   border-top: 2px solid #f1f5f9;
   flex-shrink: 0;
-  width: calc(100% - 3rem); /* AGREGADO: para que respete los márgenes */
+  width: calc(100% - 4rem); /* AJUSTADO: para nuevos márgenes */
 }
 
 .upload-label {
   flex: 1;
-  padding: 0.875rem; /* AUMENTADO padding */
+  padding: 1rem; /* AUMENTADO */
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border-radius: 10px;
   text-align: center;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.9rem; /* AUMENTADO */
   cursor: pointer;
   transition: all 0.3s ease;
-  min-height: 44px; /* AGREGADO: altura mínima para fácil clic */
+  min-height: 50px; /* AUMENTADO: mayor altura */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -427,6 +433,7 @@
   background: white;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  color: #1a1a2e; /* AGREGADO: texto oscuro */
 }
 
 .empty-icon {
@@ -481,6 +488,7 @@
   max-height: 90vh;
   overflow-y: auto;
   animation: slideUp 0.3s ease;
+  color: #1a1a2e; /* AGREGADO: texto oscuro */
 }
 
 @keyframes slideUp {
@@ -650,7 +658,7 @@
   }
   
   .course-card {
-    min-height: 580px;
+    min-height: 750px; /* AJUSTADO: un poco menos que PC */
   }
 }
 
