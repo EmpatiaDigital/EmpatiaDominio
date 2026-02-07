@@ -224,7 +224,7 @@ const Inscription = () => {
 
         // Si no interactúa, redirigir automáticamente después de 10 segundos
         setTimeout(() => {
-          navigate('/');
+          navigate('/informacion');
         }, 10000);
       } else {
         Swal.fire({
