@@ -5,12 +5,6 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem;
   font-family: 'Poppins', sans-serif;
-  color: white; /* AGREGADO: color base blanco */
-}
-
-/* Asegurar que todos los textos directos sean blancos */
-.superadmin-courses-container > * {
-  color: white;
 }
 
 .btn-whatsapp {
@@ -215,13 +209,14 @@
 .course-card {
   background: white;
   border-radius: 20px;
-  overflow: visible; /* CAMBIADO: permite que los botones no se corten */
+  overflow: hidden; /* CAMBIADO: para que el contenido no se desborde */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 600px; /* AGREGADO: altura mínima para evitar compresión */
+  min-height: 650px; /* AUMENTADO: más altura para evitar compresión */
+  padding-bottom: 1.5rem; /* AGREGADO: padding inferior para los botones */
 }
 
 .course-card:hover {
@@ -273,9 +268,11 @@
 
 .course-content {
   padding: 1.5rem;
+  padding-bottom: 0; /* AGREGADO: sin padding inferior aquí */
   display: flex;
   flex-direction: column;
   flex-grow: 1; /* AGREGADO: ocupa el espacio disponible */
+  overflow: hidden; /* AGREGADO: para que el contenido no se desborde */
 }
 
 .course-content h3 {
@@ -330,10 +327,11 @@
 .course-actions {
   display: flex;
   gap: 0.75rem;
-  margin-bottom: 1rem;
-  margin-top: auto; /* AGREGADO: empuja los botones hacia abajo */
+  margin: 1rem 1.5rem 0 1.5rem; /* MODIFICADO: margin horizontal */
   padding-top: 1rem; /* AGREGADO: espacio superior */
+  padding-bottom: 0.5rem; /* AGREGADO: espacio inferior */
   flex-shrink: 0;
+  width: calc(100% - 3rem); /* AGREGADO: para que respete los márgenes */
 }
 
 .course-actions button {
@@ -389,9 +387,11 @@
 .image-upload-section {
   display: flex;
   gap: 0.75rem;
+  margin: 0 1.5rem 1rem 1.5rem; /* MODIFICADO: márgenes laterales */
   padding-top: 1rem;
   border-top: 2px solid #f1f5f9;
   flex-shrink: 0;
+  width: calc(100% - 3rem); /* AGREGADO: para que respete los márgenes */
 }
 
 .upload-label {
