@@ -57,7 +57,7 @@ const Cursantes: React.FC<{ cursoId: string }> = ({ cursoId }) => {
     notas: ''
   });
 
-  const API_URL = 'http://localhost:5000/api/inscripciones';
+  const API_URL = 'https://empatia-dominio-back.vercel.app/api/inscripciones';
 
   useEffect(() => {
     cargarDatos();
