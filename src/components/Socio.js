@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
@@ -220,6 +218,20 @@ const SocioDashboard = () => {
     }
     const file = e.target.files[0];
     if (file) {
+      // Validar tipo de archivo
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        Swal.fire("Error", "Por favor selecciona una imagen válida (JPG, PNG, GIF, WEBP)", "error");
+        return;
+      }
+
+      // Validar tamaño (máximo 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        Swal.fire("Error", "La imagen no puede superar los 5MB", "error");
+        return;
+      }
+
       setSelectedImage(file);
       setPreviewImage(URL.createObjectURL(file));
     }
@@ -236,50 +248,94 @@ const SocioDashboard = () => {
       return Swal.fire("Error", "No estás autenticado", "error");
     }
 
+    // Mostrar loading
+    Swal.fire({
+      title: 'Guardando cambios...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     try {
       const formData = new FormData();
 
-      // Agregar campos editados
-      for (const key in editedData) {
-        if (Object.hasOwnProperty.call(editedData, key)) {
-          formData.append(key, editedData[key]);
-        }
+      // Agregar el ID del socio (muy importante)
+      if (socioData._id) {
+        formData.append('_id', socioData._id);
       }
 
-      // Agregar imagen si hay
+      // Agregar campos editados (solo los que cambiaron)
+      const fieldsToUpdate = ['nombre', 'apellido', 'telefono', 'provincia', 'ciudad'];
+      
+      fieldsToUpdate.forEach(field => {
+        if (editedData[field] !== undefined && editedData[field] !== socioData[field]) {
+          formData.append(field, editedData[field]);
+        }
+      });
+
+      // Agregar imagen si hay una nueva seleccionada
       if (selectedImage) {
         formData.append("avatar", selectedImage);
+      }
+
+      // Log para debugging (comentar en producción)
+      console.log('FormData entries:');
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
       }
 
       const res = await fetch("https://empatia-dominio-back.vercel.app/api/socios/editar", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
-          // No poner Content-Type aquí para que fetch maneje el multipart boundary
+          // NO incluir Content-Type, fetch lo manejará automáticamente con el boundary correcto
         },
         body: formData,
       });
 
       const data = await res.json();
-      if (data.success) {
-        Swal.fire("Success", "Datos actualizados correctamente", "success");
+      
+      if (res.ok && data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Datos actualizados correctamente",
+          confirmButtonColor: "#3085d6"
+        });
+        
+        // Actualizar estado local
+        setSocioData({
+          ...socioData,
+          ...editedData,
+          avatar: data.socio?.avatar || data.socio?.fotoPerfilUrl || socioData.avatar
+        });
+        
         setIsEditing(false);
-        setSocioData(data.socio); // actualizar con la data nueva del backend
         setSelectedImage(null);
-        if (data.socio.fotoPerfilUrl) {
+        
+        // Actualizar preview de imagen
+        if (data.socio?.avatar) {
+          setPreviewImage(data.socio.avatar);
+        } else if (data.socio?.fotoPerfilUrl) {
           setPreviewImage(data.socio.fotoPerfilUrl);
         }
+        
       } else {
-        Swal.fire("Error", "Ocurrió un error al actualizar los datos", "error");
+        throw new Error(data.message || data.error || "Error al actualizar los datos");
       }
     } catch (error) {
       console.error("Error al editar datos:", error);
-      Swal.fire("Error", "Ocurrió un error en el servidor", "error");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Ocurrió un error al actualizar los datos",
+        confirmButtonColor: "#d33"
+      });
     }
   };
 
-
-  
   const MySwal = withReactContent(Swal);
   
   const handleConfirmPasswordChange = () => {
@@ -371,15 +427,48 @@ const SocioDashboard = () => {
   };
 
   if (loading) {
-    return <p>Cargando datos del socio...</p>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        fontSize: '1.2rem',
+        color: '#666'
+      }}>
+        Cargando datos del socio...
+      </div>
+    );
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        fontSize: '1.2rem',
+        color: '#d33'
+      }}>
+        {error}
+      </div>
+    );
   }
 
   if (!socioData) {
-    return <p>No se encontraron datos del socio que se busca.</p>;
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        fontSize: '1.2rem',
+        color: '#666'
+      }}>
+        No se encontraron datos del socio que se busca.
+      </div>
+    );
   }
 
   return (
@@ -494,6 +583,7 @@ const SocioDashboard = () => {
                 src={previewImage || Logo}
                 alt="Foto de carnet"
                 className="card-avatar"
+                crossOrigin="anonymous"
               />
             </div>
             Socio:
@@ -511,10 +601,9 @@ const SocioDashboard = () => {
               src={LogoSentidos || Logo}
               alt="Logo Sentidos"
               className="logo-cuadrado"
+              crossOrigin="anonymous"
             />
-            {/* <h3 className="circuit-line"></h3> */}
-            <h1 >Carnet de Socio</h1>
-
+            <h1>Carnet de Socio</h1>
           </div>
 
           {/* Botón de captura fuera del div */}
@@ -556,11 +645,29 @@ const SocioDashboard = () => {
                   <h3 style={{ color: "red" }}>Cambiar Foto de Perfil</h3>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                     onChange={handleImageChange}
                     disabled={!socioData.active}
-                    style={{ opacity: socioData.active ? 1 : 0.5 }}
+                    style={{ 
+                      opacity: socioData.active ? 1 : 0.5,
+                      marginTop: '10px'
+                    }}
                   />
+                  {previewImage && selectedImage && (
+                    <div style={{ marginTop: '15px' }}>
+                      <p style={{ fontSize: '0.9rem', color: '#666' }}>Vista previa:</p>
+                      <img 
+                        src={previewImage} 
+                        alt="Preview" 
+                        style={{ 
+                          maxWidth: '150px', 
+                          maxHeight: '150px', 
+                          borderRadius: '8px',
+                          objectFit: 'cover'
+                        }} 
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <p
