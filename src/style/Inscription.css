@@ -1161,19 +1161,43 @@ body {
 
   .form-container,
   .course-info {
-    padding: var(--spacing-xl);
+    padding: 0; /* Sin padding para permitir headers de ancho completo */
+    border-radius: var(--radius-xl);
+    overflow: hidden; /* Para que los headers respeten el border-radius */
   }
 
-  /* Headers más anchos en mobile */
+  /* Contenido interno con padding */
+  .inscription-form,
+  .info-grid,
+  .gallery,
+  .form-group {
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+  }
+
+  .inscription-form {
+    padding-top: 0;
+    padding-bottom: var(--spacing-xl);
+  }
+
+  .info-grid {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .gallery {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  /* Headers de ancho completo en mobile */
   .course-info h2,
   .form-container h2 {
     font-size: 1.5rem;
     padding: var(--spacing-xl);
-    margin-left: calc(var(--spacing-xl) * -1);
-    margin-right: calc(var(--spacing-xl) * -1);
-    margin-top: calc(var(--spacing-xl) * -1);
-    margin-bottom: var(--spacing-xl);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    margin: 0; /* Sin márgenes para ancho completo */
+    border-radius: 0; /* Sin border-radius para ocupar todo el ancho */
+    width: 100%;
   }
 
   .info-grid {
@@ -1260,28 +1284,43 @@ body {
 
   .form-container,
   .course-info {
-    padding: var(--spacing-lg);
+    padding: 0; /* Sin padding para permitir headers de ancho completo */
+    border-radius: var(--radius-lg);
+    overflow: hidden;
   }
 
-  /* Headers más anchos en mobile pequeño */
-  .course-info h2 {
-    font-size: 1.375rem;
-    padding: var(--spacing-lg);
-    margin-left: calc(var(--spacing-lg) * -1);
-    margin-right: calc(var(--spacing-lg) * -1);
-    margin-top: calc(var(--spacing-lg) * -1);
-    margin-bottom: var(--spacing-lg);
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  /* Contenido interno con padding */
+  .inscription-form,
+  .info-grid,
+  .gallery,
+  .form-group {
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
   }
 
+  .inscription-form {
+    padding-top: 0;
+    padding-bottom: var(--spacing-lg);
+  }
+
+  .info-grid {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .gallery {
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
+  }
+
+  /* Headers de ancho completo en mobile pequeño */
+  .course-info h2,
   .form-container h2 {
     font-size: 1.375rem;
     padding: var(--spacing-lg);
-    margin-left: calc(var(--spacing-lg) * -1);
-    margin-right: calc(var(--spacing-lg) * -1);
-    margin-top: calc(var(--spacing-lg) * -1);
-    margin-bottom: var(--spacing-lg);
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    margin: 0;
+    border-radius: 0;
+    width: 100%;
   }
 
   .btn-submit {
