@@ -384,31 +384,7 @@ const Inscription = () => {
           </div>
 
           {/* Mostrar estadísticas de cupos por turno */}
-          {course.cuposDisponibles && (
-            <div className="cupos-info">
-              <h3>Disponibilidad por Turno</h3>
-              <div className="cupos-grid">
-                <div className="cupo-item">
-                  <span className="cupo-label">Mañana:</span>
-                  <span className={`cupo-value ${isTurnoLleno('manana') ? 'lleno' : 'disponible'}`}>
-                    {getCuposDisponiblesPorTurno('manana')} de {Math.ceil(course.cuposDisponibles / 2)} disponibles
-                  </span>
-                </div>
-                <div className="cupo-item">
-                  <span className="cupo-label">Tarde:</span>
-                  <span className={`cupo-value ${isTurnoLleno('tarde') ? 'lleno' : 'disponible'}`}>
-                    {getCuposDisponiblesPorTurno('tarde')} de {Math.ceil(course.cuposDisponibles / 2)} disponibles
-                  </span>
-                </div>
-                <div className="cupo-item">
-                  <span className="cupo-label">Indistinto:</span>
-                  <span className="cupo-value disponible">
-                    {inscriptionsStats.indistinto} inscripciones
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
+         
 
           {course.imagenesGaleria && course.imagenesGaleria.length > 0 && (
             <div className="gallery">
