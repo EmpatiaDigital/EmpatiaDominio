@@ -1164,6 +1164,18 @@ body {
     padding: var(--spacing-xl);
   }
 
+  /* Headers más anchos en mobile */
+  .course-info h2,
+  .form-container h2 {
+    font-size: 1.5rem;
+    padding: var(--spacing-xl);
+    margin-left: calc(var(--spacing-xl) * -1);
+    margin-right: calc(var(--spacing-xl) * -1);
+    margin-top: calc(var(--spacing-xl) * -1);
+    margin-bottom: var(--spacing-xl);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
   .info-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
@@ -1251,12 +1263,25 @@ body {
     padding: var(--spacing-lg);
   }
 
+  /* Headers más anchos en mobile pequeño */
   .course-info h2 {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
+    padding: var(--spacing-lg);
+    margin-left: calc(var(--spacing-lg) * -1);
+    margin-right: calc(var(--spacing-lg) * -1);
+    margin-top: calc(var(--spacing-lg) * -1);
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
   }
 
   .form-container h2 {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
+    padding: var(--spacing-lg);
+    margin-left: calc(var(--spacing-lg) * -1);
+    margin-right: calc(var(--spacing-lg) * -1);
+    margin-top: calc(var(--spacing-lg) * -1);
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
   }
 
   .btn-submit {
