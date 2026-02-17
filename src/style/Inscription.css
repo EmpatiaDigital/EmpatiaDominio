@@ -1155,39 +1155,14 @@ body {
   }
 
   .form-wrapper {
-    padding: 0 var(--spacing-md);
+    padding: 0 var(--spacing-sm); /* Padding mínimo para no tocar los bordes */
     margin-top: -60px;
   }
 
   .form-container,
   .course-info {
-    padding: 0; /* Sin padding para permitir headers de ancho completo */
+    padding: var(--spacing-xl); /* Restaurar padding normal */
     border-radius: var(--radius-xl);
-    overflow: hidden; /* Para que los headers respeten el border-radius */
-  }
-
-  /* Contenido interno con padding */
-  .inscription-form,
-  .info-grid,
-  .gallery,
-  .form-group {
-    padding-left: var(--spacing-xl);
-    padding-right: var(--spacing-xl);
-  }
-
-  .inscription-form {
-    padding-top: 0;
-    padding-bottom: var(--spacing-xl);
-  }
-
-  .info-grid {
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .gallery {
-    padding-top: var(--spacing-xl);
-    padding-bottom: var(--spacing-xl);
   }
 
   /* Headers de ancho completo en mobile */
@@ -1195,9 +1170,11 @@ body {
   .form-container h2 {
     font-size: 1.5rem;
     padding: var(--spacing-xl);
-    margin: 0; /* Sin márgenes para ancho completo */
-    border-radius: 0; /* Sin border-radius para ocupar todo el ancho */
-    width: 100%;
+    margin-left: calc(var(--spacing-xl) * -1);
+    margin-right: calc(var(--spacing-xl) * -1);
+    margin-top: calc(var(--spacing-xl) * -1);
+    margin-bottom: var(--spacing-xl);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
 
   .info-grid {
@@ -1279,38 +1256,13 @@ body {
 
 @media (max-width: 480px) {
   .form-wrapper {
-    padding: 0 var(--spacing-md);
+    padding: 0 var(--spacing-sm); /* Padding mínimo */
   }
 
   .form-container,
   .course-info {
-    padding: 0; /* Sin padding para permitir headers de ancho completo */
+    padding: var(--spacing-lg); /* Restaurar padding normal */
     border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-
-  /* Contenido interno con padding */
-  .inscription-form,
-  .info-grid,
-  .gallery,
-  .form-group {
-    padding-left: var(--spacing-lg);
-    padding-right: var(--spacing-lg);
-  }
-
-  .inscription-form {
-    padding-top: 0;
-    padding-bottom: var(--spacing-lg);
-  }
-
-  .info-grid {
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .gallery {
-    padding-top: var(--spacing-lg);
-    padding-bottom: var(--spacing-lg);
   }
 
   /* Headers de ancho completo en mobile pequeño */
@@ -1318,9 +1270,11 @@ body {
   .form-container h2 {
     font-size: 1.375rem;
     padding: var(--spacing-lg);
-    margin: 0;
-    border-radius: 0;
-    width: 100%;
+    margin-left: calc(var(--spacing-lg) * -1);
+    margin-right: calc(var(--spacing-lg) * -1);
+    margin-top: calc(var(--spacing-lg) * -1);
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
   }
 
   .btn-submit {
