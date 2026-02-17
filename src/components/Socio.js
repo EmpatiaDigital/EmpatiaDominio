@@ -237,6 +237,7 @@ const SocioDashboard = () => {
     }
   };
 
+ 
   const handleSaveChanges = async () => {
     if (!socioData?.active) {
       handleFunctionBlocked();
@@ -251,6 +252,7 @@ const SocioDashboard = () => {
     // Mostrar loading
     Swal.fire({
       title: 'Guardando cambios...',
+      html: 'Por favor espera mientras actualizamos tus datos',
       allowOutsideClick: false,
       allowEscapeKey: false,
       didOpen: () => {
@@ -261,81 +263,147 @@ const SocioDashboard = () => {
     try {
       const formData = new FormData();
 
-      // Agregar el ID del socio (muy importante)
-      if (socioData._id) {
-        formData.append('_id', socioData._id);
-      }
+      // SIEMPRE agregar el _id (OBLIGATORIO)
+      formData.append('_id', socioData._id);
 
-      // Agregar campos editados (solo los que cambiaron)
-      const fieldsToUpdate = ['nombre', 'apellido', 'telefono', 'provincia', 'ciudad'];
+      console.log('=== DATOS A ENVIAR ===');
+      console.log('ID del socio:', socioData._id);
+
+      // Agregar solo los campos que han sido editados
+      if (editedData.nombre && editedData.nombre !== socioData.nombre) {
+        formData.append('nombre', editedData.nombre);
+        console.log('Nombre:', editedData.nombre);
+      }
       
-      fieldsToUpdate.forEach(field => {
-        if (editedData[field] !== undefined && editedData[field] !== socioData[field]) {
-          formData.append(field, editedData[field]);
-        }
-      });
+      if (editedData.apellido && editedData.apellido !== socioData.apellido) {
+        formData.append('apellido', editedData.apellido);
+        console.log('Apellido:', editedData.apellido);
+      }
+      
+      if (editedData.telefono && editedData.telefono !== socioData.telefono) {
+        formData.append('telefono', editedData.telefono);
+        console.log('Teléfono:', editedData.telefono);
+      }
+      
+      if (editedData.provincia && editedData.provincia !== socioData.provincia) {
+        formData.append('provincia', editedData.provincia);
+        console.log('Provincia:', editedData.provincia);
+      }
+      
+      if (editedData.ciudad && editedData.ciudad !== socioData.ciudad) {
+        formData.append('ciudad', editedData.ciudad);
+        console.log('Ciudad:', editedData.ciudad);
+      }
 
       // Agregar imagen si hay una nueva seleccionada
       if (selectedImage) {
-        formData.append("avatar", selectedImage);
+        formData.append('avatar', selectedImage);
+        console.log('Avatar:', selectedImage.name, '|', selectedImage.type, '|', selectedImage.size, 'bytes');
       }
 
-      // Log para debugging (comentar en producción)
-      console.log('FormData entries:');
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
+      console.log('Token presente:', !!token);
+      console.log('=====================');
 
-      const res = await fetch("https://empatia-dominio-back.vercel.app/api/socios/editar", {
+      const response = await fetch("https://empatia-dominio-back.vercel.app/api/socios/editar", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
-          // NO incluir Content-Type, fetch lo manejará automáticamente con el boundary correcto
+          // NO incluir Content-Type - fetch lo maneja automáticamente
         },
         body: formData,
       });
 
-      const data = await res.json();
-      
-      if (res.ok && data.success) {
-        Swal.fire({
+      console.log('=== RESPUESTA DEL SERVIDOR ===');
+      console.log('Status:', response.status, response.statusText);
+      console.log('Headers:', Object.fromEntries(response.headers.entries()));
+
+      // Leer la respuesta como texto primero
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
+      // Intentar parsear como JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log('Parsed data:', data);
+      } catch (parseError) {
+        console.error('Error al parsear JSON:', parseError);
+        throw new Error(`Respuesta inválida del servidor: ${responseText.substring(0, 200)}`);
+      }
+
+      console.log('============================');
+
+      // Verificar si la respuesta fue exitosa
+      if (!response.ok) {
+        throw new Error(data.message || data.error || `Error ${response.status}: ${response.statusText}`);
+      }
+
+      if (data.success) {
+        // Cerrar el modal de loading
+        Swal.close();
+
+        // Mostrar éxito
+        await Swal.fire({
           icon: "success",
-          title: "¡Éxito!",
-          text: "Datos actualizados correctamente",
-          confirmButtonColor: "#3085d6"
+          title: "¡Datos Actualizados!",
+          text: data.message || "Tus datos se han actualizado correctamente",
+          confirmButtonColor: "#3085d6",
+          timer: 3000,
+          timerProgressBar: true
         });
-        
-        // Actualizar estado local
-        setSocioData({
+
+        // Actualizar el estado local con los datos del servidor
+        const updatedSocio = {
           ...socioData,
-          ...editedData,
-          avatar: data.socio?.avatar || data.socio?.fotoPerfilUrl || socioData.avatar
-        });
+          nombre: data.socio.nombre || editedData.nombre || socioData.nombre,
+          apellido: data.socio.apellido || editedData.apellido || socioData.apellido,
+          telefono: data.socio.telefono || editedData.telefono || socioData.telefono,
+          provincia: data.socio.provincia || editedData.provincia || socioData.provincia,
+          ciudad: data.socio.ciudad || editedData.ciudad || socioData.ciudad,
+          avatar: data.socio.avatar || socioData.avatar
+        };
+
+        console.log('Estado actualizado:', updatedSocio);
+
+        setSocioData(updatedSocio);
+        setEditedData(updatedSocio);
         
+        // Actualizar la imagen de preview
+        if (data.socio.avatar) {
+          setPreviewImage(data.socio.avatar);
+          console.log('Preview actualizado a:', data.socio.avatar);
+        }
+
+        // Salir del modo edición
         setIsEditing(false);
         setSelectedImage(null);
-        
-        // Actualizar preview de imagen
-        if (data.socio?.avatar) {
-          setPreviewImage(data.socio.avatar);
-        } else if (data.socio?.fotoPerfilUrl) {
-          setPreviewImage(data.socio.fotoPerfilUrl);
-        }
-        
+
       } else {
-        throw new Error(data.message || data.error || "Error al actualizar los datos");
+        throw new Error(data.message || data.error || "Error desconocido al actualizar");
       }
+
     } catch (error) {
-      console.error("Error al editar datos:", error);
+      console.error("=== ERROR COMPLETO ===");
+      console.error("Error:", error);
+      console.error("Message:", error.message);
+      console.error("Stack:", error.stack);
+      console.error("===================");
+
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: error.message || "Ocurrió un error al actualizar los datos",
-        confirmButtonColor: "#d33"
+        title: "Error al Guardar",
+        html: `
+          <p style="margin-bottom: 15px;">${error.message}</p>
+          <small style="color: #666;">
+            Si el problema persiste, contacta con soporte.
+          </small>
+        `,
+        confirmButtonColor: "#d33",
+        footer: '<a href="#" onclick="window.open(\'https://wa.me/3462529718?text=Tengo un problema al actualizar mis datos\', \'_blank\')">Contactar Soporte por WhatsApp</a>'
       });
     }
   };
-
+  
   const MySwal = withReactContent(Swal);
   
   const handleConfirmPasswordChange = () => {
@@ -796,3 +864,4 @@ const SocioDashboard = () => {
 };
 
 export default SocioDashboard;
+
