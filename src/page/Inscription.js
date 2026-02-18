@@ -8,6 +8,7 @@ const Inscription = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [totalCupos, setTotalCupos] = useState(0);
   const [inscriptionsStats, setInscriptionsStats] = useState({
     manana: 0,
     tarde: 0,
@@ -26,10 +27,10 @@ const Inscription = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const avaladores = [
-    { nombre: 'Institución 1', logo: '' },
-    { nombre: 'Institución 2', logo: '' },
-    { nombre: 'Institución 3', logo: '' },
-    { nombre: 'Institución 4', logo: '' }
+    { nombre: 'Institucion 1', logo: '' },
+    { nombre: 'Institucion 2', logo: '' },
+    { nombre: 'Institucion 3', logo: '' },
+    { nombre: 'Institucion 4', logo: '' }
   ];
 
   useEffect(() => {
@@ -49,6 +50,7 @@ const Inscription = () => {
       if (response.ok) {
         const data = await response.json();
         setCourse(data);
+        setTotalCupos(data.cuposDisponibles);
       } else {
         setCourse(null);
       }
@@ -67,7 +69,7 @@ const Inscription = () => {
         setInscriptionsStats(data);
       }
     } catch (error) {
-      console.error('Error al cargar estadísticas de inscripciones');
+      console.error('Error al cargar estadisticas de inscripciones');
     }
   };
 
@@ -89,11 +91,11 @@ const Inscription = () => {
     if (!formData.email.trim()) {
       newErrors.email = 'El email es obligatorio';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email inválido';
+      newErrors.email = 'Email invalido';
     }
     if (!formData.celular.trim()) newErrors.celular = 'El celular es obligatorio';
     if (!formData.turnoPreferido) newErrors.turnoPreferido = 'Debe seleccionar un turno';
-    if (!formData.aceptaTerminos) newErrors.aceptaTerminos = 'Debe aceptar los términos y condiciones';
+    if (!formData.aceptaTerminos) newErrors.aceptaTerminos = 'Debe aceptar los terminos y condiciones';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -127,39 +129,38 @@ const Inscription = () => {
 
         await Swal.fire({
           icon: 'success',
-          title: '¡Inscripción Exitosa!',
+          title: 'Inscripcion Exitosa',
           html: `
             <div style="text-align: left; padding: 20px;">
               <p style="font-size: 16px; margin-bottom: 15px;">
-                ¡Gracias por inscribirte al curso <strong>${course.titulo}</strong>!
+                Gracias por inscribirte al curso <strong>${course.titulo}</strong>
               </p>
               <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
                 <p style="margin-bottom: 10px;">
-                  Te hemos enviado un <strong>correo electrónico</strong> a <strong>${formData.email}</strong> con:
+                  Te hemos enviado un <strong>correo electronico</strong> a <strong>${formData.email}</strong> con:
                 </p>
                 <div style="margin-left: 20px;">
-                  <p style="margin: 5px 0;">✓ Confirmación de tu inscripción</p>
-                  <p style="margin: 5px 0;">✓ Detalles del curso</p>
-                  <p style="margin: 5px 0;">✓ <strong>Enlace al grupo de WhatsApp</strong> del curso</p>
+                  <p style="margin: 5px 0;">- Confirmacion de tu inscripcion</p>
+                  <p style="margin: 5px 0;">- Detalles del curso</p>
+                  <p style="margin: 5px 0;">- <strong>Enlace al grupo de WhatsApp</strong> del curso</p>
                 </div>
               </div>
               <div style="background-color: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                <p style="text-align: center; font-size: 30px; margin: 0;">📱</p>
                 <p style="margin-top: 10px;">
-                  <strong>¡No olvides revisar tu correo y unirte al grupo de WhatsApp!</strong>
+                  <strong>No olvides revisar tu correo y unirte al grupo de WhatsApp.</strong>
                   <br />
-                  Allí compartiremos información importante sobre el curso.
+                  Alli compartiremos informacion importante sobre el curso.
                 </p>
               </div>
               <p style="font-size: 14px; color: #666; text-align: center;">
-                Serás redirigido al inicio en 5 segundos...
+                Seras redirigido al inicio en 5 segundos...
               </p>
             </div>
           `,
           confirmButtonText: 'Volver al Inicio Ahora',
           confirmButtonColor: '#3085d6',
           showCancelButton: true,
-          cancelButtonText: 'Nueva Inscripción',
+          cancelButtonText: 'Nueva Inscripcion',
           cancelButtonColor: '#6c757d',
           allowOutsideClick: false,
           timer: 10000,
@@ -186,15 +187,15 @@ const Inscription = () => {
         Swal.fire({
           icon: 'error',
           title: 'Error al inscribirse',
-          text: data.message || 'Error al enviar la inscripción. Por favor, intente nuevamente.',
+          text: data.message || 'Error al enviar la inscripcion. Por favor, intente nuevamente.',
           confirmButtonColor: '#3085d6'
         });
       }
     } catch (error) {
       Swal.fire({
         icon: 'error',
-        title: 'Error de conexión',
-        text: 'Error de conexión. Por favor, intente nuevamente.',
+        title: 'Error de conexion',
+        text: 'Error de conexion. Por favor, intente nuevamente.',
         confirmButtonColor: '#3085d6'
       });
     } finally {
@@ -205,14 +206,13 @@ const Inscription = () => {
   const handleVolverInicio = () => navigate('/');
 
   const handleConsultarWhatsApp = () => {
-    const mensaje = encodeURIComponent('Hola! Me interesa obtener información sobre próximos cursos. ¿Podrían ayudarme?');
+    const mensaje = encodeURIComponent('Hola! Me interesa obtener informacion sobre proximos cursos. Podrian ayudarme?');
     window.open(`https://wa.me/5493413559329?text=${mensaje}`, '_blank');
   };
 
-  // ✅ CAMBIO: cupos reales por turno descontando indistintos proporcionalmente
   const getCuposDisponiblesPorTurno = (turno) => {
-    if (!course || !course.cuposDisponibles) return 0;
-    const mitadCupos = Math.ceil(course.cuposDisponibles / 2);
+    if (!course || !totalCupos) return 0;
+    const mitadCupos = Math.ceil(totalCupos / 2);
 
     if (turno === 'manana') {
       const indistinosPorTurno = Math.ceil(inscriptionsStats.indistinto / 2);
@@ -224,19 +224,18 @@ const Inscription = () => {
     return 0;
   };
 
-  // ✅ CAMBIO: turno lleno cuando sus cupos disponibles llegan a 0
   const isTurnoLleno = (turno) => {
     return getCuposDisponiblesPorTurno(turno) <= 0;
   };
 
   const isCursoLleno = () => {
-    if (!course || !course.cuposDisponibles) return false;
-    return inscriptionsStats.total >= course.cuposDisponibles;
+    if (!course || !totalCupos) return false;
+    return inscriptionsStats.total >= totalCupos;
   };
 
   const renderTurnoText = (turno) => {
     const lleno = isTurnoLleno(turno);
-    const turnoNombre = turno === 'manana' ? 'Mañana' : 'Tarde';
+    const turnoNombre = turno === 'manana' ? 'Manana' : 'Tarde';
     return lleno ? `${turnoNombre} - Cupo Lleno` : turnoNombre;
   };
 
@@ -253,19 +252,18 @@ const Inscription = () => {
       <div className="inscription-container">
         <div className="no-courses-container">
           <div className="no-courses-content">
-            <div className="no-courses-icon">📚</div>
+            <div className="no-courses-icon">Cursos</div>
             <h2 className="no-courses-title">Por el momento no hay cursos disponibles</h2>
             <p className="no-courses-text">
-              ¡Pero no te preocupes! Estamos preparando nuevos cursos increíbles para ti.
+              Estamos preparando nuevos cursos para ti.
             </p>
             <p className="no-courses-subtext">
-              Si deseas obtener información sobre próximas fechas y nuevos cursos,
-              <br/>
-              <strong>¡contáctanos por WhatsApp!</strong>
+              Si deseas obtener informacion sobre proximas fechas y nuevos cursos,
+              <br />
+              <strong>contactanos por WhatsApp.</strong>
             </p>
             <div className="no-courses-actions">
               <button className="btn-whatsapp" onClick={handleConsultarWhatsApp}>
-                <span className="whatsapp-icon">📱</span>
                 Consultar por WhatsApp
               </button>
               <button className="btn-volver" onClick={handleVolverInicio}>
@@ -273,7 +271,7 @@ const Inscription = () => {
               </button>
             </div>
             <div className="contact-info">
-              <p>También puedes contactarnos al:</p>
+              <p>Tambien puedes contactarnos al:</p>
               <a href="tel:+5493413559329" className="phone-link">+54 9 341 355 9329</a>
             </div>
           </div>
@@ -287,25 +285,24 @@ const Inscription = () => {
       <div className="inscription-container">
         <div className="no-courses-container">
           <div className="no-courses-content">
-            <div className="no-courses-icon">🎓</div>
+            <div className="no-courses-icon">Curso Completo</div>
             <h2 className="no-courses-title">Curso Completo</h2>
             <p className="no-courses-text">
-              El curso <strong>"{course.titulo}"</strong> ha alcanzado su capacidad máxima de inscripciones.
+              El curso <strong>"{course.titulo}"</strong> ha alcanzado su capacidad maxima de inscripciones.
             </p>
             <p className="no-courses-subtext">
-              ¿Te interesa este curso? ¡Contáctanos por WhatsApp para conocer las próximas fechas!
+              Te interesa este curso? Contactanos por WhatsApp para conocer las proximas fechas.
             </p>
             <div className="no-courses-actions">
               <button className="btn-whatsapp" onClick={handleConsultarWhatsApp}>
-                <span className="whatsapp-icon">📱</span>
-                Consultar Próximas Fechas
+                Consultar Proximas Fechas
               </button>
               <button className="btn-volver" onClick={handleVolverInicio}>
                 Volver al Inicio
               </button>
             </div>
             <div className="contact-info">
-              <p>También puedes contactarnos al:</p>
+              <p>Tambien puedes contactarnos al:</p>
               <a href="tel:+5493413559329" className="phone-link">+54 9 341 355 9329</a>
             </div>
           </div>
@@ -352,17 +349,17 @@ const Inscription = () => {
           </h4>
 
           <Link to="/informacion" className="btn-conocer-mas">
-            Conocer Más
+            Conocer Mas
           </Link>
         </div>
       </div>
 
       <div className="form-wrapper">
         <div className="course-info">
-          <h2>Información del Curso</h2>
+          <h2>Informacion del Curso</h2>
           <div className="info-grid">
             <div className="info-item">
-              <span className="info-label">Duración</span>
+              <span className="info-label">Duracion</span>
               <span className="info-value">{course.duracion}</span>
             </div>
             <div className="info-item">
@@ -373,40 +370,39 @@ const Inscription = () => {
               <span className="info-label">Precio</span>
               <span className="info-value">{course.precio}</span>
             </div>
-            {course.cuposDisponibles && (
+            {totalCupos > 0 && (
               <div className="info-item">
                 <span className="info-label">Cupos Totales</span>
-                <span className="info-value">{course.cuposDisponibles} disponibles</span>
+                <span className="info-value">{totalCupos} cupos</span>
               </div>
             )}
           </div>
 
-          {/* ✅ CAMBIO: barra y texto corregidos + desglose por turno */}
           <div className="cupos-indicator">
             <div className="cupos-bar-container">
               <div
                 className="cupos-bar-fill"
                 style={{
-                  width: `${Math.min((inscriptionsStats.total / course.cuposDisponibles) * 100, 100)}%`
+                  width: `${Math.min((inscriptionsStats.total / totalCupos) * 100, 100)}%`
                 }}
               ></div>
             </div>
             <p className="cupos-text">
-              <strong>{Math.max(0, course.cuposDisponibles - inscriptionsStats.total)}</strong> cupos disponibles de <strong>{course.cuposDisponibles}</strong>
+              <strong>{Math.max(0, totalCupos - inscriptionsStats.total)}</strong> cupos disponibles de <strong>{totalCupos}</strong>
             </p>
             <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.85rem', color: '#555' }}>
               <span>
-                🌅 Mañana: <strong>{getCuposDisponiblesPorTurno('manana')}</strong> disponibles
+                Manana: <strong>{getCuposDisponiblesPorTurno('manana')}</strong> disponibles
               </span>
               <span>
-                🌇 Tarde: <strong>{getCuposDisponiblesPorTurno('tarde')}</strong> disponibles
+                Tarde: <strong>{getCuposDisponiblesPorTurno('tarde')}</strong> disponibles
               </span>
             </div>
           </div>
 
           {course.imagenesGaleria && course.imagenesGaleria.length > 0 && (
             <div className="gallery">
-              <h3>Galería</h3>
+              <h3>Galeria</h3>
               <div className="gallery-grid">
                 {course.imagenesGaleria.map((img, index) => (
                   <img
@@ -488,8 +484,8 @@ const Inscription = () => {
                   <input
                     type="radio"
                     name="turnoPreferido"
-                    value="mañana"
-                    checked={formData.turnoPreferido === 'mañana'}
+                    value="manana"
+                    checked={formData.turnoPreferido === 'manana'}
                     onChange={handleChange}
                     disabled={isTurnoLleno('manana')}
                   />
@@ -539,8 +535,8 @@ const Inscription = () => {
                   onChange={handleChange}
                 />
                 <span>
-                  Acepto los términos y condiciones y el tratamiento de mis datos personales
-                  conforme a la política de privacidad *
+                  Acepto los terminos y condiciones y el tratamiento de mis datos personales
+                  conforme a la politica de privacidad *
                 </span>
               </label>
               {errors.aceptaTerminos && <span className="error-text">{errors.aceptaTerminos}</span>}
