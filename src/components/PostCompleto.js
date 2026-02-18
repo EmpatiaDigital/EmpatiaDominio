@@ -13,13 +13,21 @@ const PostCompleto = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const shareUrl = `https://empatia-dominio-back.vercel.app/post/${id}`; // ← backend (tiene los OG tags)
+  const currentUrl = `${window.location.origin}/post/${id}`; // ← frontend (para copiar en Instagram)
 
-  const currentUrl = `${window.location.origin}/post/${id}`;
   const mensaje = post
-  ? encodeURIComponent(`\`\`\`${post.titulo}\`\`\` – Leé este post en Empatía Digital: ${currentUrl}`)
+  ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital: ${shareUrl}`)
   : "";
 
+
 // const currentUrl = `${window.location.origin}/post/${id}`; // Esta es la del frontend
+
+  
+  //  const currentUrl = `${window.location.origin}/post/${id}`;
+  //const mensaje = post
+  //? encodeURIComponent(`\`\`\`${post.titulo}\`\`\` – Leé este post en Empatía Digital: ${currentUrl}`)
+  //: "";
 
 // const backendPreviewUrl = `https://empatia-dominio-back.vercel.app/post/${id}`; // Esta es la que genera los metadatos
 
@@ -215,3 +223,4 @@ const PostCompleto = () => {
 };
 
 export default PostCompleto;
+
