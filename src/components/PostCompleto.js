@@ -114,9 +114,7 @@ const PostCompleto = () => {
           </a>
 
           <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              currentUrl
-            )}`}
+            href={`https://www.facebook.com/sharer/sharer.php?u=${mensaje}`}
             target="_blank"
             rel="noopener noreferrer"
             className="share-btn facebook"
@@ -224,3 +222,4 @@ const PostCompleto = () => {
 };
 
 export default PostCompleto;
+
