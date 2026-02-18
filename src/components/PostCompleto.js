@@ -13,11 +13,12 @@ const PostCompleto = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [cargando, setCargando] = useState(true);
-  const shareUrl = `https://empatia-dominio-back.vercel.app/api/posts/${id}`;
+  // PostDetalle.jsx
+  const shareUrl = `https://empatia-dominio-back.vercel.app/api/posts/${id}/preview`;
   const currentUrl = `${window.location.origin}/post/${id}`; // ← frontend (para copiar en Instagram)
 
   const mensaje = post
-  ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital: ${currentUrl} `)
+  ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital este es lo nuevo: ${shareUrl} `)
   : "";
 
 
@@ -223,6 +224,7 @@ const PostCompleto = () => {
 };
 
 export default PostCompleto;
+
 
 
 
