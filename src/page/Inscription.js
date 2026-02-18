@@ -208,7 +208,6 @@ const Inscription = () => {
     window.open(`https://wa.me/5493413559329?text=${mensaje}`, '_blank');
   };
 
-  // usa course.cuposTotal que viene de la base de datos
   const getCuposDisponiblesPorTurno = (turno) => {
     if (!course || !course.cuposTotal) return 0;
     const mitadCupos = Math.ceil(course.cuposTotal / 2);
@@ -253,9 +252,7 @@ const Inscription = () => {
           <div className="no-courses-content">
             <div className="no-courses-icon">Cursos</div>
             <h2 className="no-courses-title">Por el momento no hay cursos disponibles</h2>
-            <p className="no-courses-text">
-              Estamos preparando nuevos cursos para ti.
-            </p>
+            <p className="no-courses-text">Estamos preparando nuevos cursos para ti.</p>
             <p className="no-courses-subtext">
               Si deseas obtener informacion sobre proximas fechas y nuevos cursos,
               <br />
@@ -327,15 +324,9 @@ const Inscription = () => {
               {avaladores.map((avalador, index) => (
                 <div key={index} className="avalador-item">
                   {avalador.logo ? (
-                    <img
-                      src={avalador.logo}
-                      alt={avalador.nombre}
-                      className="avalador-logo"
-                    />
+                    <img src={avalador.logo} alt={avalador.nombre} className="avalador-logo" />
                   ) : (
-                    <div className="avalador-placeholder">
-                      {avalador.nombre}
-                    </div>
+                    <div className="avalador-placeholder">{avalador.nombre}</div>
                   )}
                 </div>
               ))}
@@ -377,19 +368,41 @@ const Inscription = () => {
             )}
           </div>
 
-          <div className="cupos-indicator">
-            <div className="cupos-bar-container">
+          {/* ✅ cupos-indicator sin colores llamativos */}
+          <div
+            style={{
+              marginTop: '16px',
+              padding: '16px',
+              border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+              backgroundColor: '#fafafa'
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: '#e9e9e9',
+                borderRadius: '99px',
+                height: '8px',
+                overflow: 'hidden',
+                marginBottom: '10px'
+              }}
+            >
               <div
-                className="cupos-bar-fill"
                 style={{
-                  width: `${Math.min((inscriptionsStats.total / course.cuposTotal) * 100, 100)}%`
+                  height: '100%',
+                  width: `${Math.min((inscriptionsStats.total / course.cuposTotal) * 100, 100)}%`,
+                  borderRadius: '99px',
+                  backgroundColor: '#888',
+                  transition: 'width 0.5s ease'
                 }}
-              ></div>
+              />
             </div>
-            <p className="cupos-text">
+
+            <p style={{ fontSize: '0.9rem', color: '#444', marginBottom: '8px' }}>
               <strong>{Math.max(0, course.cuposTotal - inscriptionsStats.total)}</strong> cupos disponibles de <strong>{course.cuposTotal}</strong>
             </p>
-            <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.85rem', color: '#555' }}>
+
+            <div style={{ display: 'flex', gap: '20px', fontSize: '0.85rem', color: '#666' }}>
               <span>
                 Manana: <strong>{getCuposDisponiblesPorTurno('manana')}</strong> disponibles
               </span>
