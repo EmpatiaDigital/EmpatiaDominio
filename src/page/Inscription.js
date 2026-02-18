@@ -61,7 +61,7 @@ const Inscription = () => {
 
   const fetchInscriptionsStats = async () => {
     try {
-      const response = await fetch('https://empatia-dominio-back.vercel.app/api/inscriptions/stats');
+      const response = await fetch('https://empatia-dominio-back.vercel.app/api/estadisticas/:cursoId');
       if (response.ok) {
         const data = await response.json();
         setInscriptionsStats(data);
