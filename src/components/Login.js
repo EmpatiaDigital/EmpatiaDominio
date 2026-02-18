@@ -16,7 +16,7 @@ const Login = () => {
 
     try {
       const response = await login(correo, password);
-      console.log('Respuesta del backend:', response);
+      console.log('Respuesta del backend EN EL LOGIN:', response);
 
       Swal.fire({
         title: '¡Bienvenido!',
@@ -82,3 +82,4 @@ const Login = () => {
 };
 
 export default Login;
+
