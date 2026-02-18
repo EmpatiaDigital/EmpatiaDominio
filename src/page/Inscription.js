@@ -34,14 +34,16 @@ const Inscription = () => {
 
   useEffect(() => {
     fetchActiveCourse();
-    fetchInscriptionsStats();
+  }, []);
 
+  useEffect(() => {
+    if (!course) return;
+    fetchInscriptionsStats();
     const interval = setInterval(() => {
       fetchInscriptionsStats();
     }, 10000);
-
     return () => clearInterval(interval);
-  }, []);
+  }, [course]);
 
   const fetchActiveCourse = async () => {
     try {
@@ -60,11 +62,18 @@ const Inscription = () => {
   };
 
   const fetchInscriptionsStats = async () => {
+    if (!course) return;
     try {
-      const response = await fetch('https://empatia-dominio-back.vercel.app/api/estadisticas/:cursoId');
+      const response = await fetch(`https://empatia-dominio-back.vercel.app/api/inscriptions/estadisticas/${course._id}`);
       if (response.ok) {
         const data = await response.json();
-        setInscriptionsStats(data);
+        const stats = data.data || data;
+        setInscriptionsStats({
+          manana: stats.porTurno?.manana || 0,
+          tarde: stats.porTurno?.tarde || 0,
+          indistinto: stats.porTurno?.indistinto || 0,
+          total: stats.activos || 0
+        });
       }
     } catch (error) {
       console.error('Error al cargar estadisticas de inscripciones');
@@ -368,7 +377,6 @@ const Inscription = () => {
             )}
           </div>
 
-          {/* ✅ cupos-indicator sin colores llamativos */}
           <div
             style={{
               marginTop: '16px',
