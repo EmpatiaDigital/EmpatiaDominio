@@ -6,39 +6,39 @@ import "../style/PostCompleto.css";
 import { FaFacebook, FaWhatsapp, FaInstagram } from "react-icons/fa";
 import Swal from "sweetalert2";
 
-
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
 const PostCompleto = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [cargando, setCargando] = useState(true);
-  // PostDetalle.jsx
+
+  // ✅ URL del backend que genera HTML con OG tags, portada y countdown
   const shareUrl = `https://empatia-dominio-back.vercel.app/api/posts/${id}/preview`;
-  const currentUrl = `${window.location.origin}/post/${id}`; // ← frontend (para copiar en Instagram)
 
+  // WhatsApp
   const mensaje = post
-  ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital este es lo nuevo: ${shareUrl} `)
-  : "";
+    ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital: ${shareUrl}`)
+    : "";
 
+  // Facebook — apunta al preview para que muestre imagen y título
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
 
-// const currentUrl = `${window.location.origin}/post/${id}`; // Esta es la del frontend
-
-  
-  //  const currentUrl = `${window.location.origin}/post/${id}`;
-  //const mensaje = post
-  //? encodeURIComponent(`\`\`\`${post.titulo}\`\`\` – Leé este post en Empatía Digital: ${currentUrl}`)
-  //: "";
-
-// const backendPreviewUrl = `https://empatia-dominio-back.vercel.app/post/${id}`; // Esta es la que genera los metadatos
-
-// const mensaje = post
-//   ? encodeURIComponent(`*${post.titulo}*\n${post.epigrafe || ''}\n\nLeé este post en Empatía Digital: ${backendPreviewUrl}`)
-//   : "";
+  // Instagram — copia el link del preview
+  const copiarParaInstagram = () => {
+    navigator.clipboard.writeText(shareUrl);
+    Swal.fire({
+      icon: "success",
+      title: "¡Link copiado!",
+      text: "Pegalo en tus historias de Instagram.",
+      confirmButtonText: "Ok",
+      timer: 2500,
+      timerProgressBar: true,
+    });
+  };
 
   useEffect(() => {
     const enlaces = document.querySelectorAll(".post-content a");
-
     enlaces.forEach((a) => {
       const href = a.getAttribute("href");
       if (href && href.startsWith("http")) {
@@ -62,7 +62,6 @@ const PostCompleto = () => {
         setCargando(false);
       }
     };
-
     fetchPost();
   }, [id]);
 
@@ -100,11 +99,13 @@ const PostCompleto = () => {
           </div>
         </div>
       </div>
-  <div className="share-section">
-        <h3>Compartir en redes:</h3>
 
+      <div className="share-section">
+        <h3>Compartir en redes:</h3>
         <div className="share-buttons">
-          <a
+
+          {/* WhatsApp */}
+          
             href={`https://api.whatsapp.com/send?text=${mensaje}`}
             target="_blank"
             rel="noopener noreferrer"
@@ -113,10 +114,9 @@ const PostCompleto = () => {
             <FaWhatsapp size={30} />
           </a>
 
-          <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              currentUrl
-            )}`}
+          {/* Facebook */}
+          
+            href={facebookUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="share-btn facebook"
@@ -124,25 +124,19 @@ const PostCompleto = () => {
             <FaFacebook size={30} />
           </a>
 
-          <a
-            onClick={() => {
-              navigator.clipboard.writeText(currentUrl);
-              Swal.fire({
-                icon: "success",
-                title: "¡Link copiado!",
-                text: "Pegalo en tus historias de Instagram.",
-                confirmButtonText: "Ok",
-                timer: 2500,
-                timerProgressBar: true,
-              });
-            }}
+          {/* Instagram — copia el link del preview */}
+          
+            onClick={copiarParaInstagram}
             className="share-btn instagram"
             title="Copiá el link y compartilo en tus historias"
+            style={{ cursor: "pointer" }}
           >
             <FaInstagram size={30} />
           </a>
+
         </div>
       </div>
+
       {post.portada && (
         <img src={post.portada} alt="portada" className="preview-portada" />
       )}
@@ -154,6 +148,7 @@ const PostCompleto = () => {
         className="imagen-fija-1200"
         dangerouslySetInnerHTML={{ __html: post.contenido }}
       />
+
       <div
         style={{
           backgroundColor: "#fff3cd",
@@ -186,12 +181,13 @@ const PostCompleto = () => {
           introducción de IA en la parte de abajo 👇
         </p>
       </div>
+
       <div
         style={{
           borderLeft: "30px solid #42a5f5",
-          backgroundColor: " #194542", 
-          justifyContent: "center", // Centra horizontalmente el contenido
-          alignItems: "center", // Centra verticalmente
+          backgroundColor: "#194542",
+          justifyContent: "center",
+          alignItems: "center",
           borderRadius: "6px",
           padding: "0.75rem 1rem",
           marginBottom: "0.5rem",
@@ -200,21 +196,21 @@ const PostCompleto = () => {
           display: "flex",
         }}
       >
-        <a
+        
           style={{
-            borderBottom: "2px solid white", // Línea inferior blanca
+            borderBottom: "2px solid white",
             borderRadius: "6px",
             padding: "0.75rem 1rem",
             marginBottom: "0.5rem",
             fontSize: "1.5rem",
             fontWeight: "500",
             display: "flex",
-            textDecoration: "none", // Sin subrayado clásico
-            color: "white", // Color de texto blanco
-            backgroundColor: "transparent", // Fondo transparente
-            cursor: "pointer", // Cursor tipo manito
+            textDecoration: "none",
+            color: "white",
+            backgroundColor: "transparent",
+            cursor: "pointer",
           }}
-          href={`https://empatiadigital.com.ar/descargas`}
+          href="https://empatiadigital.com.ar/descargas"
         >
           Descarga la guía PDF GRATIS
         </a>
@@ -224,18 +220,3 @@ const PostCompleto = () => {
 };
 
 export default PostCompleto;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
