@@ -17,7 +17,7 @@ const PostCompleto = () => {
   const currentUrl = `${window.location.origin}/post/${id}`; // ← frontend (para copiar en Instagram)
 
   const mensaje = post
-  ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital: ${shareUrl}`)
+  ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital: ${shareUrl} - ${post.portada}`)
   : "";
 
 
@@ -223,6 +223,7 @@ const PostCompleto = () => {
 };
 
 export default PostCompleto;
+
 
 
 
