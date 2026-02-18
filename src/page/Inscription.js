@@ -123,7 +123,7 @@ const Inscription = () => {
     setSubmitting(true);
 
     try {
-      const response = await fetch('https://empatia-dominio-back.vercel.app/api/inscriptions', {
+      const response = await fetch('https://empatia-dominio-back.vercel.app/api/inscriptions/estadisticas/${course._id}', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, courseId: course._id })
