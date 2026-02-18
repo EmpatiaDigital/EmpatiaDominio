@@ -13,7 +13,7 @@ const PostCompleto = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [cargando, setCargando] = useState(true);
-  const shareUrl = `https://empatia-dominio-back.vercel.app/posts/${id}`; // ← backend (tiene los OG tags)
+  const shareUrl = `https://empatia-dominio-back.vercel.app/post/${id}`; // ← backend (tiene los OG tags)
   const currentUrl = `${window.location.origin}/post/${id}`; // ← frontend (para copiar en Instagram)
 
   const mensaje = post
@@ -223,5 +223,6 @@ const PostCompleto = () => {
 };
 
 export default PostCompleto;
+
 
 
