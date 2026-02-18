@@ -48,7 +48,7 @@ const Inscription = () => {
       const response = await fetch('https://empatia-dominio-back.vercel.app/api/courses/active');
       if (response.ok) {
         const data = await response.json();
-        alert(data.cuposTotal + ´Hola cursos´)
+        console.log(data.cuposTotal + ´Hola cursos´)
         setCourse(data);
       } else {
         setCourse(null);
