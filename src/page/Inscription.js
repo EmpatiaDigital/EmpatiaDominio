@@ -8,7 +8,6 @@ const Inscription = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [totalCupos, setTotalCupos] = useState(0);
   const [inscriptionsStats, setInscriptionsStats] = useState({
     manana: 0,
     tarde: 0,
@@ -50,7 +49,6 @@ const Inscription = () => {
       if (response.ok) {
         const data = await response.json();
         setCourse(data);
-        setTotalCupos(data.cuposDisponibles);
       } else {
         setCourse(null);
       }
@@ -210,9 +208,10 @@ const Inscription = () => {
     window.open(`https://wa.me/5493413559329?text=${mensaje}`, '_blank');
   };
 
+  // usa course.cuposTotal que viene de la base de datos
   const getCuposDisponiblesPorTurno = (turno) => {
-    if (!course || !totalCupos) return 0;
-    const mitadCupos = Math.ceil(totalCupos / 2);
+    if (!course || !course.cuposTotal) return 0;
+    const mitadCupos = Math.ceil(course.cuposTotal / 2);
 
     if (turno === 'manana') {
       const indistinosPorTurno = Math.ceil(inscriptionsStats.indistinto / 2);
@@ -229,8 +228,8 @@ const Inscription = () => {
   };
 
   const isCursoLleno = () => {
-    if (!course || !totalCupos) return false;
-    return inscriptionsStats.total >= totalCupos;
+    if (!course || !course.cuposTotal) return false;
+    return inscriptionsStats.total >= course.cuposTotal;
   };
 
   const renderTurnoText = (turno) => {
@@ -370,10 +369,10 @@ const Inscription = () => {
               <span className="info-label">Precio</span>
               <span className="info-value">{course.precio}</span>
             </div>
-            {totalCupos > 0 && (
+            {course.cuposTotal > 0 && (
               <div className="info-item">
                 <span className="info-label">Cupos Totales</span>
-                <span className="info-value">{totalCupos} cupos</span>
+                <span className="info-value">{course.cuposTotal} cupos</span>
               </div>
             )}
           </div>
@@ -383,12 +382,12 @@ const Inscription = () => {
               <div
                 className="cupos-bar-fill"
                 style={{
-                  width: `${Math.min((inscriptionsStats.total / totalCupos) * 100, 100)}%`
+                  width: `${Math.min((inscriptionsStats.total / course.cuposTotal) * 100, 100)}%`
                 }}
               ></div>
             </div>
             <p className="cupos-text">
-              <strong>{Math.max(0, totalCupos - inscriptionsStats.total)}</strong> cupos disponibles de <strong>{totalCupos}</strong>
+              <strong>{Math.max(0, course.cuposTotal - inscriptionsStats.total)}</strong> cupos disponibles de <strong>{course.cuposTotal}</strong>
             </p>
             <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.85rem', color: '#555' }}>
               <span>
