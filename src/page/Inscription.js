@@ -263,7 +263,7 @@ const Inscription = () => {
             <h2 className="no-courses-title">Por el momento no hay cursos disponibles</h2>
             <p className="no-courses-text">Estamos preparando nuevos cursos para ti.</p>
             <p className="no-courses-subtext">
-              Si deseas obtener informacion sobre proximas fechas y nuevos cursos,
+              Si deseas obtener informacion sobre proximas fechas y nuevos cursos.
               <br />
               <strong>contactanos por WhatsApp.</strong>
             </p>
