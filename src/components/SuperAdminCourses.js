@@ -5,7 +5,6 @@ import Swal from 'sweetalert2';
 import '../style/Superadmincourses.css'; 
 import { Link } from "react-router-dom";
 
-
 const SuperAdminCourses = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
