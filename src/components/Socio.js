@@ -50,7 +50,6 @@ const SocioDashboard = () => {
 
   const handleCaptureCarnet = () => {
     const carnetElement = document.getElementById("carnet-socio");
-
     if (!carnetElement) return;
 
     const allImgs = carnetElement.querySelectorAll("img");
@@ -61,15 +60,185 @@ const SocioDashboard = () => {
       }
     }
 
-    html2canvas(carnetElement, {
+    // Clonar el elemento para aplicar estilos inline sin afectar el DOM real
+    const clone = carnetElement.cloneNode(true);
+
+    // Wrapper temporal fuera de pantalla
+    const wrapper = document.createElement("div");
+    wrapper.style.cssText = `
+      position: fixed;
+      top: -9999px;
+      left: -9999px;
+      width: 320px;
+      z-index: -1;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    `;
+
+    // Estilos del carnet completo (card-header-modern)
+    clone.style.cssText = `
+      background: linear-gradient(155deg, #111827 0%, #1a2e4a 45%, #7f1d1d 100%);
+      padding: 20px 20px 16px;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      width: 320px;
+      box-sizing: border-box;
+      border-radius: 0;
+    `;
+
+    // Aplicar estilos inline a los hijos del clon
+    const applyChildStyles = (cloneEl, originalEl) => {
+      const cloneChildren = cloneEl.children;
+      const origChildren = originalEl.children;
+
+      for (let i = 0; i < cloneChildren.length; i++) {
+        const cloneChild = cloneChildren[i];
+        const origChild = origChildren[i];
+        if (!origChild) continue;
+
+        const tag = cloneChild.tagName;
+        const classes = origChild.className || "";
+
+        // card-avatar (foto de perfil)
+        if (classes.includes("card-avatar") && tag === "IMG") {
+          cloneChild.style.cssText = `
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.25);
+            background: #1e2d45;
+            margin: 12px auto 10px;
+            display: block;
+          `;
+        }
+
+        // logo-cuadrado
+        if (classes.includes("logo-cuadrado") && tag === "IMG") {
+          cloneChild.style.cssText = `
+            width: 100px;
+            height: 64px;
+            object-fit: contain;
+            margin: 10px auto 8px;
+            display: block;
+            opacity: 0.9;
+          `;
+        }
+
+        // h1 -> "Carnet de Socio"
+        if (tag === "H1") {
+          cloneChild.style.cssText = `
+            font-size: 13px;
+            font-weight: 500;
+            padding: 7px 14px;
+            border-radius: 7px;
+            background: #991b1b;
+            color: #ffffff;
+            margin: 10px auto 4px;
+            letter-spacing: 0.5px;
+            display: inline-block;
+          `;
+        }
+
+        // h2 -> nombre del socio
+        if (tag === "H2") {
+          cloneChild.style.cssText = `
+            font-size: 17px;
+            font-weight: 500;
+            margin: 6px 0 4px;
+            color: #f1f5f9;
+          `;
+        }
+
+        // strong activo/inactivo
+        if (tag === "STRONG") {
+          const cls = origChild.className || "";
+          cloneChild.style.cssText = `
+            font-size: 13px;
+            font-weight: 500;
+            color: ${cls.includes("activo") ? "#34d399" : "#f87171"};
+            display: inline;
+          `;
+        }
+
+        // card-header-orange wrapper (foto)
+        if (classes.includes("card-header-orange")) {
+          cloneChild.style.cssText = `
+            text-align: center;
+            padding: 4px 0 0;
+          `;
+          const innerImg = cloneChild.querySelector("img");
+          if (innerImg) {
+            innerImg.style.cssText = `
+              width: 90px;
+              height: 90px;
+              border-radius: 10px;
+              object-fit: cover;
+              border: 2px solid rgba(255,255,255,0.25);
+              background: #1e2d45;
+              margin: 12px auto 10px;
+              display: block;
+            `;
+          }
+        }
+
+        // Texto suelto (nodos de texto no aplican, pero los spans/strong ya cubiertos)
+      }
+    };
+
+    applyChildStyles(clone, carnetElement);
+
+    // Textos sueltos tipo "Socio:" y "Localidad:" quedan en nodos de texto nativos,
+    // html2canvas los lee bien si el color del padre está seteado.
+    // Forzamos color blanco en el wrapper del clone
+    clone.querySelectorAll("*").forEach((el) => {
+      if (!el.style.color && el.tagName !== "IMG") {
+        el.style.color = "#cbd5e1";
+      }
+    });
+
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    html2canvas(clone, {
       useCORS: true,
-      scale: 2,
-      backgroundColor: "#b30000",
+      scale: 3,
+      backgroundColor: null,
+      logging: false,
+      width: 320,
+      windowWidth: 320,
     }).then((canvas) => {
+      document.body.removeChild(wrapper);
+
+      // Agregar borde redondeado en el canvas final
+      const finalCanvas = document.createElement("canvas");
+      const radius = 14;
+      finalCanvas.width = canvas.width;
+      finalCanvas.height = canvas.height;
+      const ctx = finalCanvas.getContext("2d");
+
+      ctx.beginPath();
+      ctx.moveTo(radius * 3, 0);
+      ctx.lineTo(finalCanvas.width - radius * 3, 0);
+      ctx.quadraticCurveTo(finalCanvas.width, 0, finalCanvas.width, radius * 3);
+      ctx.lineTo(finalCanvas.width, finalCanvas.height - radius * 3);
+      ctx.quadraticCurveTo(finalCanvas.width, finalCanvas.height, finalCanvas.width - radius * 3, finalCanvas.height);
+      ctx.lineTo(radius * 3, finalCanvas.height);
+      ctx.quadraticCurveTo(0, finalCanvas.height, 0, finalCanvas.height - radius * 3);
+      ctx.lineTo(0, radius * 3);
+      ctx.quadraticCurveTo(0, 0, radius * 3, 0);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(canvas, 0, 0);
+
       const link = document.createElement("a");
-      link.download = `Carnet Socio:${socioData.nombre}.png`;
-      link.href = canvas.toDataURL("image/png");
+      link.download = `Carnet_Socio_${socioData.nombre}.png`;
+      link.href = finalCanvas.toDataURL("image/png");
       link.click();
+    }).catch(() => {
+      document.body.removeChild(wrapper);
+      Swal.fire("Error", "No se pudo capturar el carnet. Intentá de nuevo.", "error");
     });
   };
 
@@ -102,15 +271,12 @@ const SocioDashboard = () => {
 
             localStorage.setItem("nombre", data.socio.nombre);
 
-            // Set initial editedData
             setEditedData(data.socio);
 
-            // Set preview image if user has one
             if (data.socio.avatar) {
               setPreviewImage(data.socio.avatar);
             }
 
-            // Verificar si el socio está inactivo y mostrar alerta
             if (!data.socio.active) {
               showInactiveAlert();
             }
@@ -218,15 +384,13 @@ const SocioDashboard = () => {
     }
     const file = e.target.files[0];
     if (file) {
-      // Validar tipo de archivo
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!validTypes.includes(file.type)) {
         Swal.fire("Error", "Por favor selecciona una imagen válida (JPG, PNG, GIF, WEBP)", "error");
         return;
       }
 
-      // Validar tamaño (máximo 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const maxSize = 5 * 1024 * 1024;
       if (file.size > maxSize) {
         Swal.fire("Error", "La imagen no puede superar los 5MB", "error");
         return;
@@ -237,104 +401,103 @@ const SocioDashboard = () => {
     }
   };
 
- const handleSaveChanges = async () => {
-  if (!socioData?.active) {
-    handleFunctionBlocked();
-    return;
-  }
-
-  const token = localStorage.getItem("token");
-  if (!token) {
-    return Swal.fire("Error", "No estás autenticado", "error");
-  }
-
-  Swal.fire({
-    title: 'Guardando cambios...',
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    didOpen: () => {
-      Swal.showLoading();
-    }
-  });
-
-  try {
-    const formData = new FormData();
-
-    // Siempre enviar todos los campos
-    formData.append('_id', socioData._id);
-    formData.append('nombre', editedData.nombre || socioData.nombre || '');
-    formData.append('apellido', editedData.apellido || socioData.apellido || '');
-    formData.append('telefono', editedData.telefono || socioData.telefono || '');
-    formData.append('provincia', editedData.provincia || socioData.provincia || '');
-    formData.append('ciudad', editedData.ciudad || socioData.ciudad || '');
-
-    if (selectedImage) {
-      formData.append("avatar", selectedImage);
+  const handleSaveChanges = async () => {
+    if (!socioData?.active) {
+      handleFunctionBlocked();
+      return;
     }
 
-    console.log('FormData entries:');
-    for (let pair of formData.entries()) {
-      console.log(pair[0], pair[1]);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return Swal.fire("Error", "No estás autenticado", "error");
     }
 
-    const res = await fetch("https://empatia-dominio-back.vercel.app/api/socios/editar", {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
+    Swal.fire({
+      title: 'Guardando cambios...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
     });
 
-    const data = await res.json();
+    try {
+      const formData = new FormData();
 
-    if (res.ok && data.success) {
-      Swal.fire({
-        icon: "success",
-        title: "¡Éxito!",
-        text: "Datos actualizados correctamente",
-        confirmButtonColor: "#3085d6"
-      });
+      formData.append('_id', socioData._id);
+      formData.append('nombre', editedData.nombre || socioData.nombre || '');
+      formData.append('apellido', editedData.apellido || socioData.apellido || '');
+      formData.append('telefono', editedData.telefono || socioData.telefono || '');
+      formData.append('provincia', editedData.provincia || socioData.provincia || '');
+      formData.append('ciudad', editedData.ciudad || socioData.ciudad || '');
 
-      const updatedSocio = {
-        ...socioData,
-        ...editedData,
-        avatar: data.socio?.avatar || socioData.avatar
-      };
-
-      setSocioData(updatedSocio);
-      setEditedData(updatedSocio);
-      setIsEditing(false);
-      setSelectedImage(null);
-
-      if (data.socio?.avatar) {
-        setPreviewImage(data.socio.avatar);
+      if (selectedImage) {
+        formData.append("avatar", selectedImage);
       }
 
-    } else {
-      throw new Error(data.message || data.error || "Error al actualizar los datos");
-    }
+      console.log('FormData entries:');
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
-  } catch (error) {
-    console.error("Error al editar datos:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Error",
-      text: error.message || "Ocurrió un error al actualizar los datos",
-      confirmButtonColor: "#d33"
-    });
-  }
-};
+      const res = await fetch("https://empatia-dominio-back.vercel.app/api/socios/editar", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Datos actualizados correctamente",
+          confirmButtonColor: "#3085d6"
+        });
+
+        const updatedSocio = {
+          ...socioData,
+          ...editedData,
+          avatar: data.socio?.avatar || socioData.avatar
+        };
+
+        setSocioData(updatedSocio);
+        setEditedData(updatedSocio);
+        setIsEditing(false);
+        setSelectedImage(null);
+
+        if (data.socio?.avatar) {
+          setPreviewImage(data.socio.avatar);
+        }
+
+      } else {
+        throw new Error(data.message || data.error || "Error al actualizar los datos");
+      }
+
+    } catch (error) {
+      console.error("Error al editar datos:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Ocurrió un error al actualizar los datos",
+        confirmButtonColor: "#d33"
+      });
+    }
+  };
 
   const MySwal = withReactContent(Swal);
-  
+
   const handleConfirmPasswordChange = () => {
     if (!socioData?.active) {
       handleFunctionBlocked();
       return;
     }
-  
+
     let showPassword = false;
-  
+
     Swal.fire({
       title: "¿Seguro que quieres cambiar la contraseña?",
       html: `
@@ -351,7 +514,7 @@ const SocioDashboard = () => {
       didOpen: () => {
         const passwordInput = Swal.getPopup().querySelector("#swal-input-password");
         const toggleBtn = Swal.getPopup().querySelector("#toggle-password");
-  
+
         toggleBtn.addEventListener("click", () => {
           showPassword = !showPassword;
           passwordInput.type = showPassword ? "text" : "password";
@@ -360,14 +523,14 @@ const SocioDashboard = () => {
       },
       preConfirm: async () => {
         const newPassword = Swal.getPopup().querySelector("#swal-input-password").value;
-  
+
         if (!newPassword || newPassword.length < 6) {
           Swal.showValidationMessage("La contraseña debe tener al menos 6 caracteres");
           return false;
         }
-  
+
         const token = localStorage.getItem("token");
-  
+
         try {
           const res = await fetch("https://empatia-dominio-back.vercel.app/api/cambiar-password-logueado", {
             method: "PUT",
@@ -377,13 +540,13 @@ const SocioDashboard = () => {
             },
             body: JSON.stringify({ nuevaPassword: newPassword }),
           });
-  
+
           const data = await res.json();
-  
+
           if (!res.ok || !data.success) {
             throw new Error(data.error || "Error al cambiar la contraseña");
           }
-  
+
           return true;
         } catch (error) {
           Swal.showValidationMessage(`Error: ${error.message}`);
@@ -396,7 +559,7 @@ const SocioDashboard = () => {
       }
     });
   };
-  
+
   const handleConfirmPayQuota = () => {
     if (!socioData?.active) {
       handleFunctionBlocked();
@@ -462,7 +625,6 @@ const SocioDashboard = () => {
 
   return (
     <div className="socio-dashboard-container">
-      {/* Overlay completo para bloquear interfaz si está inactivo */}
       {!socioData.active && (
         <div
           style={{
@@ -524,7 +686,6 @@ const SocioDashboard = () => {
         </div>
       )}
 
-      {/* Mensaje de alerta para usuarios inactivos */}
       {!socioData.active && (
         <div
           style={{
@@ -595,7 +756,6 @@ const SocioDashboard = () => {
             <h1>Carnet de Socio</h1>
           </div>
 
-          {/* Botón de captura fuera del div */}
           <button className="btn-captura" onClick={handleCaptureCarnet}>
             Capturar Carnet
           </button>
@@ -784,5 +944,3 @@ const SocioDashboard = () => {
 };
 
 export default SocioDashboard;
-
-
