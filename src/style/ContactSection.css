@@ -1,6 +1,6 @@
 .contact-section {
-  padding: 4rem 2rem;
-  background-color: #f2f9f8; /* celeste muy suave */
+  padding: 5rem 2rem;
+  background: #f0f4f8;
   color: #222;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -16,103 +16,142 @@
   flex-direction: row;
 }
 
+/* ─── Texto izquierda ─── */
 .contact-text {
   flex: 1 1 55%;
   max-width: 600px;
 }
 
 .contact-text h2 {
-  font-size: 2.75rem;
-  margin-bottom: 1.5rem;
-  color: #00796b; /* verde azulado */
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-size: 2.4rem;
+  margin-bottom: 1.25rem;
+  color: #1e3a5f;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+  position: relative;
+  padding-bottom: 14px;
+}
+
+.contact-text h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, #4a90d9, #6bb3f0);
+  border-radius: 2px;
 }
 
 .contact-text p {
-  font-size: 1.15rem;
-  margin-bottom: 1.75rem;
-  color: #444;
-  line-height: 1.7;
-  font-weight: 500;
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+  color: #4b5563;
+  line-height: 1.75;
+  font-weight: 400;
 }
 
+/* ─── Lista de contacto ─── */
 .contact-list {
   position: relative;
-  padding-left:2rem;
+  padding-left: 1.5rem;
   margin-top: 2rem;
-  width:100%;
-  border-left: 4px solid #00796b; /* línea vertical verde */
+  width: 100%;
+  border-left: 2px solid rgba(74, 144, 217, 0.35);
 }
 
 .contact-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .contact-list li {
   display: flex;
   align-items: center;
-  margin-bottom: 1.25rem;
-  gap: 1rem;
-  font-size: 1.1rem;
-  color: rgb(208, 223, 221); /* verde oscuro */
-  font-weight: 600;
+  gap: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151;
+  background: #ffffff;
+  border: 0.5px solid rgba(0, 0, 0, 0.07);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.contact-list li:hover {
+  box-shadow: 0 4px 14px rgba(30, 58, 95, 0.08);
+  transform: translateX(3px);
 }
 
 .contact-list li span {
   user-select: text;
+  color: #374151;
 }
 
 .contact-list li a {
-  color: white;
+  color: #1e3a5f;
   text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
-  border-radius: 30px;
-  padding: 3px;
-  margin: 3px;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .contact-list li a:hover {
+  color: #4a90d9;
   text-decoration: none;
-  background: green;
-  color: rgb(229, 239, 236); /* hover más oscuro */
+  background: none;
 }
 
+/* ─── Íconos ─── */
 .icon {
-  color: white;
-  min-width: 28px;
-  font-size: 1.3rem;
+  min-width: 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #1e3a5f;
+  color: #6bb3f0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  padding: 3px;
-  margin: 3px;
 }
 
+/* ─── Imagen derecha ─── */
 .contact-image {
   flex: 1 1 40%;
   max-width: 450px;
-  border-radius: 20px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 121, 107, 0.2);
-  transition: transform 0.3s ease;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(30, 58, 95, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .contact-image img {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 20px;
+  border-radius: 16px;
   object-fit: cover;
 }
 
 .contact-image:hover {
-  transform: scale(1.05);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 32px rgba(30, 58, 95, 0.15);
 }
 
-/* Responsive */
+/* ─── Responsive ─── */
 @media (max-width: 900px) {
+  .contact-section {
+    padding: 3.5rem 1.25rem;
+  }
+
   .contact-container {
     flex-direction: column;
     align-items: center;
@@ -125,37 +164,29 @@
     flex: 1 1 100%;
   }
 
-  .contact-list{
-    text-decoration: none;
-    padding-left:0;
+  .contact-text h2::after {
+    left: 50%;
+    transform: translateX(-50%);
   }
-  
-  .icon {
-    color: white;
-    min-width: 28px;
-    font-size:1rem;
-    flex-shrink: 0;
-    padding: 2px;
-    margin:1px;
-    
+
+  .contact-list {
+    padding-left: 0;
+    border-left: none;
+    border-top: 2px solid rgba(74, 144, 217, 0.25);
+    padding-top: 1.25rem;
   }
+
   .contact-list li {
-    color: white;
-    text-decoration: none;
-    font-size:15px;
-    font-weight: 600;
-    transition: color 0.3s ease;
-    border-radius: 30px;
-    padding: 3px;
-    margin-right:3px;
+    font-size: 0.9rem;
+    padding: 9px 12px;
+    text-align: left;
   }
-  .contact-list li a {
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-    border-radius: 30px;
-    padding: 3px;
-    margin-right:3px;
+
+  .icon {
+    min-width: 28px;
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+    border-radius: 7px;
   }
 }
