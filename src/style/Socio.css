@@ -1,225 +1,322 @@
-
-.logo-cuadrado {
-  width: 120px;
-  height: 80px;
-  object-fit: contain;
-  margin: 10px auto;
-  display: block;
-  filter: drop-shadow(0 0 2px #ff4d4d) drop-shadow(0 0 5px #ff1a1a) drop-shadow(0 0 8px #ff0000);
+* {
+  box-sizing: border-box;
 }
-
 
 .socio-dashboard-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 2rem 1rem 3rem;
+  background: #f0f4f8;
+  min-height: 100vh;
 }
 
 .cards-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
   justify-content: center;
   width: 100%;
+  max-width: 1100px;
 }
 
+/* ─── Card base ─── */
 .card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+  border-radius: 14px;
+  border: 0.5px solid rgba(0,0,0,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
   width: 320px;
-  padding: 20px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
 }
 
+/* ─── Card header variants ─── */
 .card-header {
   text-align: center;
-  margin-bottom: 20px;
+  padding: 20px 20px 16px;
 }
 
 .card-header h1 {
-  font-size: 24px;
-  padding: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 14px;
   border-radius: 8px;
   color: #ffffff;
-  margin: 0;
+  margin: 0 0 12px;
+  letter-spacing: 0.3px;
 }
 
-/* Colores para los headers */
-.card-header-green h1 {
-  background-color: #28a745; /* Verde */
+.card-header-green h1  { background: #1e7e4a; }
+.card-header-orange h1 { background: #c0392b; }
+.card-header-blue h1   { background: #1a4e8a; }
+
+.card-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 8px auto 0;
+  display: block;
+  border: 2px solid rgba(255,255,255,0.35);
 }
 
-.card-header-orange h1 {
-  background-color: #ff9800; /* Naranja */
-}
-
-.card-header-blue h1 {
-  background-color: #007bff; /* Azul */
-}
-
+/* ─── Card body ─── */
 .card-body {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  padding: 16px 20px;
 }
 
-.card-body input {
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.card-body p {
+  font-size: 13.5px;
+  color: #374151;
+  margin: 0;
+  line-height: 1.5;
 }
 
-.card-avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin: 10px auto;
+.card-body p strong {
+  color: #111827;
+  font-weight: 500;
+  margin-right: 4px;
 }
 
+.card-body h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #c0392b;
+  font-weight: 500;
+  margin: 10px 0 4px;
+}
 
+.card-body input[type="text"],
+.card-body input[type="file"] {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 13px;
+  border: 0.5px solid #d1d5db;
+  border-radius: 7px;
+  background: #f9fafb;
+  color: #111827;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.card-body input[type="text"]:focus {
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 3px rgba(74,144,217,0.12);
+}
+
+/* ─── Alert ─── */
 .alert-red {
-  color: #d9534f;
-  font-weight: bold;
+  color: #b91c1c;
+  font-weight: 500;
+  font-size: 13px;
+  background: #fef2f2;
+  border: 0.5px solid #fca5a5;
+  border-radius: 7px;
+  padding: 8px 12px;
+  margin-top: 4px;
 }
 
-/* Botones comunes */
+/* ─── Buttons ─── */
 .card-changes,
 .card-footer button {
-  padding: 10px 20px;
-  font-size: 16px;
-  margin-top: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  width: 100%;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #1e3a5f;
+  color: #6bb3f0;
+  border: 0.5px solid rgba(74,144,217,0.3);
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-/* Hover de botones */
 .card-changes:hover,
 .card-footer button:hover {
-  background-color: #0056b3;
+  background: #243d60;
+  color: #90c8f8;
+}
+
+.card-changes:disabled,
+.card-footer button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .card-footer {
-  margin-top: 20px;
+  padding: 12px 20px 18px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
-}
-.card-header-modern {
-  background: linear-gradient(155deg, #111 40%, #b30000 100%);
-  padding: 20px;
-  border-radius: 12px;
-  color: white;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-
-  box-shadow: 
-    0 0 20px rgb(64, 14, 14),       /* sombra externa */
-    inset 0 0 10px rgb(100, 3, 3),  /* sombra interna roja */
-    inset 0 0 0 3px white;           /* borde interno blanco */
+  border-top: 0.5px solid #f0f0f0;
 }
 
-/* LÍNEA INCLINADA TIPO CIRCUITO */
-.circuit-line {
-  position: absolute;
-  width: 150%;
-  height: 100px;
-  background: repeating-linear-gradient(
-    45deg,
-    white,
-    white 5px,
-    transparent 5px,
-    transparent 10px
-  );
-  transform: rotate(-30deg);
-  bottom: 0%;
-  left: 60px;
-  opacity: 0.6;
-}
-
+/* ─── Modern card wrapper ─── */
 .card-header-modern-complete {
-  background: linear-gradient(135deg, #111 40%, #b30000 100%);
+  background: #ffffff;
   width: 320px;
-  padding: 20px;
-  border-radius: 12px;
+  border-radius: 14px;
+  border: 0.5px solid rgba(0,0,0,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-header-modern-complete:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+
+/* ─── Modern card header (carnet) ─── */
+.card-header-modern {
+  background: linear-gradient(155deg, #111827 0%, #1a2e4a 45%, #7f1d1d 100%);
+  padding: 20px 20px 0;
   color: white;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
   position: relative;
   overflow: hidden;
 }
+
+.card-header-modern::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -40px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: rgba(74,144,217,0.07);
+  border: 1px solid rgba(74,144,217,0.12);
+  pointer-events: none;
+}
+
+.card-header-modern::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: -20px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(127,29,29,0.12);
+  pointer-events: none;
+}
+
+/* Stripe inferior del carnet */
+.card-header-modern > *:last-child {
+  position: relative;
+  z-index: 1;
+}
+
 .card-header-modern h1 {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 7px;
+  background: #991b1b;
   color: #ffffff;
-  margin-bottom: 12px;
-  font-size: 24px;
-  padding: 12px;
-  border-radius: 8px;
-  color: #ffffff;
-  margin: 0;
-  background-color: #b30000;
+  margin: 10px 0 0;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
 }
 
 .card-header-modern img.card-avatar {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  border-radius: 50%;
-  border: 3px solid white;
-  background-color: #222;
-  margin: 10px auto;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: #1e2d45;
+  margin: 12px auto 10px;
+  display: block;
+  position: relative;
+  z-index: 1;
 }
 
 .card-header-modern h2 {
-  font-size: 20px;
-  font-weight: bold;
-  margin: 10px 0 5px;
-  color: #ffffff;
+  font-size: 17px;
+  font-weight: 500;
+  margin: 6px 0 4px;
+  color: #f1f5f9;
+  position: relative;
+  z-index: 1;
 }
 
 .card-header-modern strong.activo {
-  color: #00e676;
-  font-weight: bold;
+  color: #34d399;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .card-header-modern strong.inactivo {
-  color: #ff1744;
-  font-weight: bold;
+  color: #f87171;
+  font-weight: 500;
+  font-size: 13px;
 }
 
 .card-header-modern p {
-  margin-top: 8px;
-  color: #ddd;
-  font-size: 14px;
+  margin-top: 6px;
+  color: #94a3b8;
+  font-size: 13px;
+  position: relative;
+  z-index: 1;
 }
 
-/* Botón captura */
+/* ─── Logo cuadrado en carnet ─── */
+.logo-cuadrado {
+  width: 100px;
+  height: 64px;
+  object-fit: contain;
+  margin: 10px auto 8px;
+  display: block;
+  position: relative;
+  z-index: 1;
+  opacity: 0.9;
+}
+
+/* ─── Botón captura ─── */
 .btn-captura {
-  margin-top: 12px;
-  padding: 10px 16px;
-  background-color: #b30000;
-  color: #fff;
-  font-weight: bold;
+  margin: 0;
+  padding: 10px 18px;
+  background: #1e3a5f;
+  color: #6bb3f0;
+  font-weight: 500;
+  font-size: 13px;
   border: none;
-  border-radius: 6px;
+  border-top: 0.5px solid rgba(74,144,217,0.15);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.2s ease, color 0.2s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  letter-spacing: 0.2px;
 }
 
 .btn-captura:hover {
-  background-color: #ff1a1a;
+  background: #243d60;
+  color: #90c8f8;
 }
