@@ -32,7 +32,7 @@ const UserActividad = () => {
     const actividad = {
       visitorId,
       ruta: pathname,
-      url: fullUrl, // ✅ Agregamos la URL completa
+      url: fullUrl,
       timestamp: new Date().toISOString(),
       evento: "visita",
     };
@@ -43,7 +43,6 @@ const UserActividad = () => {
     }
 
     sendActivity(actividad);
-
     visitStartRef.current = Date.now();
 
     return () => {
@@ -52,7 +51,7 @@ const UserActividad = () => {
         sendActivity({
           visitorId,
           postId: pathname.split("/post/")[1],
-          url: fullUrl, // ✅ También en evento "permanencia"
+          url: fullUrl,
           evento: "permanencia",
           duracion: Math.round(duracionMs / 1000),
         });
