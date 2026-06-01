@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import logoImg from "../assets/empatialog.jpeg";
 import "../style/Navbar.css";
-import "../style/InstallPWAButton.css";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
