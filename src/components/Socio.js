@@ -658,7 +658,6 @@ const SocioDashboard = () => {
                     </div>
                   )}
                 </div>
-
                 <p
                   style={{
                     marginTop: "20px",
