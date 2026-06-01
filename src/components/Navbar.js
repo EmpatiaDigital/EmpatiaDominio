@@ -5,22 +5,48 @@ import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import logoImg from "../assets/empatialog.jpeg";
 import "../style/Navbar.css";
+import "../style/InstallPWAButton.css";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
 export default function Navbar() {
   const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [pwaInstalled, setPwaInstalled] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [showIOSHint, setShowIOSHint] = useState(false);
+
+  useEffect(() => {
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+    if (isStandalone) { setPwaInstalled(true); return; }
+
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+    setIsIOS(ios);
+
+    const handler = (e) => { e.preventDefault(); setDeferredPrompt(e); };
+    window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", () => { setPwaInstalled(true); setDeferredPrompt(null); });
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (isIOS) { setShowIOSHint((prev) => !prev); return; }
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") setPwaInstalled(true);
+    setDeferredPrompt(null);
+  };
 
   const getDashboardLink = () => {
     if (!user) return "/";
     switch (user.role) {
-      case "superadmin":
-        return "/superadmin/dashboard";
-      case "admin":
-        return "/admin/dashboard";
-      default:
-        return "/socio/dashboard";
+      case "superadmin": return "/superadmin/dashboard";
+      case "admin": return "/admin/dashboard";
+      default: return "/socio/dashboard";
     }
   };
 
@@ -133,18 +159,26 @@ export default function Navbar() {
           </>
         )}
       </ul>
+
+      {/* ── Botón PWA ── */}
+      {pwaInstalled ? (
+        <button className="pwa-btn pwa-btn--open" onClick={() => window.location.reload()}>
+          <span className="pwa-icon">⚡</span>
+          <span className="pwa-label">Abrir app</span>
+        </button>
+      ) : (deferredPrompt || isIOS) ? (
+        <div className="pwa-wrapper">
+          <button className="pwa-btn pwa-btn--install" onClick={handleInstallClick}>
+            <span className="pwa-icon">⬇</span>
+            <span className="pwa-label">Descargar app</span>
+          </button>
+          {isIOS && showIOSHint && (
+            <div className="pwa-ios-hint">
+              <p>Tocá <strong>Compartir</strong> ⎙ y luego <strong>"Agregar a inicio"</strong></p>
+            </div>
+          )}
+        </div>
+      ) : null}
     </nav>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
