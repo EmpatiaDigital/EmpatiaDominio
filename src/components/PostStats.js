@@ -6,7 +6,6 @@ import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import "../style/PostStats.css";
 
 const API = "https://empatia-dominio-back.vercel.app/api";
-
 // ─── Genera o recupera un fingerprint persistente para visitantes anónimos ──
 const getVisitorId = () => {
   // Prioridad: usuario logueado → visitante con fingerprint
