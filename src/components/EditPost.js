@@ -179,6 +179,7 @@ const EditPost = () => {
         <option value="Tutoriales">Tutoriales</option>
         <option value="Opinión">Opinión</option>
         <option value="Eventos">Eventos</option>
+        <option value="SociedadDigital">Sociedad Digital</option>
       </select>
 
       <label className="editor-label">📷 Imagen de portada:</label>
