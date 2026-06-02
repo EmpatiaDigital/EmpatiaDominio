@@ -11,23 +11,25 @@
 }
 
 /* =============================================
-   ENCABEZADO DE PÁGINA
+   ENCABEZADO DE PÁGINA — centrado
    ============================================= */
 .titulo-principal {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.9rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #1e3a5f;
-  text-align: left;
-  margin: 0 0 40px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #d0daea;
+  text-align: center;
+  margin: 0 0 8px;
   letter-spacing: -0.2px;
   text-transform: none;
+  border-bottom: none;
+  padding-bottom: 0;
+  display: block;
 }
 
+/* Eyebrow centrado sobre el título */
 .titulo-principal::before {
-  content: 'Blog';
+  content: 'Publicaciones';
   display: block;
   font-family: 'DM Sans', sans-serif;
   font-size: 10px;
@@ -35,7 +37,19 @@
   letter-spacing: 3px;
   text-transform: uppercase;
   color: #4a90d9;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+/* Línea decorativa centrada debajo del título */
+.titulo-principal::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 2px;
+  background: #4a90d9;
+  margin: 14px auto 40px;
+  border-radius: 2px;
 }
 
 /* =============================================
@@ -52,139 +66,12 @@
 }
 
 /* =============================================
-   GRID DE POSTS
-   ============================================= */
-.lista-posts-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 22px;
-}
-
-/* =============================================
-   TARJETA INDIVIDUAL
-   ============================================= */
-.post-card {
-  position: relative;
-  height: 300px;
-  border-radius: 8px;
-  overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #1e3a5f;
-  border: 1px solid #dae3ee;
-  box-shadow: none;
-  cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.post-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 36px rgba(30, 58, 95, 0.14);
-}
-
-/* =============================================
-   OVERLAY INTERIOR
-   ============================================= */
-.post-card-overlay {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(to top, rgba(10, 25, 55, 0.93) 0%, rgba(10, 25, 55, 0.5) 45%, rgba(10, 25, 55, 0.0) 100%);
-  color: #fff;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 18px 20px;
-  gap: 10px;
-}
-
-/* =============================================
-   ENCABEZADO DEL POST (avatar + título + autor)
-   ============================================= */
-.post-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  object-fit: cover;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.post-header-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.post-title {
-  margin: 0;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff !important;
-  line-height: 1.3;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
-}
-
-.post-autor {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.68);
-  letter-spacing: 0.2px;
-  opacity: 1;
-}
-
-/* =============================================
-   BOTÓN "VER MÁS"
-   ============================================= */
-.btn-ver-mas {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 16px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 3px;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: background 0.2s, border-color 0.2s;
-  backdrop-filter: blur(4px);
-}
-
-.btn-ver-mas:hover {
-  background: rgba(74, 144, 217, 0.55);
-  border-color: rgba(107, 179, 240, 0.6);
-}
-
-/* Separador visual sobre el botón */
-.post-card-overlay > *:last-child {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 10px;
-  margin-top: 2px;
-}
-
-/* =============================================
-   PAGINACIÓN
+   PAGINACIÓN — arriba del grid también
+   (si la usás arriba y abajo, aplica igual)
    ============================================= */
 .post-paginacion {
-  margin-top: 48px;
+  margin-top: 0;
+  margin-bottom: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -229,15 +116,151 @@
 }
 
 /* =============================================
-   RESPONSIVE — TABLET (≤991px)
+   GRID DE POSTS — 3 columnas uniformes
    ============================================= */
-@media (max-width: 991px) {
+.lista-posts-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+/* Sin card destacada — todas iguales en altura */
+.post-card:first-child {
+  grid-column: span 1;
+}
+
+/* =============================================
+   TARJETA INDIVIDUAL
+   ============================================= */
+.post-card {
+  position: relative;
+  height: 300px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #1e3a5f;
+  border: none;
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(30, 58, 95, 0.16);
+}
+
+/* =============================================
+   OVERLAY INTERIOR — gradiente desde abajo
+   ============================================= */
+.post-card-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to top,
+      rgba(8, 20, 48, 0.97) 0%,
+      rgba(8, 20, 48, 0.7) 40%,
+      rgba(8, 20, 48, 0.1) 75%,
+      transparent 100%
+    );
+  color: #fff;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px 18px 18px;
+  gap: 0;
+}
+
+/* =============================================
+   HEADER: avatar + nombre (fila compacta)
+   ============================================= */
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.post-header-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.post-title {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff !important;
+  line-height: 1.3;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* Autor — visible, blanco con peso medio */
+.post-autor {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #a8d4f5;
+  letter-spacing: 0.2px;
+  opacity: 1;
+}
+
+/* =============================================
+   SEPARADOR + BOTÓN
+   ============================================= */
+.post-card-overlay > *:last-child {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 12px;
+  margin-top: 0;
+}
+
+.btn-ver-mas {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: rgba(74, 144, 217, 0.25);
+  color: #fff;
+  border: 1px solid rgba(107, 179, 240, 0.45);
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: background 0.2s, border-color 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.btn-ver-mas:hover {
+  background: rgba(74, 144, 217, 0.65);
+  border-color: rgba(107, 179, 240, 0.8);
+}
+
+/* =============================================
+   RESPONSIVE — TABLET (≤1024px) → 2 columnas
+   ============================================= */
+@media (max-width: 1024px) {
   .post-page {
     padding: 44px 32px;
-  }
-
-  .titulo-principal {
-    font-size: 1.6rem;
   }
 
   .lista-posts-container {
@@ -248,24 +271,53 @@
   .post-card {
     height: 280px;
   }
+
+  .titulo-principal {
+    font-size: 1.7rem;
+  }
 }
 
 /* =============================================
-   RESPONSIVE — MOBILE (≤600px)
+   RESPONSIVE — TABLET CHICO (≤768px)
+   ============================================= */
+@media (max-width: 768px) {
+  .post-page {
+    padding: 36px 24px;
+  }
+
+  .lista-posts-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .post-card {
+    height: 260px;
+  }
+
+  .titulo-principal {
+    font-size: 1.5rem;
+  }
+
+  .post-title {
+    font-size: 0.95rem;
+  }
+}
+
+/* =============================================
+   RESPONSIVE — MOBILE (≤600px) → 1 columna
    ============================================= */
 @media (max-width: 600px) {
   .post-page {
-    padding: 32px 16px;
+    padding: 28px 16px;
   }
 
   .titulo-principal {
     font-size: 1.4rem;
-    margin-bottom: 28px;
   }
 
   .lista-posts-container {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   .post-card {
@@ -277,12 +329,12 @@
   }
 
   .post-autor {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .avatar {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
   }
 
   .btn-ver-mas {
@@ -291,7 +343,7 @@
   }
 
   .post-paginacion {
-    margin-top: 36px;
+    margin-bottom: 24px;
     gap: 5px;
   }
 
@@ -307,14 +359,14 @@
    ============================================= */
 @media (max-width: 380px) {
   .post-page {
-    padding: 24px 12px;
+    padding: 20px 12px;
   }
 
   .post-card {
-    height: 220px;
+    height: 210px;
   }
 
   .titulo-principal {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
   }
 }
