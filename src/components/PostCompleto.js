@@ -1,7 +1,3 @@
-nido pegado
-7.16 KB •228 líneas
-•
-El formato puede ser inconsistente con la fuente
 // src/components/PostDetalle.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
