@@ -1,234 +1,410 @@
-/* CONTENEDOR PRINCIPAL */
-body{
-  margin-top:150px;
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+
+/* =============================================
+   BASE
+   ============================================= */
+body {
+  margin-top: 150px;
+  background: #f0f4fa;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
 }
+
+/* =============================================
+   CONTENEDOR PRINCIPAL
+   ============================================= */
 .actividades-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  padding: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  gap: 22px;
+  padding: 32px 48px;
+  max-width: 1240px;
+  margin: 0 auto;
 }
 
+/* =============================================
+   PAGINACIÓN
+   ============================================= */
 .paginacion {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin: 20px;
+  align-items: center;
+  gap: 6px;
+  margin: 28px 0;
   flex-wrap: wrap;
 }
 
 .paginacion button {
-  padding: 6px 12px;
-  border: none;
-  background-color: #eee;
-  cursor: pointer;
+  padding: 8px 14px;
+  border: 1px solid #d0daea;
   border-radius: 4px;
+  background: #fff;
+  color: #4a6a8a;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  min-width: 38px;
+  text-align: center;
+}
+
+.paginacion button:hover {
+  background: #edf2fa;
+  border-color: #4a90d9;
+  color: #1e3a5f;
 }
 
 .paginacion button.active {
-  background-color: #007bff;
-  color: white;
-  font-weight: bold;
+  background: #1e3a5f;
+  border-color: #1e3a5f;
+  color: #fff;
+  font-weight: 500;
 }
 
 .paginacion button:disabled {
-  opacity: 0.5;
-  cursor: default;
+  opacity: 0.35;
+  cursor: not-allowed;
+  background: #f2f5fa;
+  border-color: #e0e8f2;
+  color: #9aabbf;
 }
 
-/* FORMULARIO DE ACTIVIDAD */
-.formulario-actividad {
-  margin: 20px 0;
-  padding: 20px;
-  background: #f2f2f2;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.formulario-actividad input {
-  padding: 8px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.btn.btn-save {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* BOTÓN PARA CREAR ACTIVIDAD */
+/* =============================================
+   BOTÓN CREAR
+   ============================================= */
 .btn-crear {
-  background-color: #28a745;
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #4a90d9;
+  color: #fff;
   border: none;
-  padding: 12px 22px;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.2s;
+  margin: 0 0 0 48px;
   flex-shrink: 0;
 }
 
 .btn-crear:hover {
-  background-color: #218838;
+  background: #1e3a5f;
 }
 
-/* TARJETA DE ACTIVIDAD */
+/* =============================================
+   FORMULARIO DE ACTIVIDAD
+   ============================================= */
+.formulario-actividad {
+  grid-column: 1 / -1;
+  background: #fff;
+  border: 1px solid #d0daea;
+  border-radius: 8px;
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 12px rgba(20, 45, 90, 0.07);
+}
+
+.formulario-actividad h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin: 0 0 4px;
+  letter-spacing: -0.2px;
+}
+
+.formulario-actividad input {
+  padding: 10px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  color: #1e3a5f;
+  border: 1px solid #d0daea;
+  border-radius: 4px;
+  background: #f8fafd;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.formulario-actividad input:focus {
+  border-color: #4a90d9;
+  box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.12);
+  background: #fff;
+}
+
+.formulario-actividad input[type="file"] {
+  padding: 8px 12px;
+  background: #f0f4fa;
+  cursor: pointer;
+}
+
+/* ── Botón guardar/actualizar ── */
+.btn.btn-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 11px 24px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
+.btn.btn-save:hover {
+  background: #4a90d9;
+}
+
+/* ── Botón eliminar imagen ── */
+.formulario-actividad button:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.35);
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  margin-top: 6px;
+}
+
+.formulario-actividad button:not(.btn):hover {
+  background: rgba(231, 76, 60, 0.07);
+  border-color: rgba(231, 76, 60, 0.6);
+}
+
+/* =============================================
+   TARJETA DE ACTIVIDAD
+   ============================================= */
 .actividad-card {
   width: 100%;
   max-width: 350px;
-  margin: 20px auto;
+  margin: 0 auto;
   background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  border: 5px solid #888;
-  transition: transform 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08);
+  border: none;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .actividad-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 44px rgba(20, 45, 90, 0.14);
 }
 
-/* IMAGEN CON FONDO DECORATIVO */
+/* ── Título ── */
+.title-content {
+  padding: 18px 20px 14px;
+  background: #fff;
+  border-bottom: 1px solid #edf2fa;
+}
+
+.title-content h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -0.1px;
+}
+
+/* ── Imagen ── */
 .card-img {
   position: relative;
-  background-color: #fdf5e6;
-  padding: 15px;
-  border-bottom: 1px solid #f0f0f0;
+  width: 100%;
+  height: 180px;
   overflow: hidden;
+  background: #0d2340;
 }
 
 .card-img img {
   width: 100%;
-  height: auto;
-  border-radius: 16px;
+  height: 100%;
   object-fit: cover;
+  display: block;
+  opacity: 0.9;
+  transition: opacity 0.3s, transform 0.35s ease;
   position: relative;
   z-index: 2;
+  border-radius: 0;
 }
 
-.card-img::before {
-  content: "";
-  position: absolute;
-  border:20px red solid;
-  top: -30px;
-  left: -20px;
-  width: 350px;
-  height: 280px;
-  background-color: rgb(247, 167, 30);
-  border-radius: 28%;
-  z-index: 1;
-  opacity: 0.8;
+.card-img:hover img {
+  opacity: 1;
+  transform: scale(1.03);
 }
 
+/* Eliminar los pseudo-elementos decorativos anteriores */
+.card-img::before,
 .card-img::after {
-  content: "";
-  position: absolute;
-  bottom: -10px;
-  right: -10px;
-  width: 80px;
-  height: 80px;
-  background-image: radial-gradient(rgb(247, 30, 30) 3px, transparent 1px);
-  background-size: 10px 10px;
-  z-index: 1;
-  opacity: 0.5;
+  display: none;
 }
 
-/* CONTENIDO DE LA TARJETA */
+/* ── Contenido ── */
 .card-content {
-  padding: 20px;
-  background-color: #fff;
-  border-top:solid 15px rgb(58, 85, 184);
-  border-bottom:solid 25px rgb(58, 85, 184);
-}
-
-.title-content{
-  font-size: 1.4rem;
-  text-align:center;
-  color: rgb(58, 85, 184);
-  margin-bottom: 10px;
-  font-weight: 700;
-  background: rgb(247, 167, 30);
-}
-.title-content h2 {
-  font-size: 1.4rem;
-  color: rgb(58, 85, 184);
-  margin-bottom: 10px;
-  font-weight: 700;
+  padding: 16px 20px;
+  background: #fff;
+  border-top: none;
+  border-bottom: none;
+  flex: 1;
 }
 
 .card-content p {
-  font-size: 0.9rem;
-  margin: 5px 0;
-  color: #333;
+  font-size: 13px;
+  margin: 6px 0;
+  color: #5a7a9a;
+  line-height: 1.5;
+  font-family: 'DM Sans', sans-serif;
 }
 
-/* ACCIONES (BOTONES) */
+.card-content p strong {
+  color: #1e3a5f;
+  font-weight: 500;
+}
+
+/* ── Acciones ── */
 .card-actions {
-  background-color: rgb(58, 85, 184);
   display: flex;
-  justify-content: space-around;
-  padding: 10px 0 20px;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 14px 20px 16px;
+  background: #fff;
+  border-top: 1px solid #edf2fa;
 }
 
 .card-actions .btn {
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 16px;
+  border-radius: 3px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s;
 }
 
 .card-actions .btn-edit {
-  background-color: #f7931e;
-  color: #fff;
+  background: rgba(74, 144, 217, 0.15);
+  color: #1e5a9f;
+  border: 1px solid rgba(74, 144, 217, 0.35);
 }
 
 .card-actions .btn-edit:hover {
-  background-color: #e67e00;
+  background: rgba(74, 144, 217, 0.3);
+  border-color: rgba(74, 144, 217, 0.6);
 }
 
 .card-actions .btn-delete {
-  background-color: #e74c3c;
-  color: #fff;
+  background: rgba(231, 76, 60, 0.1);
+  color: #922b1a;
+  border: 1px solid rgba(231, 76, 60, 0.3);
 }
 
 .card-actions .btn-delete:hover {
-  background-color: #c0392b;
+  background: rgba(231, 76, 60, 0.22);
+  border-color: rgba(231, 76, 60, 0.55);
 }
 
-/* RESPONSIVO */
-@media (max-width: 480px) {
-  
+/* =============================================
+   RESPONSIVE — TABLET (≤991px)
+   ============================================= */
+@media (max-width: 991px) {
+  .actividades-container {
+    padding: 24px 28px;
+    gap: 18px;
+  }
 
-  .card-content h2 {
-    font-size: 1.2rem;
+  .btn-crear {
+    margin-left: 28px;
+  }
+}
+
+/* =============================================
+   RESPONSIVE — MOBILE (≤600px)
+   ============================================= */
+@media (max-width: 600px) {
+  body {
+    margin-top: 100px;
+  }
+
+  .actividades-container {
+    grid-template-columns: 1fr;
+    padding: 16px 14px;
+    gap: 14px;
+  }
+
+  .btn-crear {
+    margin: 0 14px;
+    width: calc(100% - 28px);
+    justify-content: center;
+  }
+
+  .formulario-actividad {
+    padding: 20px 16px;
+  }
+
+  .actividad-card {
+    max-width: 100%;
   }
 
   .card-content p {
-    font-size: 0.85rem;
+    font-size: 12.5px;
   }
 
   .card-actions {
-    flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   .card-actions .btn {
-    width: 100%;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .paginacion button {
+    padding: 7px 11px;
+    font-size: 12px;
+    min-width: 34px;
+  }
+}
+
+/* =============================================
+   RESPONSIVE — MOBILE PEQUEÑO (≤400px)
+   ============================================= */
+@media (max-width: 400px) {
+  .actividades-container {
+    padding: 12px;
+  }
+
+  .title-content h2 {
+    font-size: 1rem;
+  }
+
+  .card-img {
+    height: 150px;
   }
 }
