@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/Post.css";
 import fondo from "../assets/Juego.jpeg";
+import PostStatsMini from "../components/PostStatsMini";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 const POSTS_PER_PAGE = 6;
@@ -111,6 +112,7 @@ export default function Post() {
                       >
                         Ver más
                       </button>
+                      <PostStatsMini postId={post._id} />
                     </div>
                   </div>
                 </div>
