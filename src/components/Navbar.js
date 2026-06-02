@@ -71,11 +71,35 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
+      {/* Logo — izquierda */}
       <div className="logo-img animated-logo">
         <img src={logoImg} alt="Logo Sentidos" className="logo-image" />
         <div className="light-shine" />
       </div>
 
+      {/* PWA — centro */}
+      <div className="pwa-center">
+        {pwaInstalled ? (
+          <button className="pwa-btn pwa-btn--open" onClick={() => window.location.reload()}>
+            <span className="pwa-icon">⚡</span>
+            <span className="pwa-label">Abrir app</span>
+          </button>
+        ) : (deferredPrompt || isIOS) ? (
+          <div className="pwa-wrapper">
+            <button className="pwa-btn pwa-btn--install" onClick={handleInstallClick}>
+              <span className="pwa-icon">⬇</span>
+              <span className="pwa-label">Descargar app</span>
+            </button>
+            {isIOS && showIOSHint && (
+              <div className="pwa-ios-hint">
+                <p>Tocá <strong>Compartir</strong> ⎙ y luego <strong>"Agregar a inicio"</strong></p>
+              </div>
+            )}
+          </div>
+        ) : null}
+      </div>
+
+      {/* Hamburguesa — derecha */}
       <button
         className="menu-toggle"
         onClick={() => setMenuOpen((prev) => !prev)}
@@ -84,62 +108,37 @@ export default function Navbar() {
         {menuOpen ? <X size={28} /> : <Menu size={28} />}
       </button>
 
+      {/* Links */}
       <ul className={`nav-links ${menuOpen ? "show" : ""}`}>
-        <li>
-          <Link to="/" onClick={handleLinkClick}>Inicio</Link>
-        </li>
-        <li>
-          <Link to="/inscription" onClick={handleLinkClick}>Cursos</Link>
-        </li>
-        <li>
-          <Link to="/contacto" onClick={handleLinkClick}>Contacto</Link>
-        </li>
-        <li>
-          <Link to="/post" onClick={handleLinkClick}>Post</Link>
-        </li>
-        <li>
-          <Link to="/descargas" onClick={handleLinkClick}>Guía gratis</Link>
-        </li>
+        <li><Link to="/" onClick={handleLinkClick}>Inicio</Link></li>
+        <li><Link to="/inscription" onClick={handleLinkClick}>Cursos</Link></li>
+        <li><Link to="/contacto" onClick={handleLinkClick}>Contacto</Link></li>
+        <li><Link to="/post" onClick={handleLinkClick}>Post</Link></li>
+        <li><Link to="/descargas" onClick={handleLinkClick}>Guía gratis</Link></li>
         {user ? (
           <>
             <li>
               <Link to={getDashboardLink()} onClick={handleLinkClick} className="dashboard-btn">
-               Panel
+                Panel
               </Link>
             </li>
             {(user.role === "admin" || user.role === "superadmin") && (
               <>
-                <li>
-                  <Link to="/editar-publicaciones" onClick={handleLinkClick}>My Post</Link>
-                </li>
-                <li>
-                  <Link to="/crear" onClick={handleLinkClick}>Crear</Link>
-                </li>
-                <li>
-                  <Link to="/crear-actividades" onClick={handleLinkClick}>Act.</Link>
-                </li>
+                <li><Link to="/editar-publicaciones" onClick={handleLinkClick}>My Post</Link></li>
+                <li><Link to="/crear" onClick={handleLinkClick}>Crear</Link></li>
+                <li><Link to="/crear-actividades" onClick={handleLinkClick}>Act.</Link></li>
               </>
             )}
             {user.role === "superadmin" && (
               <>
-                <li>
-                  <Link to="/congelar" onClick={handleLinkClick}>Freeze</Link>
-                </li>
-                <li>
-                  <Link to="/data-user" onClick={handleLinkClick}>Data</Link>
-                </li>
-                <li>
-                  <Link to="/superadmincourses" onClick={handleLinkClick}>Tutor</Link>
-                </li>
+                <li><Link to="/congelar" onClick={handleLinkClick}>Freeze</Link></li>
+                <li><Link to="/data-user" onClick={handleLinkClick}>Data</Link></li>
+                <li><Link to="/superadmincourses" onClick={handleLinkClick}>Tutor</Link></li>
               </>
             )}
             <li className="user group">
               <div className="user-info">
-                <img
-                  src={user.avatar || DEFAULT_AVATAR}
-                  alt="avatar"
-                  className="avatar-img"
-                />
+                <img src={user.avatar || DEFAULT_AVATAR} alt="avatar" className="avatar-img" />
                 <span><b>{user.nombre || "Usuario"}</b></span>
               </div>
             </li>
@@ -149,35 +148,11 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            <li>
-              <Link to="/registro" onClick={handleLinkClick} className="register-btn">Registrarse</Link>
-            </li>
-            <li>
-              <Link to="/login" onClick={handleLinkClick} className="login-btn">Ingresar</Link>
-            </li>
+            <li><Link to="/registro" onClick={handleLinkClick} className="register-btn">Registrarse</Link></li>
+            <li><Link to="/login" onClick={handleLinkClick} className="login-btn">Ingresar</Link></li>
           </>
         )}
       </ul>
-
-      {/* ── Botón PWA ── */}
-      {pwaInstalled ? (
-        <button className="pwa-btn pwa-btn--open" onClick={() => window.location.reload()}>
-          <span className="pwa-icon">⚡</span>
-          <span className="pwa-label">Abrir app</span>
-        </button>
-      ) : (deferredPrompt || isIOS) ? (
-        <div className="pwa-wrapper">
-          <button className="pwa-btn pwa-btn--install" onClick={handleInstallClick}>
-            <span className="pwa-icon">⬇</span>
-            <span className="pwa-label">Descargar app</span>
-          </button>
-          {isIOS && showIOSHint && (
-            <div className="pwa-ios-hint">
-              <p>Tocá <strong>Compartir</strong> ⎙ y luego <strong>"Agregar a inicio"</strong></p>
-            </div>
-          )}
-        </div>
-      ) : null}
     </nav>
   );
 }
