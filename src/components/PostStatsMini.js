@@ -1,6 +1,7 @@
 // src/components/PostStatsMini.jsx
 // No registra vistas ni permite votar (eso es solo en el post completo).
 
+
 import React, { useEffect, useState } from "react";
 import { FiEye, FiThumbsUp } from "react-icons/fi";
 import "../style/PostStatsMini.css";
