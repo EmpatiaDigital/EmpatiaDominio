@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import portadaGuia from "../assets/familiaEMPATIA.jpg";
 import portadaLibro from "../assets/Portada3.jpg";
 import guiaPDF from "../assets/Guía Empatía Digital.pdf";
-import avatar from "../assets/avatar.jpg";
+import avatar from "../assets/avatar.jpeg";
 import Swal from "sweetalert2";
 import "../style/Descargar.css";
 import { useAuth } from "../context/AuthContext";
@@ -29,12 +29,56 @@ const destacados = [
   },
 ];
 
+const BADGE_LABELS = { pdf: "PDF", libro: "Libro" };
+
+const ArrowRight = () => (
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const Download = () => (
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M7 2v7M4 6l3 3 3-3M2 11h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const UploadIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M7 10V3M4 6l3-3 3 3M2 11h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M2 4h10M5 4V2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V4M5.5 7v3M8.5 7v3M3 4l.75 7.25a.5.5 0 0 0 .5.45h5.5a.5.5 0 0 0 .5-.45L11 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const WhatsAppIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M7 1C3.69 1 1 3.69 1 7c0 1.08.28 2.1.78 2.97L1 13l3.13-.76A6 6 0 1 0 7 1Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/>
+  </svg>
+);
+
+const ChevronLeft = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const ChevronRight = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+    <path d="M5 3l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
 export default function Descargar() {
   const { user } = useAuth();
   const [materialDB, setMaterialDB] = useState([]);
   const [tipoFiltro, setTipoFiltro] = useState("todos");
   const [pagina, setPagina] = useState(1);
-  const porPagina = 2;
+  const porPagina = 4;
 
   const cargarMateriales = async () => {
     try {
@@ -80,14 +124,9 @@ export default function Descargar() {
         fileData: base64,
       };
 
-      // ¿Es uno de los dos destacados?
       const esDestacado = destacados.find((d) => d.name === archivo.name);
       if (esDestacado) {
-        Swal.fire(
-          "Reemplazo local",
-          "Se reemplazó un material destacado.",
-          "info"
-        );
+        Swal.fire("Reemplazo local", "Se reemplazó un material destacado.", "info");
         destacados[destacados.findIndex((d) => d.name === archivo.name)] = {
           ...destacados.find((d) => d.name === archivo.name),
           ...nuevo,
@@ -150,18 +189,16 @@ export default function Descargar() {
         return id;
       })();
 
-    const actividad = {
-      visitorId,
-      evento,
-      titulo: nombre,
-      timestamp: new Date().toISOString(),
-    };
-
     try {
       await fetch("https://empatia-dominio-back.vercel.app/api/user-actividad", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(actividad),
+        body: JSON.stringify({
+          visitorId,
+          evento,
+          titulo: nombre,
+          timestamp: new Date().toISOString(),
+        }),
       });
     } catch (error) {
       console.error("Error al registrar actividad:", error);
@@ -169,14 +206,34 @@ export default function Descargar() {
   };
 
   return (
-    <section className="compras-section">
-      <h2 className="titulo-principal">Material Recomendado</h2>
+    <section className="descargar-section">
 
+      {/* ── Header ── */}
+      <div className="descargar-section-header">
+        <div>
+          <span className="section-eyebrow">Recursos gratuitos</span>
+          <h2 className="titulo-principal">Material Recomendado</h2>
+        </div>
+        <span className="contador-materiales">
+          {filtrados.length}{" "}
+          {tipoFiltro === "todos"
+            ? "materiales"
+            : tipoFiltro === "libro"
+            ? "libros"
+            : "PDFs"}
+        </span>
+      </div>
+
+      {/* ── Filtro ── */}
       <div className="filtro-container">
-        <label>Mostrar:</label>
+        <label htmlFor="filtro-tipo">Mostrar:</label>
         <select
+          id="filtro-tipo"
           value={tipoFiltro}
-          onChange={(e) => setTipoFiltro(e.target.value)}
+          onChange={(e) => {
+            setTipoFiltro(e.target.value);
+            setPagina(1);
+          }}
         >
           <option value="todos">Todos</option>
           <option value="libro">Libros</option>
@@ -184,9 +241,11 @@ export default function Descargar() {
         </select>
       </div>
 
+      {/* ── Upload admin ── */}
       {user?.role === "superadmin" && (
         <div className="upload-container">
-          <label htmlFor="upload-input" className="btn-ver-mas">
+          <label htmlFor="upload-input" className="btn-upload">
+            <UploadIcon />
             Subir nuevo PDF o Libro
           </label>
           <input
@@ -199,11 +258,10 @@ export default function Descargar() {
         </div>
       )}
 
-      <div className="lista-posts-container">
+      {/* ── Grid de cards ── */}
+      <div className="lista-material-container">
         {visibles.map((item, index) => {
-          const isPDF = item.type === "pdf";
           const esLocal = item.esFijo;
-
           const archivoBase64 = item.fileData
             ? `data:application/pdf;base64,${item.fileData}`
             : item.file;
@@ -211,143 +269,136 @@ export default function Descargar() {
           return (
             <div
               key={item._id || index}
-              className="post-card"
+              className="material-card"
               style={{
                 backgroundImage: `url(${item.portada || portadaGuia})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
               }}
             >
-              <div className="post-content-overlay-descargar">
-                <div>
-                  <h3 className="autor">{item.title}</h3>
-                  <br></br>
-                  <hr
-                    style={{
-                      border: "none",
-                      height: "3px", // Grosor
-                      backgroundColor: "#fff", // Color
-                      margin: "2rem 0", // Separación arriba y abajo
-                      width: "100%", // Ancho relativo
-                    }}
-                  />
-                {item.type === "libro" ? (
+              {/* Badge tipo */}
+              <span className="material-badge">
+                {BADGE_LABELS[item.type] || item.type}
+              </span>
+
+              {/* Overlay */}
+              <div className="material-overlay">
+                <h3>{item.title}</h3>
+
+                <div className="material-footer">
+                  {item.type === "libro" ? (
                     <a
                       href={`https://wa.me/543413559329?text=${encodeURIComponent(
-                        `Hola, tengo interés en donar para que puedas seguir adelante "${item.title}".`
+                        `Hola, tengo interés en colaborar con "${item.title}".`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-ver-mas"
+                      className="btn-material"
                       onClick={() =>
                         registrarActividad("PDFlibroWhatsApp", item.title)
                       }
                     >
-                      Si deseas colaborar
+                      <WhatsAppIcon />
+                      Colaborar
                     </a>
-                  )  : (
+                  ) : (
                     <a
                       href={archivoBase64}
                       download={item.filename || item.name}
-                      className="btn-ver-mas"
+                      className="btn-material"
                       onClick={() =>
                         registrarActividad("PDFguiaDescarga", item.title)
                       }
                     >
+                      <Download />
                       Descargar
                     </a>
                   )}
+
+                  {user?.role === "superadmin" && !esLocal && (
+                    <button
+                      className="btn-material btn-eliminar"
+                      onClick={() => eliminarItem(item._id)}
+                    >
+                      <TrashIcon />
+                      Eliminar
+                    </button>
+                  )}
                 </div>
 
-                {user?.role === "superadmin" && !esLocal && (
-                  <button
-                    className="btn-ver-mas btn-borrar"
-                    style={{ backgroundColor: "#ff5252", marginTop: "0.5rem" }}
-                    onClick={() => eliminarItem(item._id)}
-                  >
-                    Eliminar
-                  </button>
-                )}
-              </div>
-
-              <div
-                style={{
-                  backgroundColor: "#f0f8ff",
-                  borderLeft: "4px solid #007acc",
-                  padding: "1em",
-                  marginTop: "1em",
-                  fontStyle: "italic",
-                  color: "#000",
-                }}
-              >
-                <strong>Nota:</strong>{" "}
-                <em>
-                  Este contenido tiene fines educativos y no sustituye
-                  asesoramiento clínico o médico profesional.
-                </em>{" "}
-                <a
-                  href="/descargo-de-responsabilidad"
-                  style={{
-                    fontStyle: "normal",
-                    textDecoration: "underline",
-                    color: "#007acc",
-                    marginLeft: "4px",
-                  }}
-                >
-                  Ver más
-                </a>
+                {/* Disclaimer */}
+                <p className="nota-disclaimer">
+                  Contenido educativo · no sustituye asesoramiento clínico.{" "}
+                  <a href="/descargo-de-responsabilidad">Ver más</a>
+                </p>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="paginacion-container">
-        <button disabled={pagina === 1} onClick={() => setPagina(pagina - 1)}>
-          {"<"}
-        </button>
-        <span className="contador-materiales">
-          Viendo: {visibles.length > 0 ? (pagina - 1) * porPagina + 1 : 0}–
-          {Math.min(pagina * porPagina, filtrados.length)} de {filtrados.length}{" "}
-          {tipoFiltro === "todos"
-            ? "materiales"
-            : tipoFiltro === "libro"
-            ? "libros"
-            : "PDFs"}
-        </span>
-        <button
-          disabled={pagina === totalPaginas}
-          onClick={() => setPagina(pagina + 1)}
-        >
-          {">"}
-        </button>
-      </div>
-
-      <div className="descripcion-autor">
-        <img
-          src={AUTOR_AVATAR}
-          alt="Autor"
-          className="avatar-autor"
-          style={{ width: 80, borderRadius: "50%" }}
-        />
-        <div className="tarjeta-autor">
-          <p>
-       Desde 2014 comencé a explorar el mundo digital creando aplicaciones educativas con App Inventor del MIT, y en 2017 leí por primera vez sobre los modelos "transformer", lo que despertó en mí un profundo interés por el desarrollo de la inteligencia artificial. Ese recorrido técnico se fue integrando con mi vocación por el acompañamiento en salud mental.
-
-En 2024 unifiqué mis conocimientos en IA y programación con mi formación como acompañante terapéutico, una modalidad de intervención en salud mental avalada por la Universidad Nacional de Rosario (UNR) y que ejerzo empíricamente desde 2012.
-
-Además, desde 2021 soy diplomado en lógica algorítmica y fundamentos de la programación por Egg Cooperation, lo que me permite tender puentes entre el mundo emocional y el digital.
-
-Trabajé en la gestión de redes sociales para Amfac, una Mutual avocados a diferentes servicios, y también participé en programas radiales en horarios centrales donde abordé temas sobre tecnología, salud mental e inteligencia artificial. Esa experiencia me permitió ofrecer charlas en diferentes centros comunitario y espacios de reflexión sobre el impacto digital en nuestras vidas y el avance de la IA.
-
-Hoy acompaño a personas y familias a tomar decisiones más conscientes frente a la tecnología, combinando calidez humana con comprensión técnica.
-          </p>
-          <a href="/registro" className="link-suscripcion">
-            Suscribite para recibir novedades, posts y más.
-          </a>
+      {/* ── Paginación ── */}
+      {totalPaginas > 1 && (
+        <div className="paginacion-container">
+          <button
+            className="paginacion-btn"
+            disabled={pagina === 1}
+            onClick={() => setPagina(pagina - 1)}
+            aria-label="Página anterior"
+          >
+            <ChevronLeft />
+          </button>
+          <span className="contador-materiales">
+            {(pagina - 1) * porPagina + 1}–
+            {Math.min(pagina * porPagina, filtrados.length)} de {filtrados.length}
+          </span>
+          <button
+            className="paginacion-btn"
+            disabled={pagina === totalPaginas}
+            onClick={() => setPagina(pagina + 1)}
+            aria-label="Página siguiente"
+          >
+            <ChevronRight />
+          </button>
         </div>
+      )}
+
+      {/* ── Tarjeta autor ── */}
+      <div className="tarjeta-autor-wrapper">
+        <div className="autor-header">
+          <img
+            src={AUTOR_AVATAR}
+            alt="Foto del autor"
+            className="avatar-autor"
+          />
+          <div className="autor-info">
+            <p className="autor-nombre">Acompañante Terapéutico & Dev IA</p>
+            <p className="autor-rol">Rosario · desde 2012</p>
+          </div>
+        </div>
+
+        <p className="autor-bio">
+          Desde 2014 comencé a explorar el mundo digital creando aplicaciones
+          educativas con App Inventor del MIT, y en 2017 leí por primera vez
+          sobre los modelos <strong>"transformer"</strong>, lo que despertó en
+          mí un profundo interés por el desarrollo de la inteligencia artificial.
+          Ese recorrido técnico se fue integrando con mi vocación por el
+          acompañamiento en salud mental.
+          <br /><br />
+          En <strong>2024</strong> unifiqué mis conocimientos en IA y
+          programación con mi formación como acompañante terapéutico, modalidad
+          avalada por la <strong>Universidad Nacional de Rosario (UNR)</strong>{" "}
+          y que ejerzo empíricamente desde 2012. Hoy acompaño a personas y
+          familias a tomar decisiones más conscientes frente a la tecnología,
+          combinando calidez humana con comprensión técnica.
+        </p>
+
+        <a href="/registro" className="btn-suscripcion">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M1 3h12v8.5a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 1 11.5V3ZM1 3l6 5.5L13 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Suscribite para recibir novedades
+        </a>
       </div>
+
     </section>
   );
 }
