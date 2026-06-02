@@ -130,8 +130,13 @@
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(107, 179, 240, 0.25);
   backdrop-filter: blur(8px);
-  padding: 10px 18px;
+  padding: 14px 22px;
   border-radius: var(--ins-radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 110px;
   transition: background var(--ins-transition), border-color var(--ins-transition);
 }
 
@@ -147,6 +152,17 @@
   letter-spacing: 0.5px;
 }
 
+
+/* ── Nombre debajo del logo de avalador ── */
+.avalador-name {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(168, 212, 245, 0.7);
+  margin: 0;
+  text-align: center;
+}
 .avalador-logo {
   height: 40px;
   width: auto;
@@ -385,7 +401,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-bottom: 0 !important;
+  padding-bottom: 1.8rem;
 }
 
 .form-group {
@@ -515,19 +531,21 @@
 
 /* ── Botón submit ── */
 .btn-submit {
-  padding: 1rem 2rem;
+  padding: 1.1rem 2rem;
   background: linear-gradient(100deg, var(--ins-navy) 0%, var(--ins-blue) 100%);
   color: var(--ins-white);
   border: none;
   border-radius: var(--ins-radius-sm);
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
   cursor: pointer;
   transition: opacity var(--ins-transition), transform var(--ins-transition), box-shadow var(--ins-transition);
   box-shadow: 0 4px 16px rgba(30, 58, 95, 0.28);
-  margin-top: 6px;
+  margin-top: 10px;
+  margin-bottom: 2rem;
+  width: 100%;
 }
 
 .btn-submit:hover:not(:disabled) {
