@@ -368,15 +368,12 @@ const Inscription = () => {
             <p className="avaladores-title">Curso avalado por:</p>
             <div className="avaladores-logos">
               {avaladores.map((avalador) => (
-                <div key={avalador.id} className="avalador-item">
-                  <div className="avalador-logo-circle">
-                    <img
-                      src={avalador.logo}
-                      alt={avalador.nombre}
-                      className="avalador-logo"
-                    />
-                  </div>
-                  <p className="avalador-name">{avalador.nombre}</p>
+                <div key={avalador.id} className="avalador-logo-circle">
+                  <img
+                    src={avalador.logo}
+                    alt={avalador.nombre}
+                    className="avalador-logo"
+                  />
                 </div>
               ))}
             </div>
