@@ -129,34 +129,34 @@
 
 /* ── Círculo blanco grande — sin tarjeta, sin texto ── */
 .avalador-logo-circle {
-  width: 100px;
-  height: 100px;
-  min-width: 100px;
+  width: 160px;
+  height: 160px;
+  min-width: 160px;
   border-radius: 50%;
   background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    0 0 0 3px rgba(255, 255, 255, 0.15);
+    0 6px 28px rgba(0, 0, 0, 0.35),
+    0 0 0 4px rgba(255, 255, 255, 0.18);
   overflow: hidden;
   flex-shrink: 0;
   transition: transform var(--ins-transition), box-shadow var(--ins-transition);
 }
 
 .avalador-logo-circle:hover {
-  transform: translateY(-3px) scale(1.04);
+  transform: translateY(-4px) scale(1.05);
   box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.35),
-    0 0 0 3px rgba(107, 179, 240, 0.4);
+    0 12px 36px rgba(0, 0, 0, 0.4),
+    0 0 0 4px rgba(107, 179, 240, 0.5);
 }
 
 /* ── Logo: sin filtros, colores originales del PNG ── */
 .avalador-logo {
-  height: 72px;
+  height: 118px;
   width: auto;
-  max-width: 80px;
+  max-width: 132px;
   object-fit: contain;
   display: block;
 }
@@ -164,28 +164,28 @@
 /* ─── Mobile ≤600px ─── */
 @media (max-width: 600px) {
   .avalador-logo-circle {
-    width: 80px;
-    height: 80px;
-    min-width: 80px;
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
   }
 
   .avalador-logo {
-    height: 56px;
-    max-width: 62px;
+    height: 88px;
+    max-width: 100px;
   }
 }
 
 /* ─── Mobile pequeño ≤400px ─── */
 @media (max-width: 400px) {
   .avalador-logo-circle {
-    width: 68px;
-    height: 68px;
-    min-width: 68px;
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
   }
 
   .avalador-logo {
-    height: 46px;
-    max-width: 52px;
+    height: 72px;
+    max-width: 84px;
   }
 }
 
