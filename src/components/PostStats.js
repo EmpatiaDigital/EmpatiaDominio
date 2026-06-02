@@ -1,4 +1,4 @@
-//  src/components/PostStats.jsx
+// src/components/PostStats.jsx
 
 import React, { useEffect, useState, useCallback } from "react";
 import { FiThumbsUp, FiThumbsDown, FiEye } from "react-icons/fi";
@@ -32,7 +32,7 @@ const getVisitorId = () => {
     const raw = [
       navigator.userAgent,
       navigator.language,
-      screen.width + "x" + screen.height,
+      window.screen.width + "x" + window.screen.height,
       new Date().getTimezoneOffset(),
       canvasData.slice(-50),
     ].join("|");
