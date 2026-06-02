@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 import '../style/Inscription.css';
 import { Link } from "react-router-dom";
+import logo1 from '../assets/logo1.png';
+import logo2 from '../assets/logo2.png';
 
 const BASE_URL = 'https://empatia-dominio-back.vercel.app/api';
 
@@ -29,11 +31,10 @@ const Inscription = () => {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
+  // ─── Avaladores con logo1 y logo2 ────────────────────────────────────────
   const avaladores = [
-    { nombre: 'Institucion 1', logo: '' },
-    { nombre: 'Institucion 2', logo: '' },
-    { nombre: 'Institucion 3', logo: '' },
-    { nombre: 'Institucion 4', logo: '' }
+    { nombre: 'logo1', logo: logo1 },
+    { nombre: 'logo2', logo: logo2 },
   ];
 
   // ─── Fetch del curso activo ───────────────────────────────────────────────
@@ -90,10 +91,6 @@ const Inscription = () => {
   };
 
   // ─── FIX #3 y #4: cálculo correcto de cupos por turno ───────────────────
-  //  El backend ya devuelve cuántos hay inscriptos por turno.
-  //  Se divide el total de cupos en dos mitades iguales y se descuenta
-  //  cada inscripto de su turno. Los "indistintos" se reparten equitativamente
-  //  entre los dos turnos para el cálculo de disponibilidad visual.
   const getCuposDisponiblesPorTurno = (turno) => {
     const cuposTotal = inscriptionsStats.cuposTotal || course?.cuposTotal || 0;
     if (!cuposTotal) return 0;
@@ -120,8 +117,6 @@ const Inscription = () => {
   };
 
   // ─── Determinar qué turnos están habilitados por el admin ────────────────
-  //  El backend puede devolver course.turnosHabilitados = ['manana','tarde','indistinto']
-  //  Si no existe, se habilitan todos por defecto.
   const getTurnosHabilitados = () => {
     if (course?.turnosHabilitados && course.turnosHabilitados.length > 0) {
       return course.turnosHabilitados;
@@ -182,8 +177,6 @@ const Inscription = () => {
     setSubmitting(true);
 
     try {
-      // ✅ FIX #1: backtick en lugar de comilla simple
-      // ✅ FIX #2: endpoint correcto → /api/inscriptions (POST)
       const response = await fetch(`${BASE_URL}/inscriptions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -195,7 +188,6 @@ const Inscription = () => {
       if (response.ok) {
         await fetchInscriptionsStats();
 
-        // ✅ FIX #5: sin setTimeout extra — el .then() del Swal maneja todo
         await Swal.fire({
           icon: 'success',
           title: 'Inscripción Exitosa',
@@ -236,10 +228,8 @@ const Inscription = () => {
           timerProgressBar: true
         }).then((result) => {
           if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
-            // ✅ FIX #5: solo navega si el usuario confirmó O se agotó el timer
             navigate('/informacion');
           } else if (result.dismiss === Swal.DismissReason.cancel) {
-            // El usuario eligió "Nueva Inscripción" → limpiar formulario
             setFormData({
               nombre: '',
               apellido: '',
@@ -377,16 +367,19 @@ const Inscription = () => {
           />
         )}
         <div className="course-hero-overlay">
+
+          {/* ── Avaladores con logo1 y logo2 ── */}
           <div className="avaladores-section">
             <p className="avaladores-title">Curso avalado por:</p>
             <div className="avaladores-logos">
               {avaladores.map((avalador, index) => (
                 <div key={index} className="avalador-item">
-                  {avalador.logo ? (
-                    <img src={avalador.logo} alt={avalador.nombre} className="avalador-logo" />
-                  ) : (
-                    <div className="avalador-placeholder">{avalador.nombre}</div>
-                  )}
+                  <img
+                    src={avalador.logo}
+                    alt={avalador.nombre}
+                    className="avalador-logo"
+                  />
+                  <p className="avalador-name">{avalador.nombre}</p>
                 </div>
               ))}
             </div>
