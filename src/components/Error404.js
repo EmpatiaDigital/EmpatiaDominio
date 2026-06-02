@@ -19,6 +19,7 @@ function buildBoard() {
     adjacentRobots: 0,
   }));
 
+  
   // Colocar robots aleatoriamente
   let placed = 0;
   while (placed < ROBOT_COUNT) {
