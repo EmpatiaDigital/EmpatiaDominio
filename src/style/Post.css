@@ -4,18 +4,18 @@
    LAYOUT GENERAL
    ============================================= */
 .post-page {
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 56px 48px;
+  padding: 56px 48px 72px;
   font-family: 'DM Sans', 'Segoe UI', sans-serif;
 }
 
 /* =============================================
-   ENCABEZADO DE PÁGINA — centrado
+   ENCABEZADO DE PÁGINA
    ============================================= */
 .titulo-principal {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 2rem;
+  font-size: 1.85rem;
   font-weight: 700;
   color: #1e3a5f;
   text-align: center;
@@ -119,11 +119,8 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 22px;
-}
-
-/* Sin ninguna card especial — todas iguales */
-.post-card:first-child {
-  grid-column: span 1;
+  padding: 0;
+  margin: 0;
 }
 
 /* =============================================
@@ -131,7 +128,7 @@
    ============================================= */
 .post-card {
   position: relative;
-  height: 300px;          /* altura fija igual en todas */
+  height: 300px;
   border-radius: 8px;
   overflow: hidden;
   background-size: cover;
@@ -139,61 +136,72 @@
   background-repeat: no-repeat;
   background-color: #1e3a5f;
   border: none;
-  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08);
   cursor: pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  outline: none;
 }
 
-.post-card:hover {
+.post-card:hover,
+.post-card:focus-visible {
   transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(30, 58, 95, 0.16);
+  box-shadow: 0 18px 44px rgba(20, 45, 90, 0.18);
+}
+
+/* ── Badge de categoría ── */
+.card-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  background: rgba(8, 22, 55, 0.72);
+  color: #6bb3f0;
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 3px;
+  backdrop-filter: blur(4px);
 }
 
 /* =============================================
-   OVERLAY — siempre ocupa todo, contenido
-   siempre pegado abajo con justify flex-end
+   OVERLAY
    ============================================= */
 .post-card-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(8, 20, 48, 0.97) 0%,
-    rgba(8, 20, 48, 0.65) 38%,
-    rgba(8, 20, 48, 0.0) 70%
+    rgba(6, 16, 42, 0.97) 0%,
+    rgba(6, 16, 42, 0.68) 38%,
+    rgba(6, 16, 42, 0.05) 72%,
+    transparent 100%
   );
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;   /* todo el contenido siempre abajo */
-  padding: 0 18px 16px;        /* sin padding top — el gradiente cubre */
+  justify-content: flex-end;
+  padding: 0 18px 16px;
   gap: 0;
 }
 
-/* =============================================
-   BLOQUE DE CONTENIDO: estructura fija
-   1. avatar + autor (fila)
-   2. título
-   3. separador + botón
-   ============================================= */
-
-/* Fila avatar + autor — siempre primera */
+/* ── Fila avatar + autor ── */
 .post-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 9px;
 }
 
 .avatar {
-  width: 30px;
-  height: 30px;
-  min-width: 30px;             /* no se achica */
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.55);
   object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
 }
 
-/* post-header-content solo tiene el autor — el título va aparte */
 .post-header-content {
   display: flex;
   flex-direction: column;
@@ -202,7 +210,6 @@
   min-width: 0;
 }
 
-/* Autor — siempre azul claro, misma tipografía */
 .post-autor {
   margin: 0;
   font-family: 'DM Sans', sans-serif;
@@ -215,27 +222,25 @@
   text-overflow: ellipsis;
 }
 
-/* Título — siempre debajo del autor, misma altura máxima */
+/* ── Título ── */
 .post-title {
   margin: 0 0 12px;
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.05rem;
   font-weight: 700;
   line-height: 1.3;
-  color: #fff !important;
+  color: #fff;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
-  /* Clamp a 3 líneas para que no rompa el layout */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* Separador + botón — siempre al final */
-.post-card-overlay > *:last-child {
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+/* ── Footer: separador + botón ── */
+.card-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 12px;
-  margin-top: 0;
 }
 
 /* =============================================
@@ -245,33 +250,40 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 16px;
-  background: rgba(74, 144, 217, 0.22);
+  padding: 7px 15px;
+  background: rgba(74, 144, 217, 0.2);
   color: #fff;
-  border: 1px solid rgba(107, 179, 240, 0.42);
+  border: 1px solid rgba(107, 179, 240, 0.4);
   border-radius: 3px;
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 500;
   letter-spacing: 0.3px;
   transition: background 0.2s, border-color 0.2s;
   backdrop-filter: blur(4px);
-  /* siempre a la izquierda */
-  align-self: flex-start;
 }
 
 .btn-ver-mas:hover {
-  background: rgba(74, 144, 217, 0.62);
-  border-color: rgba(107, 179, 240, 0.75);
+  background: rgba(74, 144, 217, 0.6);
+  border-color: rgba(107, 179, 240, 0.7);
 }
 
 /* =============================================
-   RESPONSIVE — TABLET (≤1024px) → 2 col
+   RESPONSIVE — TABLET GRANDE (≤1100px)
    ============================================= */
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .post-page {
-    padding: 44px 32px;
+    padding: 52px 36px 60px;
+  }
+}
+
+/* =============================================
+   RESPONSIVE — TABLET (≤991px)
+   ============================================= */
+@media (max-width: 991px) {
+  .post-page {
+    padding: 48px 28px 56px;
   }
 
   .lista-posts-container {
@@ -279,12 +291,8 @@
     gap: 18px;
   }
 
-  .post-card {
-    height: 300px;   /* misma altura que desktop */
-  }
-
   .titulo-principal {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
   }
 }
 
@@ -293,7 +301,7 @@
    ============================================= */
 @media (max-width: 768px) {
   .post-page {
-    padding: 36px 24px;
+    padding: 40px 20px 48px;
   }
 
   .lista-posts-container {
@@ -302,24 +310,28 @@
   }
 
   .post-card {
-    height: 300px;   /* misma altura */
+    height: 280px;
   }
 
   .titulo-principal {
     font-size: 1.5rem;
   }
+
+  .post-paginacion {
+    margin-bottom: 24px;
+  }
 }
 
 /* =============================================
-   RESPONSIVE — MOBILE (≤600px) → 1 col
+   RESPONSIVE — MOBILE (≤600px)
    ============================================= */
 @media (max-width: 600px) {
   .post-page {
-    padding: 28px 16px;
+    padding: 32px 14px 40px;
   }
 
   .titulo-principal {
-    font-size: 1.4rem;
+    font-size: 1.45rem;
   }
 
   .lista-posts-container {
@@ -328,31 +340,26 @@
   }
 
   .post-card {
-    height: 260px;   /* un poco menos en móvil pero todas iguales */
+    height: 260px;
   }
 
   .post-title {
     font-size: 1rem;
   }
 
-  .post-autor {
-    font-size: 11px;
+  .avatar {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
   }
 
-  .avatar {
-    width: 26px;
-    height: 26px;
-    min-width: 26px;
+  .post-autor {
+    font-size: 10.5px;
   }
 
   .btn-ver-mas {
-    padding: 6px 13px;
+    padding: 6px 12px;
     font-size: 11px;
-  }
-
-  .post-paginacion {
-    margin-bottom: 24px;
-    gap: 5px;
   }
 
   .paginacion-btn {
@@ -363,11 +370,11 @@
 }
 
 /* =============================================
-   RESPONSIVE — MOBILE PEQUEÑO (≤380px)
+   RESPONSIVE — MOBILE PEQUEÑO (≤400px)
    ============================================= */
-@media (max-width: 380px) {
+@media (max-width: 400px) {
   .post-page {
-    padding: 20px 12px;
+    padding: 24px 12px 32px;
   }
 
   .post-card {
@@ -375,6 +382,6 @@
   }
 
   .titulo-principal {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 }
