@@ -1,282 +1,232 @@
-// src/components/PostStats.jsx
-// ─── Uso en PostDetalle.jsx ─────────────────────────────────────────────────
-// import PostStats from "./PostStats";
-// Agregá al final del JSX de PostCompleto, antes del </div> de cierre:
-// <PostStats postId={id} postTitulo={post?.titulo} />
-// ────────────────────────────────────────────────────────────────────────────
+nido pegado
+7.16 KB •228 líneas
+•
+El formato puede ser inconsistente con la fuente
+// src/components/PostDetalle.jsx
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import fondo from "../assets/Juego.jpeg";
+import "../style/PostCompleto.css";
+import { FaFacebook, FaWhatsapp, FaInstagram } from "react-icons/fa";
+import Swal from "sweetalert2";
+import PostStats from "./PostStats";
 
-import React, { useEffect, useState, useCallback } from "react";
-import { FiThumbsUp, FiThumbsDown, FiEye } from "react-icons/fi";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-import "./PostStats.css";
 
-const API = "https://empatia-dominio-back.vercel.app/api";
+const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
-// ─── Genera o recupera un fingerprint persistente para visitantes anónimos ──
-const getVisitorId = () => {
-  // Prioridad: usuario logueado → visitante con fingerprint
-  const token = localStorage.getItem("token");
-  if (token) {
-    try {
-      // Decodifica el payload del JWT para obtener el userId
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      if (payload.userId) return `user_${payload.userId}`;
-    } catch (_) {}
-  }
+const PostCompleto = () => {
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  // PostDetalle.jsx
+  const shareUrl = `https://empatia-dominio-back.vercel.app/api/posts/${id}/preview`;
+  const currentUrl = `${window.location.origin}/post/${id}`; // ← frontend (para copiar en Instagram)
 
-  // Visitante anónimo: fingerprint basado en propiedades del browser + localStorage
-  let fp = localStorage.getItem("empatia_fp");
-  if (!fp) {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    ctx.textBaseline = "top";
-    ctx.font = "14px Arial";
-    ctx.fillText("fingerprint_empatia", 2, 2);
-    const canvasData = canvas.toDataURL();
+  const mensaje = post
+  ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital este es lo nuevo: ${shareUrl} `)
+  : "";
 
-    const raw = [
-      navigator.userAgent,
-      navigator.language,
-      screen.width + "x" + screen.height,
-      new Date().getTimezoneOffset(),
-      canvasData.slice(-50),
-    ].join("|");
 
-    // Hash simple
-    let hash = 0;
-    for (let i = 0; i < raw.length; i++) {
-      hash = (Math.imul(31, hash) + raw.charCodeAt(i)) | 0;
-    }
-    fp = `anon_${Math.abs(hash)}_${Date.now()}`;
-    localStorage.setItem("empatia_fp", fp);
-  }
-  return fp;
-};
+// const currentUrl = `${window.location.origin}/post/${id}`; // Esta es la del frontend
 
-// ─── Componente principal ───────────────────────────────────────────────────
-const PostStats = ({ postId, postTitulo }) => {
-  const [stats, setStats] = useState({ vistas: 0, likes: 0, dislikes: 0, miVoto: null });
-  const [relacionados, setRelacionados] = useState([]);
-  const [cargandoStats, setCargandoStats] = useState(true);
-  const [cargandoRel, setCargandoRel] = useState(true);
-  const [votando, setVotando] = useState(false);
-  const visitorId = getVisitorId();
+  
+  //  const currentUrl = `${window.location.origin}/post/${id}`;
+  //const mensaje = post
+  //? encodeURIComponent(`\`\`\`${post.titulo}\`\`\` – Leé este post en Empatía Digital: ${currentUrl}`)
+  //: "";
 
-  // Registra vista única y carga stats
+// const backendPreviewUrl = `https://empatia-dominio-back.vercel.app/post/${id}`; // Esta es la que genera los metadatos
+
+// const mensaje = post
+//   ? encodeURIComponent(`*${post.titulo}*\n${post.epigrafe || ''}\n\nLeé este post en Empatía Digital: ${backendPreviewUrl}`)
+//   : "";
+
   useEffect(() => {
-    if (!postId) return;
+    const enlaces = document.querySelectorAll(".post-content a");
 
-    const registrarVista = async () => {
-      try {
-        await fetch(`${API}/posts/${postId}/vista`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ visitorId }),
-        });
-      } catch (_) {}
-    };
+    enlaces.forEach((a) => {
+      const href = a.getAttribute("href");
+      if (href && href.startsWith("http")) {
+        a.setAttribute("target", "_blank");
+        a.setAttribute("rel", "noopener noreferrer");
+      }
+    });
+  }, []);
 
-    const cargarStats = async () => {
+  useEffect(() => {
+    const fetchPost = async () => {
       try {
         const res = await fetch(
-          `${API}/posts/${postId}/stats?visitorId=${encodeURIComponent(visitorId)}`
+          `https://empatia-dominio-back.vercel.app/api/posts/${id}`
         );
         const data = await res.json();
-        setStats(data);
-      } catch (_) {}
-      setCargandoStats(false);
+        setPost(data);
+        setCargando(false);
+      } catch (error) {
+        console.error("Error al obtener el post:", error);
+        setCargando(false);
+      }
     };
 
-    registrarVista().then(cargarStats);
-  }, [postId]);
+    fetchPost();
+  }, [id]);
 
-  // Carga posts relacionados
-  useEffect(() => {
-    if (!postId) return;
-    const cargarRelacionados = async () => {
-      try {
-        const res = await fetch(`${API}/posts/${postId}/relacionados`);
-        const data = await res.json();
-        setRelacionados(Array.isArray(data) ? data : []);
-      } catch (_) {
-        setRelacionados([]);
-      }
-      setCargandoRel(false);
-    };
-    cargarRelacionados();
-  }, [postId]);
-
-  // Maneja el voto (like / dislike con toggle y cambio)
-  const handleVoto = useCallback(
-    async (tipo) => {
-      if (votando) return;
-      setVotando(true);
-
-      // Optimistic update
-      setStats((prev) => {
-        const quitandoActual = prev.miVoto === tipo;
-        const cambiando = prev.miVoto !== null && prev.miVoto !== tipo;
-
-        let nuevoLikes = prev.likes;
-        let nuevoDislikes = prev.dislikes;
-
-        if (quitandoActual) {
-          if (tipo === "like") nuevoLikes--;
-          else nuevoDislikes--;
-        } else if (cambiando) {
-          if (tipo === "like") { nuevoLikes++; nuevoDislikes--; }
-          else { nuevoDislikes++; nuevoLikes--; }
-        } else {
-          if (tipo === "like") nuevoLikes++;
-          else nuevoDislikes++;
-        }
-
-        return {
-          ...prev,
-          likes: Math.max(0, nuevoLikes),
-          dislikes: Math.max(0, nuevoDislikes),
-          miVoto: quitandoActual ? null : tipo,
-        };
-      });
-
-      try {
-        const res = await fetch(`${API}/posts/${postId}/like`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ visitorId, tipo }),
-        });
-        const data = await res.json();
-        setStats((prev) => ({
-          ...prev,
-          likes: data.likes,
-          dislikes: data.dislikes,
-          miVoto: data.miVoto,
-        }));
-      } catch (_) {
-        // Si falla, recarga desde servidor
-        try {
-          const res = await fetch(
-            `${API}/posts/${postId}/stats?visitorId=${encodeURIComponent(visitorId)}`
-          );
-          const data = await res.json();
-          setStats(data);
-        } catch (__) {}
-      }
-
-      setVotando(false);
-    },
-    [postId, visitorId, votando]
-  );
-
-  const formatNum = (n) => (n >= 1000 ? (n / 1000).toFixed(1) + "k" : n);
+  if (cargando) return <p>Cargando post...</p>;
+  if (!post) return <p>No se encontró el post.</p>;
 
   return (
-    <div className="ps-wrapper">
-      {/* ─── Barra de stats ──────────────────────────────────────────── */}
-      <div className="ps-stats-bar">
-        {/* Vistas */}
-        <div className="ps-stat-item ps-vistas">
-          <FiEye className="ps-icon ps-icon-eye" />
-          <span className="ps-count">
-            {cargandoStats ? "—" : formatNum(stats.vistas)}
-          </span>
-          <span className="ps-label">lecturas</span>
+    <div className="post-detalle">
+      <h2 className="post-completo-title">{post.titulo}</h2>
+
+      <div className="post-header">
+        <img
+          src={post.avatar || DEFAULT_AVATAR}
+          alt="avatar"
+          className="avatar"
+        />
+        <div>
+          <p
+            style={{
+              color: "#000",
+              fontSize: "0.9rem",
+              display: "inline",
+              fontStyle: "italic",
+              fontWeight: "bold",
+            }}
+          >
+            Por: {post.autor}
+          </p>
+          <div>
+            <p>
+              <b>Fecha:</b> {new Date(post.fecha).toLocaleDateString()}{" "}
+              &nbsp;&nbsp;&nbsp;
+              <b>Categoría:</b> {post.categoria}
+            </p>
+          </div>
         </div>
+      </div>
+  <div className="share-section">
+        <h3>Compartir en redes:</h3>
 
-        <div className="ps-divider" />
+        <div className="share-buttons">
+          <a
+            href={`https://api.whatsapp.com/send?text=${mensaje}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="share-btn whatsapp"
+          >
+            <FaWhatsapp size={30} />
+          </a>
 
-        {/* Like */}
-        <button
-          className={`ps-vote-btn ps-like ${stats.miVoto === "like" ? "ps-active" : ""}`}
-          onClick={() => handleVoto("like")}
-          disabled={votando}
-          aria-label="Me gusta"
-          title="Me gusta"
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=${mensaje}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="share-btn facebook"
+          >
+            <FaFacebook size={30} />
+          </a>
+
+          <a
+            onClick={() => {
+              navigator.clipboard.writeText(currentUrl);
+              Swal.fire({
+                icon: "success",
+                title: "¡Link copiado!",
+                text: "Pegalo en tus historias de Instagram.",
+                confirmButtonText: "Ok",
+                timer: 2500,
+                timerProgressBar: true,
+              });
+            }}
+            className="share-btn instagram"
+            title="Copiá el link y compartilo en tus historias"
+          >
+            <FaInstagram size={30} />
+          </a>
+        </div>
+      </div>
+      {post.portada && (
+        <img src={post.portada} alt="portada" className="preview-portada" />
+      )}
+      <p>
+        <i>{post.epigrafe}</i>
+      </p>
+
+      <div
+        className="imagen-fija-1200"
+        dangerouslySetInnerHTML={{ __html: post.contenido }}
+      />
+      <div
+        style={{
+          backgroundColor: "#fff3cd",
+          borderLeft: "6px solid #ffc107",
+          padding: "1rem",
+          borderRadius: "8px",
+          fontFamily: "sans-serif",
+          color: "#856404",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <p style={{ margin: "0 0 0.5rem 0" }}>
+          <strong
+            style={{
+              display: "block",
+              fontSize: "1.1rem",
+              marginBottom: "0.5rem",
+            }}
+          >
+            ⚠️ Aviso importante:
+          </strong>
+          Este contenido es informativo y refleja la experiencia desde el
+          acompañamiento terapéutico. No reemplaza la consulta con profesionales
+          de la salud mental. Si experimentás síntomas persistentes o
+          preocupantes, te recomendamos buscar ayuda especializada.
+        </p>
+        <p style={{ margin: "0.5rem 0 0 0" }}>
+          Si conocés a alguien que le pueda interesar este tema, compartile este
+          post. Además, te invito a descargar la guía gratuita en PDF sobre la
+          introducción de IA en la parte de abajo 👇
+        </p>
+      </div>
+      <div
+        style={{
+          borderLeft: "30px solid #42a5f5",
+          backgroundColor: " #194542", 
+          justifyContent: "center", // Centra horizontalmente el contenido
+          alignItems: "center", // Centra verticalmente
+          borderRadius: "6px",
+          padding: "0.75rem 1rem",
+          marginBottom: "0.5rem",
+          fontSize: "1.5rem",
+          fontWeight: "500",
+          display: "flex",
+        }}
+      >
+        <a
+          style={{
+            borderBottom: "2px solid white", // Línea inferior blanca
+            borderRadius: "6px",
+            padding: "0.75rem 1rem",
+            marginBottom: "0.5rem",
+            fontSize: "1.5rem",
+            fontWeight: "500",
+            display: "flex",
+            textDecoration: "none", // Sin subrayado clásico
+            color: "white", // Color de texto blanco
+            backgroundColor: "transparent", // Fondo transparente
+            cursor: "pointer", // Cursor tipo manito
+          }}
+          href={`https://empatiadigital.com.ar/descargas`}
         >
-          {stats.miVoto === "like" ? (
-            <FaThumbsUp className="ps-icon" />
-          ) : (
-            <FiThumbsUp className="ps-icon" />
-          )}
-          <span className="ps-count">
-            {cargandoStats ? "—" : formatNum(stats.likes)}
-          </span>
-        </button>
-
-        {/* Dislike */}
-        <button
-          className={`ps-vote-btn ps-dislike ${stats.miVoto === "dislike" ? "ps-active" : ""}`}
-          onClick={() => handleVoto("dislike")}
-          disabled={votando}
-          aria-label="No me gusta"
-          title="No me gusta"
-        >
-          {stats.miVoto === "dislike" ? (
-            <FaThumbsDown className="ps-icon" />
-          ) : (
-            <FiThumbsDown className="ps-icon" />
-          )}
-          <span className="ps-count">
-            {cargandoStats ? "—" : formatNum(stats.dislikes)}
-          </span>
-        </button>
+          Descarga la guía PDF GRATIS
+        </a>
       </div>
 
-      {/* ─── Relacionados ────────────────────────────────────────────── */}
-      {(cargandoRel || relacionados.length > 0) && (
-        <div className="ps-relacionados">
-          <div className="ps-rel-header">
-            <span className="ps-rel-linea" />
-            <h3 className="ps-rel-titulo">También te puede interesar</h3>
-            <span className="ps-rel-linea" />
-          </div>
+      <PostStats postId={id} postTitulo={post?.titulo} />
 
-          {cargandoRel ? (
-            <div className="ps-rel-grid">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="ps-rel-card ps-rel-skeleton" />
-              ))}
-            </div>
-          ) : (
-            <div className="ps-rel-grid">
-              {relacionados.map((rel) => (
-                <a
-                  key={rel._id}
-                  href={`/post/${rel._id}`}
-                  className="ps-rel-card"
-                >
-                  {rel.portada && (
-                    <div className="ps-rel-img-wrap">
-                      <img
-                        src={rel.portada}
-                        alt={rel.titulo}
-                        className="ps-rel-img"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-                  <div className="ps-rel-body">
-                    <span className="ps-rel-cat">{rel.categoria}</span>
-                    <p className="ps-rel-post-titulo">{rel.titulo}</p>
-                    {rel.epigrafe && (
-                      <p className="ps-rel-epig">{rel.epigrafe}</p>
-                    )}
-                    <span className="ps-rel-fecha">
-                      {new Date(rel.fecha).toLocaleDateString("es-AR", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };
 
-export default PostStats;
+export default PostCompleto;
