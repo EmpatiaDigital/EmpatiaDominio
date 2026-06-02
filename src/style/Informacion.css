@@ -48,8 +48,8 @@ html { scroll-behavior: smooth; }
    LINKS UTILITARIOS
    ============================================= */
 .linkCel {
-  color: var(--color-white);
-  background-color: rgba(255, 255, 255, 0.15);
+  color: #a8d4f5;
+  background-color: rgba(168, 212, 245, 0.12);
   text-decoration: none;
   font-weight: 700;
   padding: 4px 8px;
@@ -58,8 +58,9 @@ html { scroll-behavior: smooth; }
 }
 
 .linkCel:hover {
-  background-color: rgba(255, 255, 255, 0.28);
+  background-color: rgba(168, 212, 245, 0.24);
   text-decoration: underline;
+  color: #ffffff;
 }
 
 /* =============================================
@@ -727,7 +728,7 @@ html { scroll-behavior: smooth; }
 .cta-button {
   width: 100%;
   padding: 1.1rem var(--spacing-lg);
-  background: linear-gradient(100deg, #1e3a5f 0%, #4a90d9 100%);
+  background: linear-gradient(100deg, #e8621e 0%, #ff8c55 100%);
   color: var(--color-white);
   border: none;
   border-radius: var(--radius-sm);
@@ -737,14 +738,14 @@ html { scroll-behavior: smooth; }
   letter-spacing: 0.5px;
   cursor: pointer;
   transition: opacity var(--transition), transform var(--transition), box-shadow var(--transition);
-  box-shadow: 0 4px 16px rgba(30, 58, 95, 0.28);
+  box-shadow: 0 4px 16px rgba(232, 98, 30, 0.35);
   text-transform: uppercase;
 }
 
 .cta-button:hover {
   opacity: 0.92;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(30, 58, 95, 0.38);
+  box-shadow: 0 8px 24px rgba(232, 98, 30, 0.48);
 }
 
 .cta-button:active {
