@@ -1,10 +1,9 @@
-// import "../style/PostStats.css"; src/components/PostStats.jsx
-
+//  src/components/PostStats.jsx
 
 import React, { useEffect, useState, useCallback } from "react";
 import { FiThumbsUp, FiThumbsDown, FiEye } from "react-icons/fi";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
-
+import "../style/PostStats.css";
 
 const API = "https://empatia-dominio-back.vercel.app/api";
 
