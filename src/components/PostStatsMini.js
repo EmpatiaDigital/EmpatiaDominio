@@ -1,10 +1,9 @@
 // src/components/PostStatsMini.jsx
-// import "../style/PostStatsMini.css";
-
 // No registra vistas ni permite votar (eso es solo en el post completo).
 
 import React, { useEffect, useState } from "react";
 import { FiEye, FiThumbsUp } from "react-icons/fi";
+import "../style/PostStatsMini.css";
 
 const API = "https://empatia-dominio-back.vercel.app/api";
 
