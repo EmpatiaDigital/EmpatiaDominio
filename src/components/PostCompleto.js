@@ -164,6 +164,7 @@ const PostCompleto = () => {
           marginBottom: "1.5rem",
         }}
       >
+            <PostStats postId={id} postTitulo={post?.titulo} />
         <p style={{ margin: "0 0 0.5rem 0" }}>
           <strong
             style={{
@@ -218,9 +219,6 @@ const PostCompleto = () => {
           Descarga la guía PDF GRATIS
         </a>
       </div>
-
-      <PostStats postId={id} postTitulo={post?.titulo} />
-
     </div>
   );
 };
