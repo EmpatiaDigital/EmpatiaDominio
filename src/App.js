@@ -31,8 +31,27 @@ import PostCompleto from "./components/PostCompleto";
 import MyPost from "./components/MyPost.js";
 import EditPost from "./components/EditPost.js";
 import CongelarUsuarios from "./components/CongelarUsuarios.js";
+import Error404 from "./components/Error404.js";
 
 const MySwal = withReactContent(Swal);
+
+// ── ErrorBoundary: atrapa errores de render en cualquier ruta ──
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, info) {
+    console.error("ErrorBoundary caught:", error, info);
+  }
+  render() {
+    if (this.state.hasError) return <Error404 />;
+    return this.props.children;
+  }
+}
 
 function AppContent() {
   const { logout, user } = useAuth();
@@ -56,8 +75,6 @@ function AppContent() {
     }
   };
 
-
-  
   const MySwal = withReactContent(Swal);
 
   const datos = [
@@ -80,7 +97,7 @@ function AppContent() {
     {
       texto: (
         <>
-          En el mundo digital, un simple <strong>“visto” sin respuesta</strong> puede tener un impacto emocional.{" "}
+          En el mundo digital, un simple <strong>"visto" sin respuesta</strong> puede tener un impacto emocional.{" "}
           <strong>Responder con empatía</strong> también es cuidar.
         </>
       ),
@@ -102,15 +119,7 @@ function AppContent() {
       ),
     },
   ];
-  
-  // const imagenes = [
-  //   "https://picsum.photos/300/200?random=1",
-  //   "https://picsum.photos/300/200?random=2",
-  //   "https://picsum.photos/300/200?random=3",
-  //   "https://picsum.photos/300/200?random=4",
-  //   "https://picsum.photos/300/200?random=5",
-  // ];
-  
+
   useEffect(() => {
     const itemRandom = datos[Math.floor(Math.random() * datos.length)];
     setLoading(true);
@@ -132,9 +141,6 @@ function AppContent() {
   
     return () => clearTimeout(timeout);
   }, [location.pathname]);
-  
-  
-  
 
   // Reiniciar temporizador por actividad
   useEffect(() => {
@@ -148,10 +154,10 @@ function AppContent() {
   }, [user]);
 
   return (
-    <>
+    <ErrorBoundary>
       <UserActividad />
       <Navbar />
-  
+
       {/* El SweetAlert se muestra sin bloquear el render de las rutas */}
       <Routes>
         <Route path="/data-user" element={<UserData />} />
@@ -177,12 +183,12 @@ function AppContent() {
         <Route path="/post" element={<Post />} />
         <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
         <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<Error404 />} />
       </Routes>
-  
+
       <Footer />
-    </>
+    </ErrorBoundary>
   );
-  
 }
 
 function App() {
