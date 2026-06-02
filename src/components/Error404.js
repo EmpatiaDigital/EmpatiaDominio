@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 
 import errorImg from "../assets/error.jpeg";
-
-// ── Configuración del juego import "../style/Error404.css"; ──
+import "../style/Error404.css";
+// ── Configuración del juego ──
 const ROWS = 8;
 const COLS = 8;
 const TOTAL_CELLS = ROWS * COLS;
