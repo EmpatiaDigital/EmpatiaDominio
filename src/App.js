@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
+
 // Importaciones de páginas y componentes
 import HomePage from './page/HomePage.js'; 
 import Post from './page/Post.js'; 
