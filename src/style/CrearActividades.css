@@ -11,121 +11,85 @@ body {
 }
 
 /* =============================================
-   PAGINACIÓN
+   BOTÓN CREAR
    ============================================= */
-.paginacion {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin: 40px 0 8px;
-  flex-wrap: wrap;
-}
-
-.paginacion button {
-  padding: 9px 16px;
-  border: 1px solid #d0daea;
-  border-radius: 6px;
-  background: #fff;
-  color: #4a6a8a;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
-  font-weight: 400;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-  min-width: 40px;
-  text-align: center;
-}
-
-.paginacion button:hover {
-  background: #edf2fa;
-  border-color: #4a90d9;
-  color: #1e3a5f;
-}
-
-.paginacion button.pagina-activa {
+.btn-crear {
+  display: block;
+  margin: 0 auto 32px;
+  padding: 10px 24px;
   background: #1e3a5f;
-  border-color: #1e3a5f;
   color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
   font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-.paginacion button:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  background: #f2f5fa;
-  border-color: #e0e8f2;
-  color: #9aabbf;
+.btn-crear:hover {
+  background: #4a90d9;
 }
 
 /* =============================================
-   WRAPPER
+   CONTAINER
    ============================================= */
-.actividades-wrapper {
+.actividades-container {
   max-width: 1280px;
   margin: 0 auto;
-  text-align: center;
-  padding: 72px 64px 96px;
-  font-family: 'DM Sans', sans-serif;
-  animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  padding: 0 56px 88px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 28px;
+  align-items: start;
 }
 
 /* =============================================
-   TÍTULO PRINCIPAL
+   FORMULARIO
    ============================================= */
-.titulo-principal {
+.formulario-actividad {
+  grid-column: 1 / -1;
+  background: #fff;
+  border-radius: 10px;
+  padding: 32px 36px;
+  box-shadow: 0 2px 12px rgba(30, 58, 95, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.formulario-actividad h3 {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 2rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #1e3a5f;
-  text-align: center;
-  margin: 0 0 8px;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
-  text-transform: none;
-  border-bottom: none;
-  padding-bottom: 0;
-  display: block;
+  margin: 0 0 4px;
 }
 
-.titulo-principal::before {
-  content: 'Actividades';
-  display: block;
+.formulario-actividad input {
+  padding: 10px 14px;
+  border: 1px solid #d0daea;
+  border-radius: 6px;
   font-family: 'DM Sans', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 3.5px;
-  text-transform: uppercase;
-  color: #4a90d9;
-  margin-bottom: 12px;
-  text-align: center;
+  font-size: 13.5px;
+  color: #1e3a5f;
+  background: #f8fafd;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-.titulo-principal::after {
-  content: '';
-  display: block;
-  width: 56px;
-  height: 2px;
-  background: #4a90d9;
-  margin: 18px auto 52px;
-  border-radius: 2px;
+.formulario-actividad input:focus {
+  border-color: #4a90d9;
+  background: #fff;
 }
 
-/* =============================================
-   GRID
-   ============================================= */
-.grid-actividades {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 28px;
-  padding: 0;
-  margin: 0;
-  text-align: left;
+.formulario-actividad input[type="file"] {
+  padding: 8px 12px;
+  background: #f0f4fa;
+  cursor: pointer;
 }
 
 /* =============================================
@@ -135,7 +99,7 @@ body {
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(30, 58, 95, 0.07);
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.08);
   border: none;
   display: flex;
   flex-direction: column;
@@ -149,20 +113,20 @@ body {
 }
 
 .actividad-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 48px rgba(20, 45, 90, 0.13);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 44px rgba(20, 45, 90, 0.14);
 }
 
 /* ── Título de la card ── */
 .title-content {
-  padding: 22px 24px 16px;
+  padding: 20px 22px 16px;
   background: #fff;
   border-bottom: 1px solid #edf2fa;
 }
 
 .title-content h2 {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #1e3a5f;
   margin: 0;
@@ -173,7 +137,7 @@ body {
 /* ── Imagen ── */
 .card-img {
   width: 100%;
-  height: 210px;
+  height: 200px;
   overflow: hidden;
   background: #0d2340;
   flex-shrink: 0;
@@ -185,7 +149,6 @@ body {
   object-fit: cover;
   display: block;
   opacity: 0.9;
-  border-bottom: none;
   transition: opacity 0.3s, transform 0.35s ease;
 }
 
@@ -196,7 +159,7 @@ body {
 
 /* ── Contenido ── */
 .card-content {
-  padding: 20px 24px 24px;
+  padding: 20px 22px 16px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -206,11 +169,10 @@ body {
 .card-content p {
   margin: 0;
   font-family: 'DM Sans', sans-serif;
-  font-size: 13.5px;
+  font-size: 13px;
   color: #5a7a9a;
   line-height: 1.65;
   font-weight: 400;
-  white-space: normal;
 }
 
 .card-content p strong {
@@ -218,32 +180,75 @@ body {
   font-weight: 500;
 }
 
-.card-content h2 {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #1e3a5f;
-  margin: 0 0 10px;
-  border-left: 2px solid #4a90d9;
-  padding-left: 12px;
-  letter-spacing: -0.1px;
-  line-height: 1.4;
+/* ── Acciones ── */
+.card-actions {
+  padding: 14px 22px 20px;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #edf2fa;
+}
+
+/* =============================================
+   BOTONES GENERALES
+   ============================================= */
+.btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-edit {
+  background: #4a90d9;
+  color: #fff;
+}
+
+.btn-edit:hover {
+  background: #1e3a5f;
+}
+
+.btn-delete {
+  background: #f0f4fa;
+  color: #c0392b;
+  border: 1px solid #e0d0d0;
+}
+
+.btn-delete:hover {
+  background: #c0392b;
+  color: #fff;
+  border-color: #c0392b;
+}
+
+.btn-save {
+  padding: 10px 24px;
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  align-self: flex-start;
+}
+
+.btn-save:hover {
+  background: #4a90d9;
 }
 
 /* =============================================
    RESPONSIVE — TABLET (≤991px)
    ============================================= */
 @media (max-width: 991px) {
-  .actividades-wrapper {
-    padding: 56px 36px 72px;
-  }
-
-  .grid-actividades {
+  .actividades-container {
+    padding: 0 32px 64px;
     gap: 22px;
-  }
-
-  .titulo-principal {
-    font-size: 1.75rem;
   }
 }
 
@@ -251,28 +256,20 @@ body {
    RESPONSIVE — TABLET CHICO (≤768px)
    ============================================= */
 @media (max-width: 768px) {
-  .actividades-wrapper {
-    padding: 48px 24px 60px;
+  .actividades-container {
+    padding: 0 22px 56px;
   }
 
-  .titulo-principal {
-    font-size: 1.6rem;
+  .formulario-actividad {
+    padding: 24px 22px;
   }
 
   .card-content {
-    padding: 18px 20px 22px;
+    padding: 18px 20px 14px;
   }
 
   .title-content {
     padding: 18px 20px 14px;
-  }
-
-  .card-content h2 {
-    font-size: 1rem;
-  }
-
-  .card-content p {
-    font-size: 13px;
   }
 }
 
@@ -284,44 +281,29 @@ body {
     margin-top: 100px;
   }
 
-  .actividades-wrapper {
-    padding: 36px 16px 52px;
-  }
-
-  .titulo-principal {
-    font-size: 1.45rem;
-  }
-
-  .titulo-principal::after {
-    margin-bottom: 40px;
-  }
-
-  .grid-actividades {
+  .actividades-container {
+    padding: 0 16px 48px;
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px;
   }
 
   .card-img {
-    height: 180px;
+    height: 170px;
   }
 
-  .card-content {
-    padding: 16px 18px 20px;
+  .card-actions {
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .title-content {
-    padding: 16px 18px 12px;
+  .btn-edit,
+  .btn-delete {
+    width: 100%;
+    text-align: center;
   }
 
-  .paginacion {
-    margin-top: 32px;
-    gap: 6px;
-  }
-
-  .paginacion button {
-    padding: 8px 12px;
-    font-size: 12px;
-    min-width: 36px;
+  .formulario-actividad {
+    padding: 20px 16px;
   }
 }
 
@@ -329,16 +311,8 @@ body {
    RESPONSIVE — MOBILE PEQUEÑO (≤400px)
    ============================================= */
 @media (max-width: 400px) {
-  .actividades-wrapper {
-    padding: 28px 14px 40px;
-  }
-
-  .titulo-principal {
-    font-size: 1.3rem;
-  }
-
   .card-img {
-    height: 160px;
+    height: 150px;
   }
 
   .title-content h2 {
@@ -346,6 +320,6 @@ body {
   }
 
   .card-content {
-    padding: 14px 16px 18px;
+    padding: 14px 16px 12px;
   }
 }
