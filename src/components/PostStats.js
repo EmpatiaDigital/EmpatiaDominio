@@ -173,7 +173,6 @@ const PostStats = ({ postId, postTitulo }) => {
           <span className="ps-count">
             {cargandoStats ? "—" : formatNum(stats.vistas)}
           </span>
-          <span className="ps-label">lecturas</span>
         </div>
 
         <div className="ps-divider" />
