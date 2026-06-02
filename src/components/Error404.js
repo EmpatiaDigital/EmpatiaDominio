@@ -18,7 +18,6 @@ function buildBoard() {
     flagged: false,
     adjacentRobots: 0,
   }));
-
   
   // Colocar robots aleatoriamente
   let placed = 0;
