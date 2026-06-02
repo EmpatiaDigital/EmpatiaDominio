@@ -369,11 +369,13 @@ const Inscription = () => {
             <div className="avaladores-logos">
               {avaladores.map((avalador) => (
                 <div key={avalador.id} className="avalador-item">
-                  <img
-                    src={avalador.logo}
-                    alt={avalador.nombre}
-                    className="avalador-logo"
-                  />
+                  <div className="avalador-logo-circle">
+                    <img
+                      src={avalador.logo}
+                      alt={avalador.nombre}
+                      className="avalador-logo"
+                    />
+                  </div>
                   <p className="avalador-name">{avalador.nombre}</p>
                 </div>
               ))}
