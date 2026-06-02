@@ -96,12 +96,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ── SECCIÓN DE POSTS ─────────────────────── */}
+        {/* ── SECCIÓN DE POSTS ───────────────────────<p className="section-eyebrow">Blog</p> */}
         <section className="posts-section">
 
           <div className="posts-section-header">
             <div>
-              <p className="section-eyebrow">Blog</p>
+              
               <h2 className="titulo-principal">Publicaciones recientes</h2>
             </div>
             <button className="section-ver-todas" onClick={() => navigate("/post")}>
