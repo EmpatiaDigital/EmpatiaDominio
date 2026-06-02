@@ -33,8 +33,8 @@ const Inscription = () => {
 
   // ─── Avaladores con logo1 y logo2 ────────────────────────────────────────
   const avaladores = [
-    { nombre: 'logo1', logo: logo1 },
-    { nombre: 'logo2', logo: logo2 },
+    { id: 'logo1', logo: logo1, nombre: 'Grupo Educativo Austral' },
+    { id: 'logo2', logo: logo2, nombre: 'Comisión Psicosocial Latinoamericana' },
   ];
 
   // ─── Fetch del curso activo ───────────────────────────────────────────────
@@ -66,7 +66,6 @@ const Inscription = () => {
     }
   };
 
-  // ─── FIX #3 y #4: guardar cuposTotal y cuposDisponibles del backend ──────
   const fetchInscriptionsStats = async () => {
     if (!course) return;
     try {
@@ -90,7 +89,6 @@ const Inscription = () => {
     }
   };
 
-  // ─── FIX #3 y #4: cálculo correcto de cupos por turno ───────────────────
   const getCuposDisponiblesPorTurno = (turno) => {
     const cuposTotal = inscriptionsStats.cuposTotal || course?.cuposTotal || 0;
     if (!cuposTotal) return 0;
@@ -116,7 +114,6 @@ const Inscription = () => {
     return inscriptionsStats.total >= cuposTotal;
   };
 
-  // ─── Determinar qué turnos están habilitados por el admin ────────────────
   const getTurnosHabilitados = () => {
     if (course?.turnosHabilitados && course.turnosHabilitados.length > 0) {
       return course.turnosHabilitados;
@@ -160,7 +157,6 @@ const Inscription = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ─── FIX #1 y #2: URL correcta con backtick → /api/inscriptions ─────────
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -350,7 +346,6 @@ const Inscription = () => {
     ? Math.min((inscriptionsStats.total / cuposTotales) * 100, 100)
     : 0;
 
-  // ─── Turnos que el admin decidió habilitar ────────────────────────────────
   const turnosHabilitados = getTurnosHabilitados();
 
   // ─── Render principal ─────────────────────────────────────────────────────
@@ -368,12 +363,12 @@ const Inscription = () => {
         )}
         <div className="course-hero-overlay">
 
-          {/* ── Avaladores con logo1 y logo2 ── */}
+          {/* ── Avaladores ── */}
           <div className="avaladores-section">
             <p className="avaladores-title">Curso avalado por:</p>
             <div className="avaladores-logos">
-              {avaladores.map((avalador, index) => (
-                <div key={index} className="avalador-item">
+              {avaladores.map((avalador) => (
+                <div key={avalador.id} className="avalador-item">
                   <img
                     src={avalador.logo}
                     alt={avalador.nombre}
@@ -456,7 +451,6 @@ const Inscription = () => {
               <strong>{cuposRestantes}</strong> cupos disponibles de <strong>{cuposTotales}</strong>
             </p>
 
-            {/* Solo mostrar desglose por turno si hay más de un turno habilitado */}
             {turnosHabilitados.filter(t => t !== 'indistinto').length > 1 && (
               <div style={{ display: 'flex', gap: '20px', fontSize: '0.85rem', color: '#666' }}>
                 {turnosHabilitados.includes('manana') && (
@@ -553,7 +547,6 @@ const Inscription = () => {
               {errors.celular && <span className="error-text">{errors.celular}</span>}
             </div>
 
-            {/* ─── FIX turnos: solo se renderizan los habilitados por el admin ─── */}
             <div className="form-group">
               <label>Turno Preferido *</label>
               <div className="radio-group">
