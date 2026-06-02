@@ -6,9 +6,8 @@ import fondo1 from "../assets/Portada1.jpg";
 import fondo2 from "../assets/Portada2.jpg";
 import fondo3 from "../assets/conexion.jpg";
 import ModalActividades from "../components/ModalActividades";
-import PostStats from "../components/PostStats";
+import PostStatsMini from "../components/PostStatsMini";
 
-// adentro del JSX, justo antes del </div> de cierre del post-detalle
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
 export default function HomePage() {
@@ -98,12 +97,11 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ── SECCIÓN DE POSTS ───────────────────────<p className="section-eyebrow">Blog</p> */}
+        {/* ── SECCIÓN DE POSTS ─────────────────────── */}
         <section className="posts-section">
 
           <div className="posts-section-header">
             <div>
-              
               <h2 className="titulo-principal">Publicaciones recientes</h2>
             </div>
             <button className="section-ver-todas" onClick={() => navigate("/post")}>
@@ -171,7 +169,7 @@ export default function HomePage() {
                       {/* Título */}
                       <h3>{post.titulo}</h3>
 
-                      {/* Botón */}
+                      {/* Botón + stats */}
                       <div className="card-footer">
                         <button
                           className="btn-ver-mas"
@@ -182,7 +180,8 @@ export default function HomePage() {
                             <path d="M3 8h10M9 4l4 4-4 4" />
                           </svg>
                         </button>
-                      <PostStats postId={id} postTitulo={post?.titulo} /> 
+
+                        <PostStatsMini postId={post._id} />
                       </div>
                     </div>
                   </div>
