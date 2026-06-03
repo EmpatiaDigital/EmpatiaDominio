@@ -9,6 +9,13 @@ import logo3 from '../assets/empatialog.jpeg';
 
 const BASE_URL = 'https://empatia-dominio-back.vercel.app/api';
 
+// ── Mapeo frontend → valor que espera el backend ──
+const TURNO_VALUE_MAP = {
+  manana:     'mañana',
+  tarde:      'tarde',
+  indistinto: 'indistinto',
+};
+
 const Inscription = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
@@ -32,7 +39,6 @@ const Inscription = () => {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  // ─── Avaladores ────────────────────────────────────────
   const avaladores = [
     { id: 'logo1', logo: logo1, nombre: 'Grupo Educativo Austral' },
     { id: 'logo2', logo: logo2, nombre: 'Comisión Psicosocial Latinoamericana' },
@@ -43,12 +49,14 @@ const Inscription = () => {
     fetchActiveCourse();
   }, []);
 
+  // ── Fix: usar course._id como dependencia para que el intervalo
+  //    se registre correctamente cada vez que llega el curso ──
   useEffect(() => {
-    if (!course) return;
+    if (!course?._id) return;
     fetchInscriptionsStats();
     const interval = setInterval(fetchInscriptionsStats, 10000);
     return () => clearInterval(interval);
-  }, [course]);
+  }, [course?._id]);                          // ← antes era [course]
 
   const fetchActiveCourse = async () => {
     try {
@@ -67,7 +75,7 @@ const Inscription = () => {
   };
 
   const fetchInscriptionsStats = async () => {
-    if (!course) return;
+    if (!course?._id) return;
     try {
       const response = await fetch(
         `${BASE_URL}/inscriptions/estadisticas/${course._id}`
@@ -76,12 +84,12 @@ const Inscription = () => {
         const data = await response.json();
         const stats = data.data || data;
         setInscriptionsStats({
-          manana: stats.porTurno?.manana || 0,
-          tarde: stats.porTurno?.tarde || 0,
-          indistinto: stats.porTurno?.indistinto || 0,
-          total: stats.activos || 0,
-          cuposTotal: stats.cuposTotal || course.cuposTotal || 0,
-          cuposDisponibles: stats.cuposDisponibles ?? 0
+          manana:          stats.porTurno?.manana    || stats.porTurno?.mañana || 0,
+          tarde:           stats.porTurno?.tarde     || 0,
+          indistinto:      stats.porTurno?.indistinto|| 0,
+          total:           stats.activos             || 0,
+          cuposTotal:      stats.cuposTotal          || course.cuposTotal || 0,
+          cuposDisponibles:stats.cuposDisponibles    ?? 0
         });
       }
     } catch {
@@ -140,16 +148,16 @@ const Inscription = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.nombre.trim())    newErrors.nombre    = 'El nombre es obligatorio';
-    if (!formData.apellido.trim())  newErrors.apellido  = 'El apellido es obligatorio';
+    if (!formData.nombre.trim())   newErrors.nombre    = 'El nombre es obligatorio';
+    if (!formData.apellido.trim()) newErrors.apellido  = 'El apellido es obligatorio';
     if (!formData.email.trim()) {
       newErrors.email = 'El email es obligatorio';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido';
     }
-    if (!formData.celular.trim())       newErrors.celular        = 'El celular es obligatorio';
-    if (!formData.turnoPreferido)       newErrors.turnoPreferido = 'Debe seleccionar un turno';
-    if (!formData.aceptaTerminos)       newErrors.aceptaTerminos = 'Debe aceptar los términos y condiciones';
+    if (!formData.celular.trim())    newErrors.celular        = 'El celular es obligatorio';
+    if (!formData.turnoPreferido)    newErrors.turnoPreferido = 'Debe seleccionar un turno';
+    if (!formData.aceptaTerminos)    newErrors.aceptaTerminos = 'Debe aceptar los términos y condiciones';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -170,10 +178,17 @@ const Inscription = () => {
     setSubmitting(true);
 
     try {
+      // ── Fix: convertir "manana" → "mañana" antes de enviar ──
+      const payload = {
+        ...formData,
+        turnoPreferido: TURNO_VALUE_MAP[formData.turnoPreferido] ?? formData.turnoPreferido,
+        courseId: course._id
+      };
+
       const response = await fetch(`${BASE_URL}/inscriptions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, courseId: course._id })
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
@@ -446,7 +461,7 @@ const Inscription = () => {
           {/* ── Código promo — independiente del descuento ── */}
           {course.tieneCodigoPromo && (
             <div className="promo-aviso promo-aviso--posible">
-              <strong>¡Inscribite y puede que te lleves algo más!</strong>{' '}
+              🎟️ <strong>¡Inscribite y puede que te lleves algo más!</strong>{' '}
               Sorteamos códigos de descuento exclusivos entre los participantes.
             </div>
           )}
