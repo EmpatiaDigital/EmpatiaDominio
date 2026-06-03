@@ -94,8 +94,7 @@ export default function Post() {
                   }}
                 >
                   <div className="post-card-overlay">
-                     {/* Badge categoría */}
-                    <span className="card-badge">{post.categoria}</span>
+                    
                     <div className="post-header">
                       <img
                         src={post.avatar || DEFAULT_AVATAR}
@@ -106,6 +105,8 @@ export default function Post() {
                         <h3 className="post-title">{post.titulo}</h3>
                         <p className="post-autor">Por: {post.autor}</p>
                       </div>
+                           {/* Badge categoría */}
+                    <span className="card-badge">{post.categoria}</span>
                     </div>
                     <div className="card-footer">
                       <button
