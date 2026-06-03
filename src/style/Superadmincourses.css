@@ -54,6 +54,7 @@
   background: var(--bg);
   min-height: 100vh;
   animation: fadeIn 0.45s ease;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -104,6 +105,7 @@
   cursor: pointer;
   transition: background 0.2s;
   letter-spacing: 0.2px;
+  white-space: nowrap;
 }
 
 .btn-create:hover {
@@ -489,17 +491,19 @@
   align-items: center;
   padding: 1.5rem;
   animation: fadeIn 0.3s ease forwards;
+  box-sizing: border-box;
 }
 
 .modal-content {
   background: var(--white);
   width: 600px;
-  max-width: 95vw;
+  max-width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   border-radius: 12px;
   box-shadow: 0 24px 64px rgba(20, 45, 90, 0.24);
   animation: fadeIn 0.35s ease forwards;
+  box-sizing: border-box;
 }
 
 .modal-header {
@@ -535,6 +539,7 @@
   color: var(--navy);
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
 }
 
 .modal-close:hover {
@@ -550,12 +555,16 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group label {
@@ -577,6 +586,8 @@
   background: #f8fafd;
   outline: none;
   transition: border-color 0.2s, background 0.2s;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .form-group input:focus,
@@ -595,27 +606,43 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── Precio + moneda ── */
 .precio-input-group {
   display: flex;
   gap: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .moneda-select {
   border-radius: 6px 0 0 6px !important;
   border-right: none !important;
-  width: 90px;
-  flex-shrink: 0;
+  width: 76px !important;
+  min-width: 76px !important;
+  max-width: 76px !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
   background: #edf2fa !important;
   font-weight: 500 !important;
   color: var(--navy) !important;
+  font-size: 12.5px !important;
+  padding: 10px 4px 10px 8px !important;
+  box-sizing: border-box !important;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
 }
 
 .precio-input {
   border-radius: 0 6px 6px 0 !important;
-  flex-grow: 1;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 /* ── Promo fields ── */
@@ -624,10 +651,14 @@
   align-items: center;
   gap: 8px;
   margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .promo-field input {
-  flex-grow: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 0;
   padding: 9px 13px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -637,6 +668,7 @@
   background: #f8fafd;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .promo-field input:focus {
@@ -649,6 +681,7 @@
   font-weight: 600;
   color: var(--text-muted);
   min-width: 20px;
+  flex-shrink: 0;
 }
 
 .codigo-input {
@@ -708,6 +741,7 @@
   padding-top: 8px;
   border-top: 1px solid var(--border);
   margin-top: 4px;
+  flex-wrap: wrap;
 }
 
 .btn-cancel {
@@ -779,8 +813,16 @@
     grid-template-columns: 1fr;
   }
 
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
   .modal-content {
-    width: 95vw;
+    width: 100%;
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 12px 12px 0 0;
   }
 }
 
@@ -805,11 +847,39 @@
   }
 
   .modal-header {
-    padding: 18px 20px 14px;
+    padding: 18px 16px 14px;
   }
 
   .course-form {
-    padding: 18px 20px 22px;
+    padding: 16px 16px 20px;
+    gap: 14px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    font-size: 16px;
+  }
+
+  .moneda-select {
+    font-size: 14px !important;
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    padding: 10px 4px 10px 6px !important;
+  }
+
+  .precio-input {
+    font-size: 16px !important;
+  }
+
+  .promo-field input {
+    font-size: 16px;
+  }
+
+  .codigo-input {
+    font-size: 13px !important;
+    letter-spacing: 1px !important;
   }
 
   .course-actions {
@@ -821,5 +891,16 @@
     width: 100%;
     justify-content: center;
     text-align: center;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn-cancel,
+  .btn-save {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
   }
 }
