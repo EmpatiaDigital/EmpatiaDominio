@@ -408,8 +408,47 @@ const Inscription = () => {
               </div>
             )}
           </div>
+         
+{course.tieneDescuento && course.descuentoPorcentaje && (() => {
+  const precioNumero = parseFloat(
+    (course.precio || '').toString().replace(/[^\d.,]/g, '').replace(',', '.')
+  );
+  const descuento = course.descuentoPorcentaje;
+  const precioConDescuento = !isNaN(precioNumero)
+    ? Math.round(precioNumero * (1 - descuento / 100))
+    : null;
 
-          {/* ── Barra de cupos mejorada ── */}
+  return (
+    <div className="descuento-banner">
+      <div className="descuento-badge">
+        <span className="descuento-porcentaje">-{descuento}%</span>
+        <span className="descuento-label">DESCUENTO ESPECIAL</span>
+      </div>
+      <div className="descuento-precios">
+        <span className="precio-original">
+          Precio original: <s>{course.precio}</s>
+        </span>
+        {precioConDescuento !== null && (
+          <span className="precio-final">
+            Precio con descuento:{' '}
+            <strong>
+              {course.moneda === 'USD' ? 'U$D' : '$'}
+              {precioConDescuento.toLocaleString('es-AR')}
+            </strong>
+          </span>
+        )}
+      </div>
+      {course.tieneCodigoPromo && (
+        <div className="promo-aviso">
+          🎟️ <strong>¡Código promocional activo!</strong> Al inscribirte participás automáticamente
+          en el sorteo de un código de descuento exclusivo.
+        </div>
+      )}
+    </div>
+  );
+})()}
+
+          {/* ── Barra de cupos ── */}
           <div className="cupos-progress-wrapper">
             <div className="cupos-progress-bar-track">
               <div
