@@ -408,45 +408,48 @@ const Inscription = () => {
               </div>
             )}
           </div>
-         
-{course.tieneDescuento && course.descuentoPorcentaje && (() => {
-  const precioNumero = parseFloat(
-    (course.precio || '').toString().replace(/[^\d.,]/g, '').replace(',', '.')
-  );
-  const descuento = course.descuentoPorcentaje;
-  const precioConDescuento = !isNaN(precioNumero)
-    ? Math.round(precioNumero * (1 - descuento / 100))
-    : null;
 
-  return (
-    <div className="descuento-banner">
-      <div className="descuento-badge">
-        <span className="descuento-porcentaje">-{descuento}%</span>
-        <span className="descuento-label">DESCUENTO ESPECIAL</span>
-      </div>
-      <div className="descuento-precios">
-        <span className="precio-original">
-          Precio original: <s>{course.precio}</s>
-        </span>
-        {precioConDescuento !== null && (
-          <span className="precio-final">
-            Precio con descuento:{' '}
-            <strong>
-              {course.moneda === 'USD' ? 'U$D' : '$'}
-              {precioConDescuento.toLocaleString('es-AR')}
-            </strong>
-          </span>
-        )}
-      </div>
-     {course.tieneCodigoPromo && (
-  <div className="promo-aviso promo-aviso--posible">
-    🎟️ <strong>¡Inscribite y puede que te lleves algo más!</strong>{' '}
-    Sorteamos códigos de descuento exclusivos entre los participantes.
-  </div>
-)}
-    </div>
-  );
-})()}
+          {/* ── Descuento — independiente del código promo ── */}
+          {course.tieneDescuento && course.descuentoPorcentaje && (() => {
+            const precioNumero = parseFloat(
+              (course.precio || '').toString().replace(/[^\d.,]/g, '').replace(',', '.')
+            );
+            const descuento = course.descuentoPorcentaje;
+            const precioConDescuento = !isNaN(precioNumero)
+              ? Math.round(precioNumero * (1 - descuento / 100))
+              : null;
+
+            return (
+              <div className="descuento-banner">
+                <div className="descuento-badge">
+                  <span className="descuento-porcentaje">-{descuento}%</span>
+                  <span className="descuento-label">DESCUENTO ESPECIAL</span>
+                </div>
+                <div className="descuento-precios">
+                  <span className="precio-original">
+                    Precio original: <s>{course.precio}</s>
+                  </span>
+                  {precioConDescuento !== null && (
+                    <span className="precio-final">
+                      Precio con descuento:{' '}
+                      <strong>
+                        {course.moneda === 'USD' ? 'U$D' : '$'}
+                        {precioConDescuento.toLocaleString('es-AR')}
+                      </strong>
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ── Código promo — independiente del descuento ── */}
+          {course.tieneCodigoPromo && (
+            <div className="promo-aviso promo-aviso--posible">
+              🎟️ <strong>¡Inscribite y puede que te lleves algo más!</strong>{' '}
+              Sorteamos códigos de descuento exclusivos entre los participantes.
+            </div>
+          )}
 
           {/* ── Barra de cupos ── */}
           <div className="cupos-progress-wrapper">
