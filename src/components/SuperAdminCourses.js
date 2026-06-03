@@ -2,8 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import '../style/Superadmincourses.css'; 
+import '../style/Superadmincourses.css';
 import { Link } from "react-router-dom";
+
+const API_BASE = 'https://empatia-dominio-back.vercel.app/api';
+
+// ── Genera un código promo alfanumérico de 8 caracteres ──
+const generarCodigoPromo = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+};
 
 const SuperAdminCourses = () => {
   const { user } = useAuth();
@@ -18,7 +26,15 @@ const SuperAdminCourses = () => {
     descripcion: '',
     duracion: '',
     modalidad: '',
+    // ── NUEVO: precio con moneda ──
     precio: '',
+    moneda: 'ARS',          // 'ARS' | 'USD'
+    // ── NUEVO: descuento ──
+    tieneDescuento: false,
+    descuentoPorcentaje: '',
+    // ── NUEVO: código promo ──
+    tieneCodigoPromo: false,
+    codigoPromo: '',
     cuposDisponibles: 30,
     fechaInicio: '',
     horarios: {
@@ -28,14 +44,14 @@ const SuperAdminCourses = () => {
     activo: false
   });
 
-  // Protección de ruta - solo superadmin
+  // ── Protección de ruta ──
   useEffect(() => {
     if (!user || user.role !== 'superadmin') {
       Swal.fire({
         icon: 'error',
         title: 'Acceso Denegado',
         text: 'Solo el SuperAdmin puede acceder a esta sección',
-        confirmButtonColor: '#667eea'
+        confirmButtonColor: '#4a90d9'
       });
       navigate('/');
     }
@@ -48,21 +64,15 @@ const SuperAdminCourses = () => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://empatia-dominio-back.vercel.app/api/courses');
+      const response = await fetch(`${API_BASE}/courses`);
       if (response.ok) {
         const data = await response.json();
         setCourses(data);
-        const active = data.find(c => c.activo);
-        setActiveCourse(active);
+        setActiveCourse(data.find(c => c.activo));
       }
     } catch (error) {
       console.error('Error fetching courses:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudieron cargar los cursos',
-        confirmButtonColor: '#667eea'
-      });
+      Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudieron cargar los cursos', confirmButtonColor: '#4a90d9' });
     } finally {
       setLoading(false);
     }
@@ -70,39 +80,43 @@ const SuperAdminCourses = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+
+    // ── Si se activa tieneCodigoPromo, genera código automáticamente ──
+    if (name === 'tieneCodigoPromo') {
+      setFormData(prev => ({
+        ...prev,
+        tieneCodigoPromo: checked,
+        codigoPromo: checked ? generarCodigoPromo() : ''
+      }));
+      return;
+    }
+
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
-        }
-      }));
+      setFormData(prev => ({ ...prev, [parent]: { ...prev[parent], [child]: value } }));
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
-      }));
+      setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     }
   };
 
+  // ── Regenerar código promo manualmente ──
+  const regenerarCodigo = () => {
+    setFormData(prev => ({ ...prev, codigoPromo: generarCodigoPromo() }));
+  };
+
+  const emptyForm = () => ({
+    titulo: '', descripcion: '', duracion: '', modalidad: '',
+    precio: '', moneda: 'ARS',
+    tieneDescuento: false, descuentoPorcentaje: '',
+    tieneCodigoPromo: false, codigoPromo: '',
+    cuposDisponibles: 30, fechaInicio: '',
+    horarios: { manana: '9:00 - 12:00', tarde: '14:00 - 17:00' },
+    activo: false
+  });
+
   const openCreateModal = () => {
     setEditingCourse(null);
-    setFormData({
-      titulo: '',
-      descripcion: '',
-      duracion: '',
-      modalidad: '',
-      precio: '',
-      cuposDisponibles: 30,
-      fechaInicio: '',
-      horarios: {
-        manana: '9:00 - 12:00',
-        tarde: '14:00 - 17:00'
-      },
-      activo: false
-    });
+    setFormData(emptyForm());
     setShowModal(true);
   };
 
@@ -114,6 +128,11 @@ const SuperAdminCourses = () => {
       duracion: course.duracion || '',
       modalidad: course.modalidad || '',
       precio: course.precio || '',
+      moneda: course.moneda || 'ARS',
+      tieneDescuento: course.tieneDescuento || false,
+      descuentoPorcentaje: course.descuentoPorcentaje || '',
+      tieneCodigoPromo: course.tieneCodigoPromo || false,
+      codigoPromo: course.codigoPromo || '',
       cuposDisponibles: course.cuposDisponibles || 30,
       fechaInicio: course.fechaInicio ? course.fechaInicio.split('T')[0] : '',
       horarios: {
@@ -127,26 +146,31 @@ const SuperAdminCourses = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // ── Si hay código promo activo, lo incluye; si no, lo omite ──
+    const payload = {
+      ...formData,
+      codigoPromo: formData.tieneCodigoPromo ? formData.codigoPromo : null,
+      descuentoPorcentaje: formData.tieneDescuento ? formData.descuentoPorcentaje : null,
+    };
+
     const url = editingCourse
-      ? `https://empatia-dominio-back.vercel.app/api/courses/${editingCourse._id}`
-      : 'https://empatia-dominio-back.vercel.app/api/courses';
+      ? `${API_BASE}/courses/${editingCourse._id}`
+      : `${API_BASE}/courses`;
     const method = editingCourse ? 'PUT' : 'POST';
 
     try {
       const response = await fetch(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-
       if (response.ok) {
         Swal.fire({
           icon: 'success',
           title: editingCourse ? 'Curso Actualizado' : 'Curso Creado',
           text: editingCourse ? 'El curso se actualizó correctamente' : 'El curso se creó exitosamente',
-          confirmButtonColor: '#667eea'
+          confirmButtonColor: '#4a90d9'
         });
         setShowModal(false);
         fetchCourses();
@@ -155,12 +179,7 @@ const SuperAdminCourses = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo guardar el curso',
-        confirmButtonColor: '#667eea'
-      });
+      Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo guardar el curso', confirmButtonColor: '#4a90d9' });
     }
   };
 
@@ -175,58 +194,30 @@ const SuperAdminCourses = () => {
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     });
-
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${courseId}`, {
-          method: 'DELETE'
-        });
-
+        const response = await fetch(`${API_BASE}/courses/${courseId}`, { method: 'DELETE' });
         if (response.ok) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Eliminado',
-            text: 'El curso se eliminó correctamente',
-            confirmButtonColor: '#667eea'
-          });
+          Swal.fire({ icon: 'success', title: 'Eliminado', text: 'El curso se eliminó correctamente', confirmButtonColor: '#4a90d9' });
           fetchCourses();
         }
       } catch (error) {
         console.error('Error:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo eliminar el curso',
-          confirmButtonColor: '#667eea'
-        });
+        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo eliminar el curso', confirmButtonColor: '#4a90d9' });
       }
     }
   };
 
   const handleToggleStatus = async (courseId) => {
     try {
-      const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${courseId}/toggle-status`, {
-        method: 'PATCH'
-      });
-
+      const response = await fetch(`${API_BASE}/courses/${courseId}/toggle-status`, { method: 'PATCH' });
       if (response.ok) {
-        Swal.fire({
-          icon: 'success',
-          title: 'Estado Actualizado',
-          text: 'El estado del curso se actualizó correctamente',
-          timer: 2000,
-          showConfirmButton: false
-        });
+        Swal.fire({ icon: 'success', title: 'Estado Actualizado', text: 'El estado del curso se actualizó correctamente', timer: 2000, showConfirmButton: false });
         fetchCourses();
       }
     } catch (error) {
       console.error('Error:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo cambiar el estado del curso',
-        confirmButtonColor: '#667eea'
-      });
+      Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo cambiar el estado del curso', confirmButtonColor: '#4a90d9' });
     }
   };
 
@@ -235,148 +226,94 @@ const SuperAdminCourses = () => {
     reader.onloadend = async () => {
       try {
         const endpoint = type === 'main' ? 'main' : 'gallery';
-        const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${courseId}/image/${endpoint}`, {
+        const response = await fetch(`${API_BASE}/courses/${courseId}/image/${endpoint}`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: reader.result })
         });
-
         if (response.ok) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Imagen Subida',
-            text: 'La imagen se subió correctamente',
-            timer: 2000,
-            showConfirmButton: false
-          });
+          Swal.fire({ icon: 'success', title: 'Imagen Subida', text: 'La imagen se subió correctamente', timer: 2000, showConfirmButton: false });
           fetchCourses();
         }
       } catch (error) {
         console.error('Error:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo subir la imagen',
-          confirmButtonColor: '#667eea'
-        });
+        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo subir la imagen', confirmButtonColor: '#4a90d9' });
       }
     };
     reader.readAsDataURL(file);
   };
 
-  // NUEVA FUNCIÓN: Enviar reporte por WhatsApp
- // Función mejorada para enviar reporte por WhatsApp
-const sendEnrollmentReportWhatsApp = async (courseId) => {
-  try {
-    // Fetch enrollments for the course
-    const response = await fetch(`https://empatia-dominio-back.vercel.app/api/courses/${courseId}/enrollments`);
-    
-    if (!response.ok) {
-      throw new Error('No se pudieron obtener los inscritos');
-    }
+  const sendEnrollmentReportWhatsApp = async (courseId) => {
+    try {
+      const response = await fetch(`${API_BASE}/courses/${courseId}/enrollments`);
+      if (!response.ok) throw new Error('No se pudieron obtener los inscritos');
+      const enrollments = await response.json();
+      const course = courses.find(c => c._id === courseId);
+      if (!course) throw new Error('Curso no encontrado');
 
-    const enrollments = await response.json();
-    const course = courses.find(c => c._id === courseId);
-    
-    if (!course) {
-      throw new Error('Curso no encontrado');
-    }
+      let message = `📊 *REPORTE DE INSCRIPCIONES*\n\n`;
+      message += `📚 *Curso:* ${course.titulo}\n`;
+      message += `📅 *Fecha:* ${new Date().toLocaleDateString('es-AR')}\n`;
+      message += `⏰ *Hora:* ${new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}\n\n`;
+      message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
-    // Construir mensaje
-    let message = `📊 *REPORTE DE INSCRIPCIONES*\n\n`;
-    message += `📚 *Curso:* ${course.titulo}\n`;
-    message += `📅 *Fecha:* ${new Date().toLocaleDateString('es-AR')}\n`;
-    message += `⏰ *Hora:* ${new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}\n\n`;
-    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    
-    if (enrollments.length === 0) {
-      message += `ℹ️ *No hay inscripciones registradas*\n\n`;
-    } else {
-      message += `👥 *TOTAL INSCRITOS: ${enrollments.length}*\n\n`;
-      
-      // Agrupar por turno
-      const porTurno = {
-        'mañana': enrollments.filter(e => e.turnoPreferido === 'mañana'),
-        'tarde': enrollments.filter(e => e.turnoPreferido === 'tarde'),
-        'indistinto': enrollments.filter(e => e.turnoPreferido === 'indistinto')
-      };
-
-      // Mostrar inscritos por turno MAÑANA
-      if (porTurno['mañana'].length > 0) {
-        message += `🌅 *TURNO MAÑANA (${porTurno['mañana'].length}):*\n\n`;
-        porTurno['mañana'].forEach((enrollment, index) => {
-          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
-          message += `   📞 ${enrollment.celular || 'Sin teléfono'}\n`;
-          message += `   📧 ${enrollment.email || 'Sin email'}\n`;
-          message += `   ✅ Estado: ${enrollment.estado.toUpperCase()}\n\n`;
+      if (enrollments.length === 0) {
+        message += `ℹ️ *No hay inscripciones registradas*\n\n`;
+      } else {
+        message += `👥 *TOTAL INSCRITOS: ${enrollments.length}*\n\n`;
+        const porTurno = {
+          'mañana': enrollments.filter(e => e.turnoPreferido === 'mañana'),
+          'tarde': enrollments.filter(e => e.turnoPreferido === 'tarde'),
+          'indistinto': enrollments.filter(e => e.turnoPreferido === 'indistinto')
+        };
+        const turnos = [['mañana', '🌅'], ['tarde', '🌆'], ['indistinto', '🔄']];
+        turnos.forEach(([turno, emoji]) => {
+          if (porTurno[turno].length > 0) {
+            message += `${emoji} *TURNO ${turno.toUpperCase()} (${porTurno[turno].length}):*\n\n`;
+            porTurno[turno].forEach((enrollment, index) => {
+              message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
+              message += `   📞 ${enrollment.celular || 'Sin teléfono'}\n`;
+              message += `   📧 ${enrollment.email || 'Sin email'}\n`;
+              message += `   ✅ Estado: ${enrollment.estado.toUpperCase()}\n\n`;
+            });
+          }
         });
       }
 
-      // Mostrar inscritos por turno TARDE
-      if (porTurno['tarde'].length > 0) {
-        message += `🌆 *TURNO TARDE (${porTurno['tarde'].length}):*\n\n`;
-        porTurno['tarde'].forEach((enrollment, index) => {
-          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
-          message += `   📞 ${enrollment.celular || 'Sin teléfono'}\n`;
-          message += `   📧 ${enrollment.email || 'Sin email'}\n`;
-          message += `   ✅ Estado: ${enrollment.estado.toUpperCase()}\n\n`;
-        });
-      }
+      message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      message += `📊 *RESUMEN DEL CURSO:*\n`;
+      message += `• Total inscritos: ${enrollments.length}\n`;
+      message += `• Cupos disponibles: ${course.cuposDisponibles}\n`;
+      message += `• Precio: ${course.moneda === 'USD' ? 'USD' : '$'} ${course.precio}\n`;
+      if (course.tieneDescuento) message += `• Descuento: ${course.descuentoPorcentaje}%\n`;
+      if (course.tieneCodigoPromo) message += `• Código promo: ${course.codigoPromo}\n`;
+      message += `• Duración: ${course.duracion}\n`;
+      message += `• Modalidad: ${course.modalidad}\n\n`;
 
-      // Mostrar inscritos por turno INDISTINTO
-      if (porTurno['indistinto'].length > 0) {
-        message += `🔄 *TURNO INDISTINTO (${porTurno['indistinto'].length}):*\n\n`;
-        porTurno['indistinto'].forEach((enrollment, index) => {
-          message += `${index + 1}. *${enrollment.nombre} ${enrollment.apellido}*\n`;
-          message += `   📞 ${enrollment.celular || 'Sin teléfono'}\n`;
-          message += `   📧 ${enrollment.email || 'Sin email'}\n`;
-          message += `   ✅ Estado: ${enrollment.estado.toUpperCase()}\n\n`;
-        });
-      }
+      const mananaCount = enrollments.filter(e => e.turnoPreferido === 'mañana').length;
+      const tardeCount = enrollments.filter(e => e.turnoPreferido === 'tarde').length;
+      const indistintoCount = enrollments.filter(e => e.turnoPreferido === 'indistinto').length;
+      message += `📈 *DISTRIBUCIÓN POR TURNO:*\n`;
+      if (mananaCount > 0) message += `• Mañana: ${mananaCount}\n`;
+      if (tardeCount > 0) message += `• Tarde: ${tardeCount}\n`;
+      if (indistintoCount > 0) message += `• Indistinto: ${indistintoCount}\n`;
+      message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+      message += `_Reporte generado automáticamente_\n`;
+      message += `_Sistema de Gestión Empatía Digital_`;
+
+      window.open(`https://wa.me/5493413559329?text=${encodeURIComponent(message)}`, '_blank');
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire({ icon: 'error', title: 'Error', text: error.message || 'No se pudo generar el reporte', confirmButtonColor: '#4a90d9' });
     }
+  };
 
-    message += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    message += `📊 *RESUMEN DEL CURSO:*\n`;
-    message += `• Total inscritos: ${enrollments.length}\n`;
-    message += `• Cupos disponibles: ${course.cuposDisponibles}\n`;
-    message += `• Precio: ${course.precio}\n`;
-    message += `• Duración: ${course.duracion}\n`;
-    message += `• Modalidad: ${course.modalidad}\n\n`;
-    
-    // Estadísticas por turno
-    const mananaCount = enrollments.filter(e => e.turnoPreferido === 'mañana').length;
-    const tardeCount = enrollments.filter(e => e.turnoPreferido === 'tarde').length;
-    const indistintoCount = enrollments.filter(e => e.turnoPreferido === 'indistinto').length;
-    
-    message += `📈 *DISTRIBUCIÓN POR TURNO:*\n`;
-    if (mananaCount > 0) message += `• Mañana: ${mananaCount}\n`;
-    if (tardeCount > 0) message += `• Tarde: ${tardeCount}\n`;
-    if (indistintoCount > 0) message += `• Indistinto: ${indistintoCount}\n`;
-    
-    message += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
-    message += `_Reporte generado automáticamente_\n`;
-    message += `_Sistema de Gestión Empatía Digital_`;
-
-    // Codificar mensaje para URL
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappNumber = '5493413559329';
-    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
-    // Abrir WhatsApp
-    window.open(whatsappURL, '_blank');
-
-  } catch (error) {
-    console.error('Error:', error);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: error.message || 'No se pudo generar el reporte de inscripciones',
-      confirmButtonColor: '#667eea'
-    });
-  }
-};
+  // ── Helpers de display ──
+  const formatPrecio = (course) => {
+    if (!course.precio) return '—';
+    const simbolo = course.moneda === 'USD' ? 'USD ' : '$ ';
+    return `${simbolo}${course.precio}`;
+  };
 
   if (loading) {
     return (
@@ -389,40 +326,40 @@ const sendEnrollmentReportWhatsApp = async (courseId) => {
 
   return (
     <div className="superadmin-courses-container">
+
+      {/* ── HEADER ── */}
       <div className="header">
         <div className="header-content">
-          <h1>🎓 Gestión de Cursos</h1>
+          <h1>Gestión de Cursos</h1>
           <p>Panel exclusivo de SuperAdmin</p>
         </div>
         <button className="btn-create" onClick={openCreateModal}>
-          ➕ Crear Nuevo Curso
+          + Crear Nuevo Curso
         </button>
       </div>
 
-      {/* Active Course Highlight */}
+      {/* ── CURSO ACTIVO BANNER ── */}
       {activeCourse && (
         <div className="active-course-banner">
-          <div className="banner-badge">⭐ CURSO ACTIVO</div>
+          <div className="banner-badge">★ CURSO ACTIVO</div>
           <h2>{activeCourse.titulo}</h2>
           <p>{activeCourse.descripcion}</p>
           <div className="banner-stats">
             <span>📅 {activeCourse.duracion}</span>
-            <span>💰 {activeCourse.precio}</span>
+            <span>💰 {formatPrecio(activeCourse)}</span>
+            {activeCourse.tieneDescuento && <span>🏷 -{activeCourse.descuentoPorcentaje}%</span>}
+            {activeCourse.tieneCodigoPromo && <span>🎟 {activeCourse.codigoPromo}</span>}
             <span>👥 {activeCourse.cuposDisponibles} cupos</span>
           </div>
         </div>
       )}
 
-      {/* Courses Grid */}
+      {/* ── GRID DE CURSOS ── */}
       <div className="courses-grid">
         {courses.map((course) => (
           <div key={course._id} className={`course-card ${course.activo ? 'active' : ''}`}>
-            {course.activo && (
-              <div className="active-badge">
-                ⭐ ACTIVO
-              </div>
-            )}
-            
+            {course.activo && <div className="active-badge">★ ACTIVO</div>}
+
             {course.imagenPrincipal && (
               <div className="course-image">
                 <img src={course.imagenPrincipal} alt={course.titulo} />
@@ -432,78 +369,58 @@ const sendEnrollmentReportWhatsApp = async (courseId) => {
             <div className="course-content">
               <h3>{course.titulo}</h3>
               <p className="course-description">{course.descripcion}</p>
-              
+
               <div className="course-details">
                 <div className="detail-item">
-                  <span className="label">Duración:</span>
+                  <span className="label">Duración</span>
                   <span className="value">{course.duracion}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Modalidad:</span>
+                  <span className="label">Modalidad</span>
                   <span className="value">{course.modalidad}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="label">Precio:</span>
-                  <span className="value">{course.precio}</span>
+                  <span className="label">Precio</span>
+                  <span className="value">{formatPrecio(course)}</span>
                 </div>
+                {course.tieneDescuento && (
+                  <div className="detail-item">
+                    <span className="label">Descuento</span>
+                    <span className="value promo-tag">−{course.descuentoPorcentaje}%</span>
+                  </div>
+                )}
+                {course.tieneCodigoPromo && (
+                  <div className="detail-item">
+                    <span className="label">Código Promo</span>
+                    <span className="value promo-tag">{course.codigoPromo}</span>
+                  </div>
+                )}
                 <div className="detail-item">
-                  <span className="label">Cupos:</span>
+                  <span className="label">Cupos</span>
                   <span className="value">{course.cuposDisponibles}</span>
                 </div>
               </div>
 
               <div className="course-actions">
-                <button
-                  className={`btn-toggle ${course.activo ? 'active' : ''}`}
-                  onClick={() => handleToggleStatus(course._id)}
-                >
+                <button className={`btn-toggle ${course.activo ? 'active' : ''}`} onClick={() => handleToggleStatus(course._id)}>
                   {course.activo ? '🔴 Desactivar' : '🟢 Activar'}
                 </button>
-                
-                <button
-                  className="btn-edit"
-                  onClick={() => openEditModal(course)}
-                >
-                  ✏️ Editar
-                </button>
-                
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDelete(course._id)}
-                >
-                  🗑️ Eliminar
-                </button>
-
-                {/* NUEVO BOTÓN: Enviar reporte por WhatsApp */}
-                <button
-                  className="btn-whatsapp"
-                  onClick={() => sendEnrollmentReportWhatsApp(course._id)}
-                  title="Enviar lista de inscritos por WhatsApp"
-                >
+                <button className="btn-edit" onClick={() => openEditModal(course)}>✏️ Editar</button>
+                <button className="btn-delete" onClick={() => handleDelete(course._id)}>🗑️ Eliminar</button>
+                <button className="btn-whatsapp" onClick={() => sendEnrollmentReportWhatsApp(course._id)} title="Enviar lista de inscritos por WhatsApp">
                   📱 Enviar Reporte
                 </button>
-
-          <Link to="/cursantes" >Post</Link>
+                <Link to="/cursantes">Post</Link>
               </div>
 
               <div className="image-uploads">
                 <div className="upload-section">
                   <label>📸 Imagen Principal</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(course._id, e.target.files[0], 'main')}
-                    className="file-input"
-                  />
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(course._id, e.target.files[0], 'main')} className="file-input" />
                 </div>
                 <div className="upload-section">
                   <label>🖼️ Galería</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(course._id, e.target.files[0], 'gallery')}
-                    className="file-input"
-                  />
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(course._id, e.target.files[0], 'gallery')} className="file-input" />
                 </div>
               </div>
             </div>
@@ -515,152 +432,135 @@ const sendEnrollmentReportWhatsApp = async (courseId) => {
             <div className="empty-icon">📚</div>
             <h3>No hay cursos creados</h3>
             <p>Crea tu primer curso para comenzar</p>
-            <button className="btn-create" onClick={openCreateModal}>
-              Crear Curso
-            </button>
+            <button className="btn-create" onClick={openCreateModal}>Crear Curso</button>
           </div>
         )}
       </div>
 
-      {/* Modal */}
+      {/* ── MODAL ── */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>{editingCourse ? '✏️ Editar Curso' : '➕ Crear Nuevo Curso'}</h2>
-              <button className="modal-close" onClick={() => setShowModal(false)}>
-                ✕
-              </button>
+              <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
             </div>
 
             <form onSubmit={handleSubmit} className="course-form">
+
               <div className="form-group">
                 <label>Título del Curso *</label>
-                <input
-                  type="text"
-                  name="titulo"
-                  value={formData.titulo}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="Ej: Curso de Formación en Empatía"
-                />
+                <input type="text" name="titulo" value={formData.titulo} onChange={handleInputChange} required placeholder="Ej: Curso de Formación en Empatía" />
               </div>
 
               <div className="form-group">
                 <label>Descripción *</label>
-                <textarea
-                  name="descripcion"
-                  value={formData.descripcion}
-                  onChange={handleInputChange}
-                  required
-                  rows="4"
-                  placeholder="Descripción detallada del curso"
-                />
+                <textarea name="descripcion" value={formData.descripcion} onChange={handleInputChange} required rows="4" placeholder="Descripción detallada del curso" />
               </div>
 
               <div className="form-row">
                 <div className="form-group">
                   <label>Duración</label>
-                  <input
-                    type="text"
-                    name="duracion"
-                    value={formData.duracion}
-                    onChange={handleInputChange}
-                    placeholder="Ej: 3 meses"
-                  />
+                  <input type="text" name="duracion" value={formData.duracion} onChange={handleInputChange} placeholder="Ej: 3 meses" />
                 </div>
                 <div className="form-group">
                   <label>Modalidad</label>
-                  <input
-                    type="text"
-                    name="modalidad"
-                    value={formData.modalidad}
-                    onChange={handleInputChange}
-                    placeholder="Ej: Presencial/Online"
-                  />
+                  <input type="text" name="modalidad" value={formData.modalidad} onChange={handleInputChange} placeholder="Ej: Presencial/Online" />
                 </div>
               </div>
 
+              {/* ── PRECIO + MONEDA ── */}
               <div className="form-row">
                 <div className="form-group">
                   <label>Precio</label>
-                  <input
-                    type="text"
-                    name="precio"
-                    value={formData.precio}
-                    onChange={handleInputChange}
-                    placeholder="Ej: $50,000"
-                  />
+                  <div className="precio-input-group">
+                    <select name="moneda" value={formData.moneda} onChange={handleInputChange} className="moneda-select">
+                      <option value="ARS">$ ARS</option>
+                      <option value="USD">USD</option>
+                    </select>
+                    <input type="text" name="precio" value={formData.precio} onChange={handleInputChange} placeholder="Ej: 50000" className="precio-input" />
+                  </div>
                 </div>
                 <div className="form-group">
                   <label>Cupos Disponibles</label>
-                  <input
-                    type="number"
-                    name="cuposDisponibles"
-                    value={formData.cuposDisponibles}
-                    onChange={handleInputChange}
-                    min="0"
-                  />
+                  <input type="number" name="cuposDisponibles" value={formData.cuposDisponibles} onChange={handleInputChange} min="0" />
                 </div>
+              </div>
+
+              {/* ── DESCUENTO ── */}
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input type="checkbox" name="tieneDescuento" checked={formData.tieneDescuento} onChange={handleInputChange} />
+                  <span>Aplicar descuento</span>
+                </label>
+                {formData.tieneDescuento && (
+                  <div className="promo-field">
+                    <input
+                      type="number"
+                      name="descuentoPorcentaje"
+                      value={formData.descuentoPorcentaje}
+                      onChange={handleInputChange}
+                      placeholder="Porcentaje de descuento (ej: 20)"
+                      min="1"
+                      max="99"
+                    />
+                    <span className="promo-suffix">%</span>
+                  </div>
+                )}
+              </div>
+
+              {/* ── CÓDIGO PROMO ── */}
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input type="checkbox" name="tieneCodigoPromo" checked={formData.tieneCodigoPromo} onChange={handleInputChange} />
+                  <span>Generar código promocional</span>
+                </label>
+                {formData.tieneCodigoPromo && (
+                  <div className="promo-field">
+                    <input
+                      type="text"
+                      name="codigoPromo"
+                      value={formData.codigoPromo}
+                      onChange={handleInputChange}
+                      placeholder="Código promo"
+                      readOnly
+                      className="codigo-input"
+                    />
+                    <button type="button" className="btn-regenerar" onClick={regenerarCodigo} title="Generar nuevo código">
+                      🔄
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
                 <label>Fecha de Inicio</label>
-                <input
-                  type="date"
-                  name="fechaInicio"
-                  value={formData.fechaInicio}
-                  onChange={handleInputChange}
-                />
+                <input type="date" name="fechaInicio" value={formData.fechaInicio} onChange={handleInputChange} />
               </div>
 
               <div className="form-row">
                 <div className="form-group">
                   <label>Horario Mañana</label>
-                  <input
-                    type="text"
-                    name="horarios.manana"
-                    value={formData.horarios.manana}
-                    onChange={handleInputChange}
-                    placeholder="9:00 - 12:00"
-                  />
+                  <input type="text" name="horarios.manana" value={formData.horarios.manana} onChange={handleInputChange} placeholder="9:00 - 12:00" />
                 </div>
                 <div className="form-group">
                   <label>Horario Tarde</label>
-                  <input
-                    type="text"
-                    name="horarios.tarde"
-                    value={formData.horarios.tarde}
-                    onChange={handleInputChange}
-                    placeholder="14:00 - 17:00"
-                  />
+                  <input type="text" name="horarios.tarde" value={formData.horarios.tarde} onChange={handleInputChange} placeholder="14:00 - 17:00" />
                 </div>
               </div>
 
               <div className="form-group checkbox-group">
                 <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="activo"
-                    checked={formData.activo}
-                    onChange={handleInputChange}
-                  />
+                  <input type="checkbox" name="activo" checked={formData.activo} onChange={handleInputChange} />
                   <span>Activar curso inmediatamente</span>
                 </label>
               </div>
 
               <div className="modal-actions">
-                <button
-                  type="button"
-                  className="btn-cancel"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancelar
-                </button>
-                <button type="submit" className="btn-save">
-                  {editingCourse ? 'Actualizar' : 'Crear'} Curso
-                </button>
+                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Cancelar</button>
+                <button type="submit" className="btn-save">{editingCourse ? 'Actualizar' : 'Crear'} Curso</button>
               </div>
+
             </form>
           </div>
         </div>
@@ -670,9 +570,3 @@ const sendEnrollmentReportWhatsApp = async (courseId) => {
 };
 
 export default SuperAdminCourses;
-
-
-
-
-
-
