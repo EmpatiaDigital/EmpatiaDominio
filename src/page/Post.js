@@ -94,9 +94,9 @@ export default function Post() {
                   }}
                 >
                   <div className="post-card-overlay">
-                    <div className="post-header">
                      {/* Badge categoría */}
                     <span className="card-badge">{post.categoria}</span>
+                    <div className="post-header">
                       <img
                         src={post.avatar || DEFAULT_AVATAR}
                         alt="avatar"
