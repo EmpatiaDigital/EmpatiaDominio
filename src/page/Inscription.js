@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 import '../style/Inscription.css';
@@ -9,7 +9,6 @@ import logo3 from '../assets/empatialog.jpeg';
 
 const BASE_URL = 'https://empatia-dominio-back.vercel.app/api';
 
-// ── Mapeo frontend → valor que espera el backend ──
 const TURNO_VALUE_MAP = {
   manana:     'mañana',
   tarde:      'tarde',
@@ -21,23 +20,18 @@ const Inscription = () => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [inscriptionsStats, setInscriptionsStats] = useState({
-    manana: 0,
-    tarde: 0,
-    indistinto: 0,
-    total: 0,
-    cuposTotal: 0,
-    cuposDisponibles: 0
+    manana: 0, tarde: 0, indistinto: 0,
+    total: 0, cuposTotal: 0, cuposDisponibles: 0
   });
   const [formData, setFormData] = useState({
-    nombre: '',
-    apellido: '',
-    email: '',
-    celular: '',
-    turnoPreferido: '',
-    aceptaTerminos: false
+    nombre: '', apellido: '', email: '', celular: '',
+    turnoPreferido: '', aceptaTerminos: false
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+
+  // ── Ref para tener siempre el courseId actualizado dentro del intervalo ──
+  const courseIdRef = useRef(null);
 
   const avaladores = [
     { id: 'logo1', logo: logo1, nombre: 'Grupo Educativo Austral' },
@@ -45,57 +39,53 @@ const Inscription = () => {
     { id: 'logo3', logo: logo3, nombre: 'Salud Digital' },
   ];
 
-  useEffect(() => {
-    fetchActiveCourse();
+  // ── Refresca curso + stats juntos — sin depender del closure de course ──
+  const refreshAll = useCallback(async () => {
+    try {
+      // 1. Siempre re-fetch el curso activo para captar cambios de cupos del admin
+      const courseRes = await fetch(`${BASE_URL}/courses/active`);
+      if (!courseRes.ok) return;
+      const freshCourse = await courseRes.json();
+
+      setCourse(freshCourse);
+      courseIdRef.current = freshCourse._id;
+
+      // 2. Fetch stats con el ID fresco
+      const statsRes = await fetch(
+        `${BASE_URL}/inscriptions/estadisticas/${freshCourse._id}`
+      );
+      if (!statsRes.ok) return;
+      const data = await statsRes.json();
+      const stats = data.data || data;
+
+      setInscriptionsStats({
+        manana:           stats.porTurno?.manana    || stats.porTurno?.mañana || 0,
+        tarde:            stats.porTurno?.tarde     || 0,
+        indistinto:       stats.porTurno?.indistinto|| 0,
+        total:            stats.activos             || 0,
+        // ── cuposTotal siempre viene del curso fresco ──
+        cuposTotal:       freshCourse.cuposTotal    || freshCourse.cuposDisponibles || 0,
+        cuposDisponibles: stats.cuposDisponibles    ?? 0
+      });
+    } catch (err) {
+      console.error('Error al refrescar datos:', err);
+    }
   }, []);
 
-  // ── Fix: usar course._id como dependencia para que el intervalo
-  //    se registre correctamente cada vez que llega el curso ──
+  // ── Carga inicial ──
   useEffect(() => {
-    if (!course?._id) return;
-    fetchInscriptionsStats();
-    const interval = setInterval(fetchInscriptionsStats, 10000);
-    return () => clearInterval(interval);
-  }, [course?._id]);                          // ← antes era [course]
-
-  const fetchActiveCourse = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/courses/active`);
-      if (response.ok) {
-        const data = await response.json();
-        setCourse(data);
-      } else {
-        setCourse(null);
-      }
-    } catch {
-      setCourse(null);
-    } finally {
+    const init = async () => {
+      await refreshAll();
       setLoading(false);
-    }
-  };
+    };
+    init();
+  }, [refreshAll]);
 
-  const fetchInscriptionsStats = async () => {
-    if (!course?._id) return;
-    try {
-      const response = await fetch(
-        `${BASE_URL}/inscriptions/estadisticas/${course._id}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        const stats = data.data || data;
-        setInscriptionsStats({
-          manana:          stats.porTurno?.manana    || stats.porTurno?.mañana || 0,
-          tarde:           stats.porTurno?.tarde     || 0,
-          indistinto:      stats.porTurno?.indistinto|| 0,
-          total:           stats.activos             || 0,
-          cuposTotal:      stats.cuposTotal          || course.cuposTotal || 0,
-          cuposDisponibles:stats.cuposDisponibles    ?? 0
-        });
-      }
-    } catch {
-      console.error('Error al cargar estadísticas de inscripciones');
-    }
-  };
+  // ── Intervalo cada 10 segundos — refresca curso Y stats ──
+  useEffect(() => {
+    const interval = setInterval(refreshAll, 10000);
+    return () => clearInterval(interval);
+  }, [refreshAll]);
 
   const getCuposDisponiblesPorTurno = (turno) => {
     const cuposTotal = inscriptionsStats.cuposTotal || course?.cuposTotal || 0;
@@ -112,7 +102,7 @@ const Inscription = () => {
     return 0;
   };
 
-  const isTurnoLleno = (turno) => getCuposDisponiblesPorTurno(turno) <= 0;
+  const isTurnoLleno   = (turno) => getCuposDisponiblesPorTurno(turno) <= 0;
 
   const isCursoLleno = () => {
     const cuposTotal = inscriptionsStats.cuposTotal || course?.cuposTotal || 0;
@@ -155,16 +145,15 @@ const Inscription = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido';
     }
-    if (!formData.celular.trim())    newErrors.celular        = 'El celular es obligatorio';
-    if (!formData.turnoPreferido)    newErrors.turnoPreferido = 'Debe seleccionar un turno';
-    if (!formData.aceptaTerminos)    newErrors.aceptaTerminos = 'Debe aceptar los términos y condiciones';
+    if (!formData.celular.trim())  newErrors.celular        = 'El celular es obligatorio';
+    if (!formData.turnoPreferido)  newErrors.turnoPreferido = 'Debe seleccionar un turno';
+    if (!formData.aceptaTerminos)  newErrors.aceptaTerminos = 'Debe aceptar los términos y condiciones';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) {
       Swal.fire({
         icon: 'warning',
@@ -176,9 +165,7 @@ const Inscription = () => {
     }
 
     setSubmitting(true);
-
     try {
-      // ── Fix: convertir "manana" → "mañana" antes de enviar ──
       const payload = {
         ...formData,
         turnoPreferido: TURNO_VALUE_MAP[formData.turnoPreferido] ?? formData.turnoPreferido,
@@ -194,7 +181,8 @@ const Inscription = () => {
       const data = await response.json();
 
       if (response.ok) {
-        await fetchInscriptionsStats();
+        // Refresca curso + stats tras inscripción exitosa
+        await refreshAll();
 
         await Swal.fire({
           icon: 'success',
@@ -239,12 +227,8 @@ const Inscription = () => {
             navigate('/informacion');
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             setFormData({
-              nombre: '',
-              apellido: '',
-              email: '',
-              celular: '',
-              turnoPreferido: '',
-              aceptaTerminos: false
+              nombre: '', apellido: '', email: '', celular: '',
+              turnoPreferido: '', aceptaTerminos: false
             });
             setErrors({});
           }
@@ -270,9 +254,8 @@ const Inscription = () => {
     }
   };
 
-  const handleVolverInicio = () => navigate('/');
-
-  const handleConsultarWhatsApp = () => {
+  const handleVolverInicio       = () => navigate('/');
+  const handleConsultarWhatsApp  = () => {
     const mensaje = encodeURIComponent(
       'Hola! Me interesa obtener información sobre próximos cursos. ¿Podrían ayudarme?'
     );
@@ -349,8 +332,8 @@ const Inscription = () => {
     );
   }
 
-  const cuposTotales = inscriptionsStats.cuposTotal || course.cuposTotal || 0;
-  const cuposRestantes = Math.max(0, cuposTotales - inscriptionsStats.total);
+  const cuposTotales      = inscriptionsStats.cuposTotal || course.cuposTotal || 0;
+  const cuposRestantes    = Math.max(0, cuposTotales - inscriptionsStats.total);
   const porcentajeOcupado = cuposTotales > 0
     ? Math.min((inscriptionsStats.total / cuposTotales) * 100, 100)
     : 0;
@@ -363,44 +346,27 @@ const Inscription = () => {
       {/* Hero */}
       <div className="course-hero">
         {course.imagenPrincipal && (
-          <img
-            src={course.imagenPrincipal}
-            alt={course.titulo}
-            className="course-hero-image"
-          />
+          <img src={course.imagenPrincipal} alt={course.titulo} className="course-hero-image" />
         )}
         <div className="course-hero-overlay">
-
-          {/* Avaladores */}
           <div className="avaladores-section">
             <p className="avaladores-title">Curso avalado por:</p>
             <div className="avaladores-logos">
               {avaladores.map((avalador) => (
                 <div key={avalador.id} className="avalador-logo-circle">
-                  <img
-                    src={avalador.logo}
-                    alt={avalador.nombre}
-                    className="avalador-logo"
-                  />
+                  <img src={avalador.logo} alt={avalador.nombre} className="avalador-logo" />
                 </div>
               ))}
             </div>
           </div>
-
           <h1 className="course-title">{course.titulo}</h1>
-          <h4 className="course-description" style={{ color: '#ffffff' }}>
-            {course.descripcion}
-          </h4>
-
-          <Link to="/informacion" className="btn-conocer-mas">
-            Conocer Más
-          </Link>
+          <h4 className="course-description" style={{ color: '#ffffff' }}>{course.descripcion}</h4>
+          <Link to="/informacion" className="btn-conocer-mas">Conocer Más</Link>
         </div>
       </div>
 
       <div className="form-wrapper">
 
-        {/* Info del curso */}
         <div className="course-info">
           <h2>Información del Curso</h2>
           <div className="info-grid">
@@ -424,7 +390,7 @@ const Inscription = () => {
             )}
           </div>
 
-          {/* ── Descuento — independiente del código promo ── */}
+          {/* Descuento */}
           {course.tieneDescuento && course.descuentoPorcentaje && (() => {
             const precioNumero = parseFloat(
               (course.precio || '').toString().replace(/[^\d.,]/g, '').replace(',', '.')
@@ -433,7 +399,6 @@ const Inscription = () => {
             const precioConDescuento = !isNaN(precioNumero)
               ? Math.round(precioNumero * (1 - descuento / 100))
               : null;
-
             return (
               <div className="descuento-banner">
                 <div className="descuento-badge">
@@ -441,9 +406,7 @@ const Inscription = () => {
                   <span className="descuento-label">DESCUENTO ESPECIAL</span>
                 </div>
                 <div className="descuento-precios">
-                  <span className="precio-original">
-                    Precio original: <s>{course.precio}</s>
-                  </span>
+                  <span className="precio-original">Precio original: <s>{course.precio}</s></span>
                   {precioConDescuento !== null && (
                     <span className="precio-final">
                       Precio con descuento:{' '}
@@ -458,7 +421,7 @@ const Inscription = () => {
             );
           })()}
 
-          {/* ── Código promo — independiente del descuento ── */}
+          {/* Código promo */}
           {course.tieneCodigoPromo && (
             <div className="promo-aviso promo-aviso--posible">
               🎟️ <strong>¡Inscribite y puede que te lleves algo más!</strong>{' '}
@@ -466,7 +429,7 @@ const Inscription = () => {
             </div>
           )}
 
-          {/* ── Barra de cupos ── */}
+          {/* Barra de cupos */}
           <div className="cupos-progress-wrapper">
             <div className="cupos-progress-bar-track">
               <div
@@ -476,18 +439,14 @@ const Inscription = () => {
                 style={{ width: `${porcentajeOcupado}%` }}
               />
             </div>
-
             <div className="cupos-progress-info">
               <p className="cupos-progress-texto">
                 <strong>{cuposRestantes}</strong> cupos disponibles de <strong>{cuposTotales}</strong>
               </p>
               {cuposRestantes <= 5 && cuposRestantes > 0 && (
-                <span className="cupos-urgencia">
-                  ⚡ ¡Últimos lugares!
-                </span>
+                <span className="cupos-urgencia">⚡ ¡Últimos lugares!</span>
               )}
             </div>
-
             {turnosHabilitados.filter(t => t !== 'indistinto').length > 1 && (
               <div className="cupos-turnos">
                 {turnosHabilitados.includes('manana') && (
@@ -510,12 +469,7 @@ const Inscription = () => {
               <h3>Galería</h3>
               <div className="gallery-grid">
                 {course.imagenesGaleria.map((img, index) => (
-                  <img
-                    key={index}
-                    src={img.url}
-                    alt={`Imagen ${index + 1}`}
-                    className="gallery-image"
-                  />
+                  <img key={index} src={img.url} alt={`Imagen ${index + 1}`} className="gallery-image" />
                 ))}
               </div>
             </div>
@@ -525,149 +479,85 @@ const Inscription = () => {
         {/* Formulario */}
         <div className="form-container">
           <h2>Inscribite Ahora</h2>
-
           <form onSubmit={handleSubmit} className="inscription-form">
 
             <div className="form-group">
               <label htmlFor="nombre">Nombre *</label>
-              <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                className={errors.nombre ? 'error' : ''}
-                placeholder="Tu nombre"
-              />
+              <input type="text" id="nombre" name="nombre" value={formData.nombre}
+                onChange={handleChange} className={errors.nombre ? 'error' : ''} placeholder="Tu nombre" />
               {errors.nombre && <span className="error-text">{errors.nombre}</span>}
             </div>
 
             <div className="form-group">
               <label htmlFor="apellido">Apellido *</label>
-              <input
-                type="text"
-                id="apellido"
-                name="apellido"
-                value={formData.apellido}
-                onChange={handleChange}
-                className={errors.apellido ? 'error' : ''}
-                placeholder="Tu apellido"
-              />
+              <input type="text" id="apellido" name="apellido" value={formData.apellido}
+                onChange={handleChange} className={errors.apellido ? 'error' : ''} placeholder="Tu apellido" />
               {errors.apellido && <span className="error-text">{errors.apellido}</span>}
             </div>
 
             <div className="form-group">
               <label htmlFor="email">Email *</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={errors.email ? 'error' : ''}
-                placeholder="@email.com"
-              />
+              <input type="email" id="email" name="email" value={formData.email}
+                onChange={handleChange} className={errors.email ? 'error' : ''} placeholder="@email.com" />
               {errors.email && <span className="error-text">{errors.email}</span>}
             </div>
 
             <div className="form-group">
               <label htmlFor="celular">Celular *</label>
-              <input
-                type="tel"
-                id="celular"
-                name="celular"
-                value={formData.celular}
-                onChange={handleChange}
-                className={errors.celular ? 'error' : ''}
-                placeholder="+54 xxx xxxx xxxx"
-              />
+              <input type="tel" id="celular" name="celular" value={formData.celular}
+                onChange={handleChange} className={errors.celular ? 'error' : ''} placeholder="+54 xxx xxxx xxxx" />
               {errors.celular && <span className="error-text">{errors.celular}</span>}
             </div>
 
             <div className="form-group">
               <label>Turno Preferido *</label>
               <div className="radio-group">
-
                 {turnosHabilitados.includes('manana') && (
                   <label className={`radio-label ${isTurnoLleno('manana') ? 'turno-lleno' : ''}`}>
-                    <input
-                      type="radio"
-                      name="turnoPreferido"
-                      value="manana"
+                    <input type="radio" name="turnoPreferido" value="manana"
                       checked={formData.turnoPreferido === 'manana'}
-                      onChange={handleChange}
-                      disabled={isTurnoLleno('manana')}
-                    />
+                      onChange={handleChange} disabled={isTurnoLleno('manana')} />
                     <span>{renderTurnoText('manana')}</span>
                     {!isTurnoLleno('manana') && (
-                      <span className="cupos-restantes">
-                        ({getCuposDisponiblesPorTurno('manana')} cupos)
-                      </span>
+                      <span className="cupos-restantes">({getCuposDisponiblesPorTurno('manana')} cupos)</span>
                     )}
                   </label>
                 )}
-
                 {turnosHabilitados.includes('tarde') && (
                   <label className={`radio-label ${isTurnoLleno('tarde') ? 'turno-lleno' : ''}`}>
-                    <input
-                      type="radio"
-                      name="turnoPreferido"
-                      value="tarde"
+                    <input type="radio" name="turnoPreferido" value="tarde"
                       checked={formData.turnoPreferido === 'tarde'}
-                      onChange={handleChange}
-                      disabled={isTurnoLleno('tarde')}
-                    />
+                      onChange={handleChange} disabled={isTurnoLleno('tarde')} />
                     <span>{renderTurnoText('tarde')}</span>
                     {!isTurnoLleno('tarde') && (
-                      <span className="cupos-restantes">
-                        ({getCuposDisponiblesPorTurno('tarde')} cupos)
-                      </span>
+                      <span className="cupos-restantes">({getCuposDisponiblesPorTurno('tarde')} cupos)</span>
                     )}
                   </label>
                 )}
-
                 {turnosHabilitados.includes('indistinto') && (
                   <label className="radio-label">
-                    <input
-                      type="radio"
-                      name="turnoPreferido"
-                      value="indistinto"
-                      checked={formData.turnoPreferido === 'indistinto'}
-                      onChange={handleChange}
-                    />
+                    <input type="radio" name="turnoPreferido" value="indistinto"
+                      checked={formData.turnoPreferido === 'indistinto'} onChange={handleChange} />
                     <span>Indistinto</span>
                   </label>
                 )}
-
               </div>
-              {errors.turnoPreferido && (
-                <span className="error-text">{errors.turnoPreferido}</span>
-              )}
+              {errors.turnoPreferido && <span className="error-text">{errors.turnoPreferido}</span>}
             </div>
 
             <div className="form-group checkbox-group">
               <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="aceptaTerminos"
-                  checked={formData.aceptaTerminos}
-                  onChange={handleChange}
-                />
+                <input type="checkbox" name="aceptaTerminos"
+                  checked={formData.aceptaTerminos} onChange={handleChange} />
                 <span>
                   Acepto los términos y condiciones y el tratamiento de mis datos personales
                   conforme a la política de privacidad *
                 </span>
               </label>
-              {errors.aceptaTerminos && (
-                <span className="error-text">{errors.aceptaTerminos}</span>
-              )}
+              {errors.aceptaTerminos && <span className="error-text">{errors.aceptaTerminos}</span>}
             </div>
 
-            <button
-              type="submit"
-              className="btn-submit"
-              disabled={submitting}
-            >
+            <button type="submit" className="btn-submit" disabled={submitting}>
               {submitting ? 'Enviando...' : 'Inscribirme'}
             </button>
 
