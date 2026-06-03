@@ -32,19 +32,17 @@ const Inscription = () => {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  // ─── Avaladores con logo1,logo2 y logo3  ────────────────────────────────────────
+  // ─── Avaladores ────────────────────────────────────────
   const avaladores = [
     { id: 'logo1', logo: logo1, nombre: 'Grupo Educativo Austral' },
     { id: 'logo2', logo: logo2, nombre: 'Comisión Psicosocial Latinoamericana' },
     { id: 'logo3', logo: logo3, nombre: 'Salud Digital' },
   ];
 
-  // ─── Fetch del curso activo ───────────────────────────────────────────────
   useEffect(() => {
     fetchActiveCourse();
   }, []);
 
-  // ─── Polling de estadísticas cada 10 s ───────────────────────────────────
   useEffect(() => {
     if (!course) return;
     fetchInscriptionsStats();
@@ -94,10 +92,8 @@ const Inscription = () => {
   const getCuposDisponiblesPorTurno = (turno) => {
     const cuposTotal = inscriptionsStats.cuposTotal || course?.cuposTotal || 0;
     if (!cuposTotal) return 0;
-
     const mitad = Math.floor(cuposTotal / 2);
     const mitadIndistinto = Math.floor(inscriptionsStats.indistinto / 2);
-
     if (turno === 'manana') {
       return Math.max(0, mitad - inscriptionsStats.manana - mitadIndistinto);
     }
@@ -133,7 +129,6 @@ const Inscription = () => {
     return lleno ? `${renderTurnoLabel(turno)} - Cupo Lleno` : renderTurnoLabel(turno);
   };
 
-  // ─── Handlers del formulario ──────────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -152,7 +147,7 @@ const Inscription = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido';
     }
-    if (!formData.celular.trim())       newErrors.celular       = 'El celular es obligatorio';
+    if (!formData.celular.trim())       newErrors.celular        = 'El celular es obligatorio';
     if (!formData.turnoPreferido)       newErrors.turnoPreferido = 'Debe seleccionar un turno';
     if (!formData.aceptaTerminos)       newErrors.aceptaTerminos = 'Debe aceptar los términos y condiciones';
     setErrors(newErrors);
@@ -260,7 +255,6 @@ const Inscription = () => {
     }
   };
 
-  // ─── Acciones rápidas ─────────────────────────────────────────────────────
   const handleVolverInicio = () => navigate('/');
 
   const handleConsultarWhatsApp = () => {
@@ -270,7 +264,6 @@ const Inscription = () => {
     window.open(`https://wa.me/5493413559329?text=${mensaje}`, '_blank');
   };
 
-  // ─── Estados de carga / sin curso / curso lleno ───────────────────────────
   if (loading) {
     return (
       <div className="inscription-container">
@@ -341,7 +334,6 @@ const Inscription = () => {
     );
   }
 
-  // ─── Cupos totales usados para la barra de progreso ───────────────────────
   const cuposTotales = inscriptionsStats.cuposTotal || course.cuposTotal || 0;
   const cuposRestantes = Math.max(0, cuposTotales - inscriptionsStats.total);
   const porcentajeOcupado = cuposTotales > 0
@@ -350,11 +342,10 @@ const Inscription = () => {
 
   const turnosHabilitados = getTurnosHabilitados();
 
-  // ─── Render principal ─────────────────────────────────────────────────────
   return (
     <div className="inscription-container">
 
-      {/* Hero con imagen y datos del curso */}
+      {/* Hero */}
       <div className="course-hero">
         {course.imagenPrincipal && (
           <img
@@ -365,7 +356,7 @@ const Inscription = () => {
         )}
         <div className="course-hero-overlay">
 
-          {/* ── Avaladores ── */}
+          {/* Avaladores */}
           <div className="avaladores-section">
             <p className="avaladores-title">Curso avalado por:</p>
             <div className="avaladores-logos">
@@ -394,7 +385,7 @@ const Inscription = () => {
 
       <div className="form-wrapper">
 
-        {/* Info del curso + barra de cupos */}
+        {/* Info del curso */}
         <div className="course-info">
           <h2>Información del Curso</h2>
           <div className="info-grid">
@@ -418,49 +409,37 @@ const Inscription = () => {
             )}
           </div>
 
-          {/* Barra de progreso de cupos */}
-          <div
-            style={{
-              marginTop: '16px',
-              padding: '16px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              backgroundColor: '#fafafa'
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: '#e9e9e9',
-                borderRadius: '99px',
-                height: '8px',
-                overflow: 'hidden',
-                marginBottom: '10px'
-              }}
-            >
+          {/* ── Barra de cupos mejorada ── */}
+          <div className="cupos-progress-wrapper">
+            <div className="cupos-progress-bar-track">
               <div
-                style={{
-                  height: '100%',
-                  width: `${porcentajeOcupado}%`,
-                  borderRadius: '99px',
-                  backgroundColor: porcentajeOcupado >= 80 ? '#e74c3c' : '#888',
-                  transition: 'width 0.5s ease'
-                }}
+                className={`cupos-progress-bar-fill ${
+                  porcentajeOcupado >= 83 ? 'urgente' : porcentajeOcupado >= 60 ? 'medio' : ''
+                }`}
+                style={{ width: `${porcentajeOcupado}%` }}
               />
             </div>
 
-            <p style={{ fontSize: '0.9rem', color: '#444', marginBottom: '8px' }}>
-              <strong>{cuposRestantes}</strong> cupos disponibles de <strong>{cuposTotales}</strong>
-            </p>
+            <div className="cupos-progress-info">
+              <p className="cupos-progress-texto">
+                <strong>{cuposRestantes}</strong> cupos disponibles de <strong>{cuposTotales}</strong>
+              </p>
+              {cuposRestantes <= 5 && cuposRestantes > 0 && (
+                <span className="cupos-urgencia">
+                  ⚡ ¡Últimos lugares!
+                </span>
+              )}
+            </div>
 
             {turnosHabilitados.filter(t => t !== 'indistinto').length > 1 && (
-              <div style={{ display: 'flex', gap: '20px', fontSize: '0.85rem', color: '#666' }}>
+              <div className="cupos-turnos">
                 {turnosHabilitados.includes('manana') && (
-                  <span>
+                  <span className="cupos-turno-item">
                     Mañana: <strong>{getCuposDisponiblesPorTurno('manana')}</strong> disponibles
                   </span>
                 )}
                 {turnosHabilitados.includes('tarde') && (
-                  <span>
+                  <span className="cupos-turno-item">
                     Tarde: <strong>{getCuposDisponiblesPorTurno('tarde')}</strong> disponibles
                   </span>
                 )}
@@ -486,7 +465,7 @@ const Inscription = () => {
           )}
         </div>
 
-        {/* Formulario de inscripción */}
+        {/* Formulario */}
         <div className="form-container">
           <h2>Inscribite Ahora</h2>
 
