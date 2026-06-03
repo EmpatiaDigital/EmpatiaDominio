@@ -102,7 +102,7 @@
 }
 
 /* =============================================
-   AVALADORES — círculos grandes, sin tarjetas
+   AVALADORES
    ============================================= */
 .avaladores-section {
   margin-bottom: 36px;
@@ -127,7 +127,6 @@
   flex-wrap: nowrap;
 }
 
-/* ── Círculo blanco grande — sin tarjeta, sin texto ── */
 .avalador-logo-circle {
   width: 160px;
   height: 160px;
@@ -152,41 +151,12 @@
     0 0 0 4px rgba(107, 179, 240, 0.5);
 }
 
-/* ── Logo: sin filtros, colores originales del PNG ── */
 .avalador-logo {
   height: 118px;
   width: auto;
   max-width: 132px;
   object-fit: contain;
   display: block;
-}
-
-/* ─── Mobile ≤600px ─── */
-@media (max-width: 600px) {
-  .avalador-logo-circle {
-    width: 120px;
-    height: 120px;
-    min-width: 120px;
-  }
-
-  .avalador-logo {
-    height: 88px;
-    max-width: 100px;
-  }
-}
-
-/* ─── Mobile pequeño ≤400px ─── */
-@media (max-width: 400px) {
-  .avalador-logo-circle {
-    width: 100px;
-    height: 100px;
-    min-width: 100px;
-  }
-
-  .avalador-logo {
-    height: 72px;
-    max-width: 84px;
-  }
 }
 
 /* =============================================
@@ -213,7 +183,6 @@
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* ── Botón CTA héroe ── */
 .btn-conocer-mas {
   display: inline-flex;
   align-items: center;
@@ -253,7 +222,7 @@
 }
 
 /* =============================================
-   CARDS COMPARTIDAS (course-info + form-container)
+   CARDS COMPARTIDAS
    ============================================= */
 .course-info,
 .form-container {
@@ -351,12 +320,112 @@
 /* =============================================
    BARRA DE CUPOS
    ============================================= */
-.course-info [style*="border: 1px solid #e0e0e0"] {
-  border: 1px solid var(--ins-gray-200) !important;
-  border-radius: var(--ins-radius-md) !important;
-  background: var(--ins-off-white) !important;
+.cupos-progress-wrapper {
+  margin-top: 0;
+  margin-bottom: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--ins-gray-200);
+  border-radius: var(--ins-radius-md);
+  background: var(--ins-off-white);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
+/* ── Track ── */
+.cupos-progress-bar-track {
+  width: 100%;
+  height: 8px;
+  background: var(--ins-gray-200);
+  border-radius: var(--ins-radius-full);
+  overflow: hidden;
+}
+
+/* ── Fill — 3 estados ── */
+.cupos-progress-bar-fill {
+  height: 100%;
+  border-radius: var(--ins-radius-full);
+  background: linear-gradient(90deg, var(--ins-blue) 0%, var(--ins-blue-light) 100%);
+  transition: width 0.6s ease, background 0.4s ease;
+}
+
+/* 60–82%: amarillo ámbar */
+.cupos-progress-bar-fill.medio {
+  background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+}
+
+/* ≥83% o ≤5 cupos: rojo pulsante */
+.cupos-progress-bar-fill.urgente {
+  background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+  animation: cupos-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes cupos-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
+}
+
+/* ── Fila: texto + badge ── */
+.cupos-progress-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cupos-progress-texto {
+  font-size: 13px;
+  color: var(--ins-gray-600);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.cupos-progress-texto strong {
+  color: var(--ins-navy);
+  font-weight: 700;
+}
+
+/* ── Badge urgencia ── */
+.cupos-urgencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(220, 38, 38, 0.09);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.28);
+  border-radius: var(--ins-radius-full);
+  padding: 3px 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  animation: cupos-pulse 1.6s ease-in-out infinite;
+}
+
+/* ── Desglose por turno ── */
+.cupos-turnos {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+  border-top: 1px solid var(--ins-gray-200);
+}
+
+.cupos-turno-item {
+  font-size: 12.5px;
+  color: var(--ins-gray-600);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cupos-turno-item strong {
+  color: var(--ins-navy);
+  font-weight: 700;
+}
+
+/* ── Badge cupos en radio-label ── */
 .cupos-restantes {
   font-size: 0.78rem;
   color: var(--ins-blue);
@@ -754,7 +823,6 @@
   outline-offset: 2px;
 }
 
-/* Prevenir zoom en iOS */
 @media screen and (max-width: 768px) {
   select,
   textarea,
@@ -836,6 +904,10 @@
   .no-courses-title {
     font-size: 1.55rem;
   }
+
+  .cupos-turnos {
+    gap: 14px;
+  }
 }
 
 /* =============================================
@@ -860,6 +932,17 @@
     margin-bottom: 24px;
   }
 
+  .avalador-logo-circle {
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+  }
+
+  .avalador-logo {
+    height: 88px;
+    max-width: 100px;
+  }
+
   .form-wrapper {
     padding: 0 14px;
     margin-top: -36px;
@@ -869,6 +952,25 @@
 
   .info-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .cupos-progress-wrapper {
+    padding: 14px;
+  }
+
+  .cupos-progress-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .cupos-urgencia {
+    align-self: flex-start;
+  }
+
+  .cupos-turnos {
+    flex-direction: column;
+    gap: 6px;
   }
 
   .no-courses-content {
@@ -912,5 +1014,16 @@
 
   .course-title {
     font-size: 1.4rem;
+  }
+
+  .avalador-logo-circle {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+  }
+
+  .avalador-logo {
+    height: 72px;
+    max-width: 84px;
   }
 }
