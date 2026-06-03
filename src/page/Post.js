@@ -107,7 +107,7 @@ export default function Post() {
                         <h3 className="post-title">{post.titulo}</h3>
                         <p className="post-autor">Por: {post.autor}</p>
                                {/* Badge categoría */}
-                    <span className="card-badge">{post.categoria}</span>
+                    <span className="post-title">{post.categoria}</span>
                       </div>
                    
                     </div>
