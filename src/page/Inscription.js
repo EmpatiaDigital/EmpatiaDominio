@@ -438,12 +438,12 @@ const Inscription = () => {
           </span>
         )}
       </div>
-      {course.tieneCodigoPromo && (
-        <div className="promo-aviso">
-          🎟️ <strong>¡Código promocional activo!</strong> Al inscribirte participás automáticamente
-          en el sorteo de un código de descuento exclusivo.
-        </div>
-      )}
+     {course.tieneCodigoPromo && (
+  <div className="promo-aviso promo-aviso--posible">
+    🎟️ <strong>¡Inscribite y puede que te lleves algo más!</strong>{' '}
+    Sorteamos códigos de descuento exclusivos entre los participantes.
+  </div>
+)}
     </div>
   );
 })()}
