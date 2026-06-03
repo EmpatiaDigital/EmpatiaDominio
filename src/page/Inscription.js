@@ -5,6 +5,7 @@ import '../style/Inscription.css';
 import { Link } from "react-router-dom";
 import logo1 from '../assets/logo1.png';
 import logo2 from '../assets/logo2.png';
+import logo3 from '../assets/empatialog.jpeg';
 
 const BASE_URL = 'https://empatia-dominio-back.vercel.app/api';
 
@@ -31,10 +32,11 @@ const Inscription = () => {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  // ─── Avaladores con logo1 y logo2 ────────────────────────────────────────
+  // ─── Avaladores con logo1,logo2 y logo3  ────────────────────────────────────────
   const avaladores = [
     { id: 'logo1', logo: logo1, nombre: 'Grupo Educativo Austral' },
     { id: 'logo2', logo: logo2, nombre: 'Comisión Psicosocial Latinoamericana' },
+    { id: 'logo3', logo: logo3, nombre: 'Salud Digital' },
   ];
 
   // ─── Fetch del curso activo ───────────────────────────────────────────────
