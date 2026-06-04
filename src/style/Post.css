@@ -128,8 +128,8 @@
    ============================================= */
 .post-card {
   position: relative;
-  height: 340px;                 /* ↑ más alta */
-  border-radius: 12px;           /* ↑ bordes más redondeados */
+  height: 340px;
+  border-radius: 12px;
   overflow: hidden;
   background-size: cover;
   background-position: center;
@@ -148,22 +148,29 @@
   box-shadow: 0 20px 48px rgba(20, 45, 90, 0.20);
 }
 
-/* ── Badge de categoría ── */
+/* ── Badge de categoría ──
+   Movido a esquina superior DERECHA para no
+   competir con el avatar (inferior izquierda).  */
 .card-badge {
   position: absolute;
   top: 14px;
-  left: 14px;
+  right: 14px;
+  left: auto;
   z-index: 3;
-  background: rgba(8, 22, 55, 0.80);
+  background: rgba(8, 22, 55, 0.82);
   color: #6bb3f0;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 500;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  padding: 5px 11px;
+  padding: 5px 13px;
   border-radius: 4px;
   backdrop-filter: blur(6px);
-  border: 1px solid rgba(107, 179, 240, 0.2);
+  border: 1px solid rgba(107, 179, 240, 0.22);
+  max-width: calc(100% - 28px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* =============================================
@@ -177,7 +184,7 @@
   background: linear-gradient(
     to top,
     rgba(6, 16, 42, 0.98) 0%,
-    rgba(6, 16, 42, 0.82) 42%,   /* ↑ zona avatar bien cubierta */
+    rgba(6, 16, 42, 0.82) 42%,
     rgba(6, 16, 42, 0.20) 68%,
     transparent 100%
   );
@@ -223,7 +230,7 @@
   font-family: 'DM Sans', sans-serif;
   font-size: 11.5px;
   font-weight: 500;
-  color: #c8e2f8;                /* ↑ más claro */
+  color: #c8e2f8;
   letter-spacing: 0.2px;
   white-space: nowrap;
   overflow: hidden;
@@ -353,14 +360,13 @@
     font-size: 1.45rem;
   }
 
-  /* 1 columna en mobile con altura generosa */
   .lista-posts-container {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
   .post-card {
-    height: 320px;               /* ↑ espacio real para el contenido */
+    height: 320px;
   }
 
   .post-title {
@@ -377,7 +383,6 @@
     font-size: 11px;
   }
 
-  /* Compacto, NO ocupa todo el ancho */
   .btn-ver-mas {
     padding: 7px 14px;
     font-size: 11px;
