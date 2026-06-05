@@ -32,30 +32,51 @@ const EditPost = () => {
   const [categoria, setCategoria] = useState('');
   const [cargando, setCargando] = useState(false);
 
+  // 🛠️ MEJORA: Configuración nativa para preservar clases CSS en imágenes de Tiptap
   const editor = useEditor({
-    extensions: [StarterKit, Image, Link],
+    extensions: [
+      StarterKit,
+      Image.configure({
+        HTMLAttributes: {
+          class: "imagen-fija-1200",
+        },
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          rel: "noopener noreferrer",
+          target: "_blank",
+        },
+      }),
+    ],
     content: '',
   });
 
+  // 🛠️ MEJORA: Evitamos llamadas innecesarias a la API controlando que el editor esté instanciado
   useEffect(() => {
+    if (!editor || !postId) return;
+
     const fetchPost = async () => {
       try {
         const res = await fetch(`https://empatia-dominio-back.vercel.app/api/posts/${postId}`);
+        if (!res.ok) throw new Error("No se pudo obtener el post");
+        
         const data = await res.json();
 
         setTitulo(data.titulo || '');
         setAutor(data.autor || '');
         setEpigrafe(data.epigrafe || '');
-        // La portada ya guardada puede venir con o sin transformaciones; la normalizamos
         setPortada(data.portada ? optimizarPortada(data.portada) : null);
         setCategoria(data.categoria || '');
         setImagenes(data.imagenes || []);
         setEpigrafes(data.epigrafes || []);
         setTamanos(data.tamanos || []);
-        editor?.commands.setContent(data.contenido || '');
+        
+        // Seteamos el contenido de manera segura ahora que sabemos que 'editor' existe
+        editor.commands.setContent(data.contenido || '');
       } catch (err) {
         console.error(err);
-        Swal.fire('Error', 'No se pudo cargar el post', 'error');
+        Swal.fire('Error', 'No se pudo cargar el post de la base de datos.', 'error');
       }
     };
 
@@ -77,42 +98,68 @@ const EditPost = () => {
     return data.secure_url;
   };
 
+  // 🛠️ MEJORA: Try/Catch/Finally para que no se congele el loader si falla Cloudinary
   const handleImagenesSeleccionadas = async (e) => {
     const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
     setCargando(true);
     const urls = [];
 
-    for (const file of files) {
-      const urlOriginal = await subirImagenACloudinary(file);
-      const urlOptimizada = optimizarContenido(urlOriginal);
-      urls.push(urlOptimizada);
-      editor?.chain().focus().insertContent(`<img src="${urlOptimizada}" class="imagen-fija-1200" />`).run();
-    }
+    try {
+      for (const file of files) {
+        const urlOriginal = await subirImagenACloudinary(file);
+        const urlOptimizada = optimizarContenido(urlOriginal);
+        urls.push(urlOptimizada);
+        
+        if (editor) {
+          editor
+            .chain()
+            .focus()
+            .insertContent(`<img src="${urlOptimizada}" />`) // Tiptap inyecta la clase configurada arriba
+            .run();
+        }
+      }
 
-    setImagenes((prev) => [...prev, ...urls]);
-    setEpigrafes((prev) => [...prev, ...urls.map(() => '')]);
-    setTamanos((prev) => [...prev, ...urls.map(() => 100)]);
-    setCargando(false);
+      setImagenes((prev) => [...prev, ...urls]);
+      setEpigrafes((prev) => [...prev, ...urls.map(() => '')]);
+      setTamanos((prev) => [...prev, ...urls.map(() => 100)]);
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error', 'Hubo un problema al cargar los archivos al cuerpo del post.', 'error');
+    } finally {
+      setCargando(false);
+    }
   };
 
+  // 🛠️ MEJORA: Resguardo de errores en la edición de portada
   const handlePortadaSeleccionada = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
     setCargando(true);
-    const urlOriginal = await subirImagenACloudinary(file);
-    const urlOptimizada = optimizarPortada(urlOriginal);
-    setPortada(urlOptimizada);
-    setCargando(false);
+    try {
+      const urlOriginal = await subirImagenACloudinary(file);
+      const urlOptimizada = optimizarPortada(urlOriginal);
+      setPortada(urlOptimizada);
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error de Portada', 'No se pudo reemplazar la imagen de portada.', 'error');
+    } finally {
+      setCargando(false);
+    }
   };
 
   const actualizarPost = async () => {
     const contenido = editor?.getHTML() || '';
+    
     if (!titulo || !autor || !contenido || contenido === '<p></p>' || !categoria) {
       Swal.fire({
         icon: 'warning',
         title: 'Faltan datos obligatorios',
         text: 'Completá título, autor, contenido y categoría.',
       });
-      return navigate('/');
+      return; // 🛠️ FIJADO: Quitamos el 'navigate' erróneo que echaba al usuario perdiendo sus cambios
     }
 
     const avatar = localStorage.getItem('avatar') || '';
@@ -132,21 +179,42 @@ const EditPost = () => {
     };
 
     try {
+      // 🛠️ MEJORA: Agregamos feedback visual de carga para evitar clicks duplicados del usuario
+      Swal.fire({
+        title: 'Guardando cambios...',
+        html: 'Actualizando la información del post.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
       const res = await fetch(`https://empatia-dominio-back.vercel.app/api/posts/${postId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(postActualizado),
       });
 
+      Swal.close();
+
       if (res.ok) {
-        Swal.fire('Actualizado', 'El post fue actualizado con éxito.', 'success');
-        navigate('/'); 
+        Swal.fire({
+          icon: 'success',
+          title: '¡Post actualizado!',
+          text: 'Los cambios se guardaron con éxito.',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          navigate('/'); 
+        });
       } else {
-        Swal.fire('Error', 'No se pudo actualizar el post.', 'error');
+        Swal.fire('Error', 'El servidor rechazó la actualización del post.', 'error');
       }
     } catch (err) {
+      Swal.close();
       console.error(err);
-      Swal.fire('Error inesperado', 'Revisá la consola.', 'error');
+      Swal.fire('Error inesperado', 'Revisá la conexión o la consola del desarrollador.', 'error');
     }
   };
 
@@ -216,12 +284,12 @@ const EditPost = () => {
       )}
 
       <div className="toolbar">
-        <button onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? 'active' : ''}>B</button>
-        <button onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? 'active' : ''}>I</button>
-        <button onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? 'active' : ''}>•</button>
-        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={editor?.isActive('heading', { level: 1 }) ? 'active' : ''}>H1</button>
-        <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''}>H2</button>
-        <button onClick={() => editor?.chain().focus().unsetAllMarks().run()}>Limpiar</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? 'active' : ''}>B</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? 'active' : ''}>I</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? 'active' : ''}>•</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={editor?.isActive('heading', { level: 1 }) ? 'active' : ''}>H1</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''}>H2</button>
+        <button type="button" onClick={() => editor?.chain().focus().unsetAllMarks().run()}>Limpiar</button>
         <button
           onClick={async () => {
             const previousUrl = editor?.getAttributes('link').href || '';
@@ -268,9 +336,14 @@ const EditPost = () => {
       <label className="editor-label">🖼️ Agregar nuevas imágenes:</label>
       <input type="file" multiple accept="image/*" onChange={handleImagenesSeleccionadas} className="editor-file" />
 
-      {cargando && <p className="uploading-text">Subiendo imágenes...</p>}
+      {cargando && <p className="uploading-text">Procesando archivos multimedia...</p>}
 
-      <button onClick={actualizarPost} className="publish-button" type="button">
+      <button 
+        onClick={actualizarPost} 
+        className="publish-button" 
+        type="button"
+        disabled={cargando}
+      >
         💾 Guardar cambios
       </button>
     </div>
