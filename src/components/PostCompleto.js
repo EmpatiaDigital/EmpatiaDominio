@@ -1,6 +1,6 @@
 // src/components/PostDetalle.jsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import fondo from "../assets/Juego.jpeg";
 import "../style/PostCompleto.css";
 import { FaFacebook, FaWhatsapp, FaInstagram } from "react-icons/fa";
@@ -18,13 +18,11 @@ const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
 
 const optimizarPortada = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_800");
 
-// Reemplaza todos los src de imágenes Cloudinary dentro del HTML del contenido
 const optimizarImagenesEnHtml = (html) => {
   if (!html) return html;
   return html.replace(
     /(src=")(https:\/\/res\.cloudinary\.com\/[^"]+)(")/g,
     (match, pre, url, post) => {
-      // Evitar doble transformación
       if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) {
         return match;
       }
@@ -33,11 +31,12 @@ const optimizarImagenesEnHtml = (html) => {
     }
   );
 };
-// ──────────────────────────────────────────────────────────────────────────────
 
 const PostCompleto = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
+  const [postsRelacionados, setPostsRelacionados] = useState([]);
   const [cargando, setCargando] = useState(true);
 
   const shareUrl = `https://empatia-dominio-back.vercel.app/api/posts/${id}/preview`;
@@ -47,23 +46,12 @@ const PostCompleto = () => {
     ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital este es lo nuevo: ${shareUrl} `)
     : "";
 
-  useEffect(() => {
-    const enlaces = document.querySelectorAll(".post-content a");
-    enlaces.forEach((a) => {
-      const href = a.getAttribute("href");
-      if (href && href.startsWith("http")) {
-        a.setAttribute("target", "_blank");
-        a.setAttribute("rel", "noopener noreferrer");
-      }
-    });
-  }, []);
-
+  // 1. Carga del post principal
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const res = await fetch(
-          `https://empatia-dominio-back.vercel.app/api/posts/${id}`
-        );
+        setCargando(true);
+        const res = await fetch(`https://empatia-dominio-back.vercel.app/api/posts/${id}`);
         const data = await res.json();
         setPost(data);
         setCargando(false);
@@ -76,9 +64,42 @@ const PostCompleto = () => {
     fetchPost();
   }, [id]);
 
-  // Aplicar lazy loading a las imágenes del contenido HTML una vez que el post carga
+  // 2. Carga de los 3 posts relacionados de la misma categoría
+  useEffect(() => {
+    if (!post?.categoria) return;
+
+    const fetchRelacionados = async () => {
+      try {
+        const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
+        const todosLosPosts = await res.json();
+        
+        // Filtramos por categoría y dejamos afuera el post que ya se está leyendo
+        const filtrados = todosLosPosts
+          .filter((p) => p.categoria === post.categoria && p._id !== id)
+          .slice(0, 3);
+
+        setPostsRelacionados(filtrados);
+      } catch (error) {
+        console.error("Error al cargar posts relacionados:", error);
+      }
+    };
+
+    fetchRelacionados();
+  }, [post, id]);
+
+  // 3. Formateo de elementos inyectados en el HTML (Links externos y Lazy loading)
   useEffect(() => {
     if (!post) return;
+
+    const enlaces = document.querySelectorAll(".imagen-fija-1200 a, .post-content a");
+    enlaces.forEach((a) => {
+      const href = a.getAttribute("href");
+      if (href && href.startsWith("http")) {
+        a.setAttribute("target", "_blank");
+        a.setAttribute("rel", "noopener noreferrer");
+      }
+    });
+
     const imgs = document.querySelectorAll(".imagen-fija-1200 img, .post-content img");
     imgs.forEach((img) => {
       img.setAttribute("loading", "lazy");
@@ -89,9 +110,7 @@ const PostCompleto = () => {
   if (cargando) return <p>Cargando post...</p>;
   if (!post) return <p>No se encontró el post.</p>;
 
-  // Contenido con URLs de imágenes optimizadas
   const contenidoOptimizado = optimizarImagenesEnHtml(post.contenido);
-  // Portada optimizada
   const portadaOptimizada = optimizarPortada(post.portada);
 
   return (
@@ -202,6 +221,7 @@ const PostCompleto = () => {
           fontFamily: "sans-serif",
           color: "#856404",
           marginBottom: "1.5rem",
+          marginTop: "2rem"
         }}
       >
         <p style={{ margin: "0 0 0.5rem 0" }}>
@@ -234,7 +254,7 @@ const PostCompleto = () => {
           alignItems: "center",
           borderRadius: "6px",
           padding: "0.75rem 1rem",
-          marginBottom: "0.5rem",
+          marginBottom: "3rem",
           fontSize: "1.5rem",
           fontWeight: "500",
           display: "flex",
@@ -259,6 +279,60 @@ const PostCompleto = () => {
           Descarga la guía PDF GRATIS
         </a>
       </div>
+
+      {postsRelacionados.length > 0 && (
+        <div className="contenido-interes-section" style={{ marginTop: "3rem", borderTop: "2px solid #eaeaea", paddingTop: "2rem" }}>
+          <h3 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1.5rem", color: "#1a1a1a" }}>
+            🎯 Artículos relacionados de {post.categoria}:
+          </h3>
+          <div 
+            className="relacionados-grid" 
+            style={{ 
+              display: "grid", 
+              gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", 
+              gap: "1.5rem" 
+            }}
+          >
+            {postsRelacionados.map((relPost) => (
+              <div
+                key={relPost._id}
+                onClick={() => {
+                  navigate(`/post/${relPost._id}`);
+                  window.scrollTo(0, 0);
+                }}
+                style={{
+                  cursor: "pointer",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "10px",
+                  overflow: "hidden",
+                  backgroundColor: "#fff",
+                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)",
+                  transition: "transform 0.2s ease",
+                  display: "flex",
+                  flexDirection: "column"
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-4px)"}
+                onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
+              >
+                <img
+                  src={relPost.portada ? optimizarPortada(relPost.portada) : fondo}
+                  alt={relPost.titulo}
+                  style={{ width: "100%", height: "150px", objectFit: "cover" }}
+                  loading="lazy"
+                />
+                <div style={{ padding: "1rem", flexGrow: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <h4 style={{ fontSize: "1.1rem", fontWeight: "600", margin: "0 0 0.5rem 0", color: "#2d3748", lineBreak: "anywhere" }}>
+                    {relPost.titulo.length > 60 ? `${relPost.titulo.substring(0, 60)}...` : relPost.titulo}
+                  </h4>
+                  <p style={{ fontSize: "0.85rem", color: "#718096", margin: "auto 0 0 0", fontStyle: "italic" }}>
+                    Por: {relPost.autor}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
