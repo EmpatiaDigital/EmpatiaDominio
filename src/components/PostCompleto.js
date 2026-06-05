@@ -7,25 +7,48 @@ import { FaFacebook, FaWhatsapp, FaInstagram } from "react-icons/fa";
 import Swal from "sweetalert2";
 import PostStats from "./PostStats";
 
-
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
+
+// ─── Helpers de optimización Cloudinary ───────────────────────────────────────
+const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
+  if (!url || !url.includes("res.cloudinary.com")) return url;
+  if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) return url;
+  return url.replace("/upload/", `/upload/${params}/`);
+};
+
+const optimizarPortada = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_800");
+
+// Reemplaza todos los src de imágenes Cloudinary dentro del HTML del contenido
+const optimizarImagenesEnHtml = (html) => {
+  if (!html) return html;
+  return html.replace(
+    /(src=")(https:\/\/res\.cloudinary\.com\/[^"]+)(")/g,
+    (match, pre, url, post) => {
+      // Evitar doble transformación
+      if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) {
+        return match;
+      }
+      const urlOptimizada = url.replace("/upload/", "/upload/f_auto,q_auto,w_1200/");
+      return `${pre}${urlOptimizada}${post}`;
+    }
+  );
+};
+// ──────────────────────────────────────────────────────────────────────────────
 
 const PostCompleto = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [cargando, setCargando] = useState(true);
-  // PostDetalle.jsx
+
   const shareUrl = `https://empatia-dominio-back.vercel.app/api/posts/${id}/preview`;
-  const currentUrl = `${window.location.origin}/post/${id}`; // ← frontend (para copiar en Instagram)
+  const currentUrl = `${window.location.origin}/post/${id}`;
 
   const mensaje = post
-  ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital este es lo nuevo: ${shareUrl} `)
-  : "";
-
+    ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital este es lo nuevo: ${shareUrl} `)
+    : "";
 
   useEffect(() => {
     const enlaces = document.querySelectorAll(".post-content a");
-
     enlaces.forEach((a) => {
       const href = a.getAttribute("href");
       if (href && href.startsWith("http")) {
@@ -53,8 +76,23 @@ const PostCompleto = () => {
     fetchPost();
   }, [id]);
 
+  // Aplicar lazy loading a las imágenes del contenido HTML una vez que el post carga
+  useEffect(() => {
+    if (!post) return;
+    const imgs = document.querySelectorAll(".imagen-fija-1200 img, .post-content img");
+    imgs.forEach((img) => {
+      img.setAttribute("loading", "lazy");
+      img.setAttribute("decoding", "async");
+    });
+  }, [post]);
+
   if (cargando) return <p>Cargando post...</p>;
   if (!post) return <p>No se encontró el post.</p>;
+
+  // Contenido con URLs de imágenes optimizadas
+  const contenidoOptimizado = optimizarImagenesEnHtml(post.contenido);
+  // Portada optimizada
+  const portadaOptimizada = optimizarPortada(post.portada);
 
   return (
     <div className="post-detalle">
@@ -65,6 +103,8 @@ const PostCompleto = () => {
           src={post.avatar || DEFAULT_AVATAR}
           alt="avatar"
           className="avatar"
+          loading="lazy"
+          decoding="async"
         />
         <div>
           <p
@@ -87,9 +127,10 @@ const PostCompleto = () => {
           </div>
         </div>
       </div>
-  <div className="share-section">
-    <PostStats postId={id} postTitulo={post?.titulo} />    
-                
+
+      <div className="share-section">
+        <PostStats postId={id} postTitulo={post?.titulo} />
+
         <h3>Compartir en redes:</h3>
         <div className="share-buttons">
           <a
@@ -129,18 +170,29 @@ const PostCompleto = () => {
           </a>
         </div>
       </div>
-      {post.portada && (
-        <img src={post.portada} alt="portada" className="preview-portada" />
+
+      {portadaOptimizada && (
+        <img
+          src={portadaOptimizada}
+          alt="portada"
+          className="preview-portada"
+          loading="eager"
+          decoding="async"
+          width="800"
+        />
       )}
+
       <p>
         <i>{post.epigrafe}</i>
       </p>
 
       <div
         className="imagen-fija-1200"
-        dangerouslySetInnerHTML={{ __html: post.contenido }}
+        dangerouslySetInnerHTML={{ __html: contenidoOptimizado }}
       />
-    <PostStats postId={id} postTitulo={post?.titulo} />    
+
+      <PostStats postId={id} postTitulo={post?.titulo} />
+
       <div
         style={{
           backgroundColor: "#fff3cd",
@@ -173,12 +225,13 @@ const PostCompleto = () => {
           introducción de IA en la parte de abajo 👇
         </p>
       </div>
+
       <div
         style={{
           borderLeft: "30px solid #42a5f5",
-          backgroundColor: " #194542", 
-          justifyContent: "center", // Centra horizontalmente el contenido
-          alignItems: "center", // Centra verticalmente
+          backgroundColor: " #194542",
+          justifyContent: "center",
+          alignItems: "center",
           borderRadius: "6px",
           padding: "0.75rem 1rem",
           marginBottom: "0.5rem",
@@ -189,17 +242,17 @@ const PostCompleto = () => {
       >
         <a
           style={{
-            borderBottom: "2px solid white", // Línea inferior blanca
+            borderBottom: "2px solid white",
             borderRadius: "6px",
             padding: "0.75rem 1rem",
             marginBottom: "0.5rem",
             fontSize: "1.5rem",
             fontWeight: "500",
             display: "flex",
-            textDecoration: "none", // Sin subrayado clásico
-            color: "white", // Color de texto blanco
-            backgroundColor: "transparent", // Fondo transparente
-            cursor: "pointer", // Cursor tipo manito
+            textDecoration: "none",
+            color: "white",
+            backgroundColor: "transparent",
+            cursor: "pointer",
           }}
           href={`https://empatiadigital.com.ar/descargas`}
         >
