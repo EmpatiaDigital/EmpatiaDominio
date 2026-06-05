@@ -6,6 +6,20 @@ import Image from "@tiptap/extension-image";
 import "../style/Editor.css";
 import Swal from "sweetalert2";
 
+// ─── Helpers de optimización Cloudinary ───────────────────────────────────────
+// Inserta parámetros de transformación en una URL de Cloudinary.
+// Si la URL no es de Cloudinary, la devuelve sin cambios.
+const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
+  if (!url || !url.includes("res.cloudinary.com")) return url;
+  // Evitar duplicar transformaciones
+  if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) return url;
+  return url.replace("/upload/", `/upload/${params}/`);
+};
+
+const optimizarPortada = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_800");
+const optimizarContenido = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_1200");
+// ──────────────────────────────────────────────────────────────────────────────
+
 const CrearPost = () => {
   const [autor, setAutor] = useState(() => {
     return localStorage.getItem("nombre") || "Sentidos";
@@ -58,14 +72,16 @@ const CrearPost = () => {
     const urls = [];
 
     for (const file of files) {
-      const url = await subirImagenACloudinary(file);
-      urls.push(url);
+      const urlOriginal = await subirImagenACloudinary(file);
+      // Guardamos la URL optimizada para el editor y la lista
+      const urlOptimizada = optimizarContenido(urlOriginal);
+      urls.push(urlOptimizada);
 
       if (editor) {
         editor
           .chain()
           .focus()
-          .insertContent(`<img src="${url}" class="imagen-fija-1200" />`)
+          .insertContent(`<img src="${urlOptimizada}" class="imagen-fija-1200" />`)
           .run();
       }
     }
@@ -79,8 +95,10 @@ const CrearPost = () => {
   const handlePortadaSeleccionada = async (e) => {
     const file = e.target.files[0];
     setCargando(true);
-    const url = await subirImagenACloudinary(file);
-    setPortada(url);
+    const urlOriginal = await subirImagenACloudinary(file);
+    // Portada optimizada a 800px de ancho
+    const urlOptimizada = optimizarPortada(urlOriginal);
+    setPortada(urlOptimizada);
     setCargando(false);
   };
 
@@ -121,7 +139,6 @@ const CrearPost = () => {
     };
   
     try {
-      // Mostrar alerta con loading
       const loadingSwal = Swal.fire({
         title: "Subiendo post...",
         html: "Por favor esperá un momento.",
@@ -138,7 +155,7 @@ const CrearPost = () => {
         body: JSON.stringify(nuevoPost),
       });
   
-      Swal.close(); // cerrar loading
+      Swal.close();
   
       if (res.ok) {
         Swal.fire({
@@ -151,7 +168,6 @@ const CrearPost = () => {
           window.location.reload();
         });
     
-        // Limpiar campos
         setTitulo("");
         setAutor("");
         setEpigrafe("");
@@ -169,7 +185,7 @@ const CrearPost = () => {
         });
       }
     } catch (err) {
-      Swal.close(); // asegurarse de cerrar si hay error
+      Swal.close();
       console.error(err);
       Swal.fire({
         icon: "error",
@@ -235,7 +251,13 @@ const CrearPost = () => {
 
       {portada && (
         <div className="preview-portada-block">
-          <img src={portada} alt="portada" className="preview-portada" />
+          <img
+            src={portada}
+            alt="portada"
+            className="preview-portada"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       )}
 
@@ -280,7 +302,6 @@ const CrearPost = () => {
           H2
         </button>
 
-        {/* Botón para insertar/quitar link */}
         <button
           onClick={async () => {
             const previousUrl = editor.getAttributes("link").href || "";
@@ -301,21 +322,19 @@ const CrearPost = () => {
               },
             });
 
-            if (url === undefined) return; // usuario canceló
+            if (url === undefined) return;
 
             if (url === "") {
-              editor.chain().focus().unsetLink().run(); // quitar enlace
+              editor.chain().focus().unsetLink().run();
               return;
             }
 
-            // Limpiar si es localhost
             let cleanedUrl = url;
             const isExternal = /^https?:\/\//i.test(url);
             
             if (!isExternal && url.startsWith("http://localhost:3000")) {
               cleanedUrl = url.replace("http://localhost:3000", "");
             }            
-            
 
             editor
               .chain()
@@ -352,7 +371,6 @@ const CrearPost = () => {
       />
 
       {cargando && <p className="uploading-text">Subiendo imágenes...</p>}
-
 
       <button onClick={guardarPost} className="publish-button" type="button">
         🚀 Publicar
