@@ -10,6 +10,7 @@ import PostStatsMini from "../components/PostStatsMini";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
+
 export default function HomePage() {
   const [posts, setPosts]       = useState([]);
   const [cargando, setCargando] = useState(true);
