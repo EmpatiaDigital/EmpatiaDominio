@@ -7,6 +7,17 @@ import Image from '@tiptap/extension-image';
 import Swal from 'sweetalert2';
 import '../style/Editor.css';
 
+// ─── Helpers de optimización Cloudinary ───────────────────────────────────────
+const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
+  if (!url || !url.includes("res.cloudinary.com")) return url;
+  if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) return url;
+  return url.replace("/upload/", `/upload/${params}/`);
+};
+
+const optimizarPortada = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_800");
+const optimizarContenido = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_1200");
+// ──────────────────────────────────────────────────────────────────────────────
+
 const EditPost = () => {
   const { postId } = useParams();
   const navigate = useNavigate();
@@ -26,7 +37,6 @@ const EditPost = () => {
     content: '',
   });
 
-  // Cargar datos del post al iniciar
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -36,7 +46,8 @@ const EditPost = () => {
         setTitulo(data.titulo || '');
         setAutor(data.autor || '');
         setEpigrafe(data.epigrafe || '');
-        setPortada(data.portada || null);
+        // La portada ya guardada puede venir con o sin transformaciones; la normalizamos
+        setPortada(data.portada ? optimizarPortada(data.portada) : null);
         setCategoria(data.categoria || '');
         setImagenes(data.imagenes || []);
         setEpigrafes(data.epigrafes || []);
@@ -72,9 +83,10 @@ const EditPost = () => {
     const urls = [];
 
     for (const file of files) {
-      const url = await subirImagenACloudinary(file);
-      urls.push(url);
-      editor?.chain().focus().insertContent(`<img src="${url}" class="imagen-fija-1200" />`).run();
+      const urlOriginal = await subirImagenACloudinary(file);
+      const urlOptimizada = optimizarContenido(urlOriginal);
+      urls.push(urlOptimizada);
+      editor?.chain().focus().insertContent(`<img src="${urlOptimizada}" class="imagen-fija-1200" />`).run();
     }
 
     setImagenes((prev) => [...prev, ...urls]);
@@ -86,8 +98,9 @@ const EditPost = () => {
   const handlePortadaSeleccionada = async (e) => {
     const file = e.target.files[0];
     setCargando(true);
-    const url = await subirImagenACloudinary(file);
-    setPortada(url);
+    const urlOriginal = await subirImagenACloudinary(file);
+    const urlOptimizada = optimizarPortada(urlOriginal);
+    setPortada(urlOptimizada);
     setCargando(false);
   };
 
@@ -192,7 +205,13 @@ const EditPost = () => {
 
       {portada && (
         <div className="preview-portada-block">
-          <img src={portada} alt="portada" className="preview-portada" />
+          <img
+            src={portada}
+            alt="portada"
+            className="preview-portada"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       )}
 
@@ -203,57 +222,45 @@ const EditPost = () => {
         <button onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={editor?.isActive('heading', { level: 1 }) ? 'active' : ''}>H1</button>
         <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''}>H2</button>
         <button onClick={() => editor?.chain().focus().unsetAllMarks().run()}>Limpiar</button>
-  <button
-  onClick={async () => {
-    const previousUrl = editor?.getAttributes('link').href || '';
+        <button
+          onClick={async () => {
+            const previousUrl = editor?.getAttributes('link').href || '';
 
-    const { value: url } = await Swal.fire({
-      title: 'Insertar enlace',
-      input: 'url',
-      inputLabel: 'URL del enlace',
-      inputValue: previousUrl,
-      showCancelButton: true,
-      confirmButtonText: 'Insertar',
-      cancelButtonText: 'Cancelar',
-      inputValidator: (value) => {
-        // Validación: permitir vacío (para quitar link), pero no texto inválido si se pone algo
-        if (value && !/^https?:\/\/|^\/|^[\w\-]/.test(value)) {
-          return 'Ingresá una URL válida o dejalo vacío para quitar el enlace';
-        }
-        return null;
-      },
-    });
+            const { value: url } = await Swal.fire({
+              title: 'Insertar enlace',
+              input: 'url',
+              inputLabel: 'URL del enlace',
+              inputValue: previousUrl,
+              showCancelButton: true,
+              confirmButtonText: 'Insertar',
+              cancelButtonText: 'Cancelar',
+              inputValidator: (value) => {
+                if (value && !/^https?:\/\/|^\/|^[\w\-]/.test(value)) {
+                  return 'Ingresá una URL válida o dejalo vacío para quitar el enlace';
+                }
+                return null;
+              },
+            });
 
-    // Si el input fue cancelado (botón Cancelar)
-    if (url === undefined) return;
+            if (url === undefined) return;
+            if (url === '') {
+              editor?.chain().focus().unsetLink().run();
+              return;
+            }
 
-    // Si está vacío, eliminamos el link actual
-    if (url === '') {
-      editor?.chain().focus().unsetLink().run();
-      return;
-    }
+            let cleanedUrl = url;
+            const isExternal = /^https?:\/\//i.test(url);
+            if (!isExternal && url.startsWith("http://localhost:3000")) {
+              cleanedUrl = url.replace("http://localhost:3000", "");
+            }
 
-    // Limpiar localhost u origen del frontend
-    let cleanedUrl = url;
-
-    // Si es un enlace interno a tu app (rutas tipo /post/titulo), dejalo pasar tal cual
-    // Pero si es externo (comienza con http:// o https://), no lo toques
-    const isExternal = /^https?:\/\//i.test(url);
-    
-    if (!isExternal && url.startsWith("http://localhost:3000")) {
-      cleanedUrl = url.replace("http://localhost:3000", "");
-    }
-    
-
-    editor?.chain().focus().extendMarkRange('link').setLink({ href: cleanedUrl }).run();
-  }}
-  className={editor?.isActive('link') ? 'active' : ''}
-  type="button"
->
-  🔗 Link
-</button>
-
-
+            editor?.chain().focus().extendMarkRange('link').setLink({ href: cleanedUrl }).run();
+          }}
+          className={editor?.isActive('link') ? 'active' : ''}
+          type="button"
+        >
+          🔗 Link
+        </button>
       </div>
 
       <EditorContent editor={editor} className="tiptap" />
@@ -262,7 +269,6 @@ const EditPost = () => {
       <input type="file" multiple accept="image/*" onChange={handleImagenesSeleccionadas} className="editor-file" />
 
       {cargando && <p className="uploading-text">Subiendo imágenes...</p>}
-
 
       <button onClick={actualizarPost} className="publish-button" type="button">
         💾 Guardar cambios
