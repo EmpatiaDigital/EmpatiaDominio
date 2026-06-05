@@ -18,6 +18,8 @@ const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
 
 const optimizarPortada = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_800");
 
+const optimizarAvatar = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_150,h_150,c_fill");
+
 const optimizarImagenesEnHtml = (html) => {
   if (!html) return html;
   return html.replace(
@@ -26,10 +28,20 @@ const optimizarImagenesEnHtml = (html) => {
       if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) {
         return match;
       }
-      const urlOptimizada = url.replace("/upload/", "/upload/f_auto,q_auto,w_1200/");
+      const urlOptimizada = url.replace("/upload/", "/upload/f_auto,q_auto,w_800/");
       return `${pre}${urlOptimizada}${post}`;
     }
   );
+};
+
+// Helper extractor de categorías (Lógica idéntica a tu HomePage)
+const resolverCategoria = (categoriaData) => {
+  if (Array.isArray(categoriaData) && categoriaData.length > 0 && typeof categoriaData[0] === "string") {
+    return categoriaData[0].trim();
+  } else if (typeof categoriaData === "string" && categoriaData.trim() !== "") {
+    return categoriaData.trim();
+  }
+  return "Sentidos";
 };
 
 const PostCompleto = () => {
@@ -64,19 +76,29 @@ const PostCompleto = () => {
     fetchPost();
   }, [id]);
 
-  // 2. Carga de los 3 posts relacionados de la misma categoría
+  // 2. Carga de posts relacionados adaptada al formato mixto de categorías
   useEffect(() => {
-    if (!post?.categoria) return;
+    if (!post) return;
 
     const fetchRelacionados = async () => {
       try {
         const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
         const todosLosPosts = await res.json();
         
-        // Filtramos por categoría y dejamos afuera el post que ya se está leyendo
+        // Resolvemos la categoría limpia del post que se está leyendo actual
+        const categoriaActual = resolverCategoria(post.categoria);
+
+        // Filtramos aplicando la misma lógica exacta para cada post de la lista
         const filtrados = todosLosPosts
-          .filter((p) => p.categoria === post.categoria && p._id !== id)
-          .slice(0, 3);
+          .filter((p) => {
+            const categoriaFiltro = resolverCategoria(p.categoria);
+            // Comparamos ignorando mayúsculas/minúsculas y excluimos el post abierto
+            return (
+              categoriaFiltro.toLowerCase() === categoriaActual.toLowerCase() && 
+              p._id !== id
+            );
+          })
+          .slice(0, 3); // Límite de hasta 3 artículos
 
         setPostsRelacionados(filtrados);
       } catch (error) {
@@ -87,7 +109,7 @@ const PostCompleto = () => {
     fetchRelacionados();
   }, [post, id]);
 
-  // 3. Formateo de elementos inyectados en el HTML (Links externos y Lazy loading)
+  // 3. Modificaciones sobre HTML inyectado (Target blank y Lazy Loading)
   useEffect(() => {
     if (!post) return;
 
@@ -112,6 +134,8 @@ const PostCompleto = () => {
 
   const contenidoOptimizado = optimizarImagenesEnHtml(post.contenido);
   const portadaOptimizada = optimizarPortada(post.portada);
+  const avatarOptimizado = post.avatar ? optimizarAvatar(post.avatar) : DEFAULT_AVATAR;
+  const categoriaFormateada = resolverCategoria(post.categoria);
 
   return (
     <div className="post-detalle">
@@ -119,11 +143,13 @@ const PostCompleto = () => {
 
       <div className="post-header">
         <img
-          src={post.avatar || DEFAULT_AVATAR}
+          src={avatarOptimizado}
           alt="avatar"
           className="avatar"
           loading="lazy"
           decoding="async"
+          width="50"
+          height="50"
         />
         <div>
           <p
@@ -141,13 +167,14 @@ const PostCompleto = () => {
             <p>
               <b>Fecha:</b> {new Date(post.fecha).toLocaleDateString()}{" "}
               &nbsp;&nbsp;&nbsp;
-              <b>Categoría:</b> {post.categoria}
+              <b>Categoría:</b> {categoriaFormateada}
             </p>
           </div>
         </div>
       </div>
 
       <div className="share-section">
+        {/* LIKES Y VISTAS ARRIBA */}
         <PostStats postId={id} postTitulo={post?.titulo} />
 
         <h3>Compartir en redes:</h3>
@@ -210,6 +237,7 @@ const PostCompleto = () => {
         dangerouslySetInnerHTML={{ __html: contenidoOptimizado }}
       />
 
+      {/* LIKES Y VISTAS ABAJO */}
       <PostStats postId={id} postTitulo={post?.titulo} />
 
       <div
@@ -280,10 +308,11 @@ const PostCompleto = () => {
         </a>
       </div>
 
+      {/* COSAS DE INTERÉS (SÓLO ABAJO) */}
       {postsRelacionados.length > 0 && (
         <div className="contenido-interes-section" style={{ marginTop: "3rem", borderTop: "2px solid #eaeaea", paddingTop: "2rem" }}>
           <h3 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1.5rem", color: "#1a1a1a" }}>
-            🎯 Artículos relacionados de {post.categoria}:
+            🎯 Artículos relacionados de {categoriaFormateada}:
           </h3>
           <div 
             className="relacionados-grid" 
