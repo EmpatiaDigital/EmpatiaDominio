@@ -8,10 +8,8 @@ import Swal from "sweetalert2";
 
 // ─── Helpers de optimización Cloudinary ───────────────────────────────────────
 // Inserta parámetros de transformación en una URL de Cloudinary.
-// Si la URL no es de Cloudinary, la devuelve sin cambios.
 const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
   if (!url || !url.includes("res.cloudinary.com")) return url;
-  // Evitar duplicar transformaciones
   if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) return url;
   return url.replace("/upload/", `/upload/${params}/`);
 };
@@ -34,10 +32,15 @@ const CrearPost = () => {
   const [categoria, setCategoria] = useState("");
   const [cargando, setCargando] = useState(false);
 
+  // 🛠️ MEJORA: Configuración nativa de atributos HTML para extensiones de Tiptap
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Image,
+      Image.configure({
+        HTMLAttributes: {
+          class: "imagen-fija-1200", // Asegura que Tiptap no barra ni elimine tu clase de CSS
+        },
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -66,40 +69,64 @@ const CrearPost = () => {
     return data.secure_url;
   };
 
+  // 🛠️ MEJORA: Try/Catch/Finally para prevenir pantallas congeladas si falla la API
   const handleImagenesSeleccionadas = async (e) => {
     const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
     setCargando(true);
     const urls = [];
 
-    for (const file of files) {
-      const urlOriginal = await subirImagenACloudinary(file);
-      // Guardamos la URL optimizada para el editor y la lista
-      const urlOptimizada = optimizarContenido(urlOriginal);
-      urls.push(urlOptimizada);
+    try {
+      for (const file of files) {
+        const urlOriginal = await subirImagenACloudinary(file);
+        const urlOptimizada = optimizarContenido(urlOriginal);
+        urls.push(urlOptimizada);
 
-      if (editor) {
-        editor
-          .chain()
-          .focus()
-          .insertContent(`<img src="${urlOptimizada}" class="imagen-fija-1200" />`)
-          .run();
+        if (editor) {
+          editor
+            .chain()
+            .focus()
+            .insertContent(`<img src="${urlOptimizada}" />`) // Tiptap le inyecta la clase automáticamente
+            .run();
+        }
       }
-    }
 
-    setImagenes((prev) => [...prev, ...urls]);
-    setEpigrafes((prev) => [...prev, ...urls.map(() => "")]);
-    setTamanos((prev) => [...prev, ...urls.map(() => 100)]);
-    setCargando(false);
+      setImagenes((prev) => [...prev, ...urls]);
+      setEpigrafes((prev) => [...prev, ...urls.map(() => "")]);
+      setTamanos((prev) => [...prev, ...urls.map(() => 100)]);
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error al subir imágenes",
+        text: "No se pudieron cargar una o más imágenes dentro del contenido.",
+      });
+    } finally {
+      setCargando(false); // Se ejecuta SIEMPRE, evitando loaders infinitos
+    }
   };
 
+  // 🛠️ MEJORA: Control de errores en la carga de la portada
   const handlePortadaSeleccionada = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
     setCargando(true);
-    const urlOriginal = await subirImagenACloudinary(file);
-    // Portada optimizada a 800px de ancho
-    const urlOptimizada = optimizarPortada(urlOriginal);
-    setPortada(urlOptimizada);
-    setCargando(false);
+    try {
+      const urlOriginal = await subirImagenACloudinary(file);
+      const urlOptimizada = optimizarPortada(urlOriginal);
+      setPortada(urlOptimizada);
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: "error",
+        title: "Error de Portada",
+        text: "Hubo un problema al subir la imagen de portada.",
+      });
+    } finally {
+      setCargando(false);
+    }
   };
 
   const guardarPost = async () => {
@@ -131,7 +158,7 @@ const CrearPost = () => {
       contenido,
       imagenes,
       epigrafes,
-      tamanos,
+      tamanos, // Nota: Asegúrate de recibir 'tamanos' en la destructuración de tu backend si lo persistís
       categoria,
       fecha: new Date().toISOString(),
       avatar,
@@ -139,7 +166,7 @@ const CrearPost = () => {
     };
   
     try {
-      const loadingSwal = Swal.fire({
+      Swal.fire({
         title: "Subiendo post...",
         html: "Por favor esperá un momento.",
         allowOutsideClick: false,
@@ -284,18 +311,14 @@ const CrearPost = () => {
           •
         </button>
         <button
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 1 }).run()
-          }
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={editor?.isActive("heading", { level: 1 }) ? "active" : ""}
           type="button"
         >
           H1
         </button>
         <button
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={editor?.isActive("heading", { level: 2 }) ? "active" : ""}
           type="button"
         >
@@ -315,7 +338,8 @@ const CrearPost = () => {
               confirmButtonText: "Insertar",
               cancelButtonText: "Cancelar",
               inputValidator: (value) => {
-                if (value && !/^http?:\/\/|^\/|^[\w\-]/.test(value)) {
+                // 🛠️ MEJORA: Se corrigió la Regex cambiándola a https? para admitir enlaces seguros nativamente
+                if (value && !/^https?:\/\/|^\/|^[\w\-]/.test(value)) {
                   return "Ingresá una URL válida o dejala vacía para quitar el enlace";
                 }
                 return null;
@@ -370,9 +394,14 @@ const CrearPost = () => {
         className="editor-file"
       />
 
-      {cargando && <p className="uploading-text">Subiendo imágenes...</p>}
+      {cargando && <p className="uploading-text">Procesando archivos multimedia...</p>}
 
-      <button onClick={guardarPost} className="publish-button" type="button">
+      <button 
+        onClick={guardarPost} 
+        className="publish-button" 
+        type="button"
+        disabled={cargando} // 🛠️ MEJORA: Deshabilita el botón de enviar si se están subiendo imágenes
+      >
         🚀 Publicar
       </button>
     </div>
