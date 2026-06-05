@@ -312,7 +312,7 @@ const PostCompleto = () => {
       {postsRelacionados.length > 0 && (
         <div className="contenido-interes-section" style={{ marginTop: "3rem", borderTop: "2px solid #eaeaea", paddingTop: "2rem" }}>
           <h3 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1.5rem", color: "#1a1a1a" }}>
-            🎯 Artículos relacionados de {categoriaFormateada}:
+            Artículos relacionados de {categoriaFormateada}:
           </h3>
           <div 
             className="relacionados-grid" 
