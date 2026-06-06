@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import Logo from "../assets/Portada1.jpg";
-import LogoSentidos from "../assets/Portada2.jpg";
+import Logo from "../assets/empatialog.jpeg";
+import LogoSentidos from "../assets/empatialog.jpeg";
 
 import "../style/Socio.css";
 import html2canvas from "html2canvas";
