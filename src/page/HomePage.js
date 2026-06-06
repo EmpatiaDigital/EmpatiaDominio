@@ -15,7 +15,6 @@ export default function HomePage() {
   const [cargando, setCargando] = useState(true);
   const navigate                = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
-
   const slides = [fondo1, fondo2, fondo3];
 
   // Auto-avance del carrusel
