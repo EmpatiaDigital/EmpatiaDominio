@@ -9,14 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
     <link
-      rel="preload"
-      as="image"
-      href="%PUBLIC_URL%/static/media/Portada1.webp"
-      type="image/webp"
-      fetchpriority="high"
-    />
-
-    <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap"
       media="print"
@@ -31,28 +23,28 @@
 
     <script>
       (function() {
-        // 1. REEMPLAZÁ ESTA URL POR TU ENDPOINT REAL DEL BACKEND
-        const API_URL = 'https://tu-api.com/api/posts/top-liked'; 
+        const API_URL = 'https://empatia-dominio-back.vercel.app/api/posts'; 
 
         fetch(API_URL)
           .then(res => res.json())
           .then(posts => {
-            // Guardamos la respuesta en el objeto global de la ventana (window)
-            // para que React la consuma al instante sin duplicar la petición
-            window.__INITIAL_TOP_POSTS__ = posts;
+            // Guardamos todos los posts en el objeto global
+            window.__INITIAL_POSTS__ = posts;
 
-            if (posts && posts[0]) {
-              // Asumimos que la propiedad de la imagen se llama "imagen" o "img" (ajustalo si cambia)
-              let imageUrl = posts[0].imagen || posts[0].img; 
+            if (posts && posts.length > 0) {
+              // Replicamos el ordenamiento por votos/likes del front para hallar el Top 1
+              const topPosts = [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0));
+              const firstPost = topPosts[0];
+              
+              let imageUrl = firstPost ? (firstPost.portada || firstPost.imagen || firstPost.img) : null;
 
-              if (imageUrl) {
-                // Si el usuario está en mobile, interceptamos la URL de Cloudinary 
-                // para pedir una versión optimizada (w_450) en vez de la pesada (w_800)
+              if (imageUrl && typeof imageUrl === 'string') {
+                // Optimización para celulares (w_450 en Cloudinary)
                 if (window.innerWidth <= 768) {
                   imageUrl = imageUrl.replace('/w_800/', '/w_450/');
                 }
 
-                // Creamos e inyectamos el nodo de precarga en el DOM de forma inmediata
+                // Inyectamos la precarga de la imagen real del elemento LCP
                 const link = document.createElement('link');
                 link.rel = 'preload';
                 link.as = 'image';
