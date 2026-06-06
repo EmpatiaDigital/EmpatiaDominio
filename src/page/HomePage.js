@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/HomePage.css";
-import fondo1 from "../assets/Portada1.webp";
+import fondo1 from "../assets/Portada1.jpg";
 import fondo2 from "../assets/Portada2.jpg";
 import fondo3 from "../assets/conexion.webp";
 import ModalActividades from "../components/ModalActividades";
