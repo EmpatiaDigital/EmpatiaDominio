@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import errorImg from "../assets/error.jpeg";
+import errorImg from "../assets/error.jpg";
 import "../style/Error404.css";
 
 // ── Configuración del juego ──
