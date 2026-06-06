@@ -10,12 +10,13 @@ const FALLBACK_COVER = "https://images.unsplash.com/photo-1516321318423-f06f85e5
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
 export default function HomePage() {
-  const [posts, setPosts]       = useState([]);
-  const [cargando, setCargando] = useState(true);
+  // Sincronizamos los estados iniciales directamente con el Early Fetch del HTML
+  const [posts, setPosts]       = useState(window.__INITIAL_POSTS__ || []);
+  const [cargando, setCargando] = useState(!window.__INITIAL_POSTS__);
   const navigate                = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
 
-  // Fetch de posts completo (asincrónico de fondo)
+  // Fetch de posts secundario (solo si el script del index de casualidad falló o no terminó)
   const fetchPosts = async () => {
     try {
       const res  = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
@@ -23,27 +24,28 @@ export default function HomePage() {
       setPosts(data);
       setCargando(false);
     } catch (error) {
-      console.error("Error al obtener posts:", error);
+      console.error("Error al obtener posts en contingencia:", error);
       setCargando(false);
     }
   };
 
   useEffect(() => { 
-    fetchPosts(); 
+    if (!window.__INITIAL_POSTS__ || window.__INITIAL_POSTS__.length === 0) {
+      fetchPosts(); 
+    }
   }, []);
 
-  // OBTENCIÓN DE SLIDES: Si React todavía no terminó su fetch,
-  // usamos los datos del Early Fetch del index.html para no mostrar un bloque vacío.
-  const topSlides = posts.length > 0
-    ? [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0)).slice(0, 3)
-    : (window.__INITIAL_TOP_POSTS__ || []);
+  // Obtener los 3 posts más votados basados en los datos activos
+  const topSlides = [...posts]
+    .sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0))
+    .slice(0, 3);
 
-  // Auto-avance del carrusel (solo si hay slides cargados)
+  // Auto-avance del carrusel
   useEffect(() => {
     if (topSlides.length <= 1) return;
     const interval = setInterval(() => {
       setSlideIndex((prev) => (prev + 1) % topSlides.length);
-    }, 6000); // 6 segundos para dar tiempo a leer el título destacado
+    }, 6000);
     return () => clearInterval(interval);
   }, [topSlides.length]);
 
@@ -53,8 +55,6 @@ export default function HomePage() {
     setSlideIndex((prev) => (prev + 1) % topSlides.length);
 
   const postsToShow = posts.slice(0, 6);
-
-  // Post actualmente activo en el carrusel
   const currentSlidePost = topSlides[slideIndex];
 
   return (
@@ -66,8 +66,7 @@ export default function HomePage() {
         {/* ── CARRUSEL DINÁMICO DE POSTS MÁS VOTADOS ─────────────────────────────── */}
         <div className="carousel-wrapper">
           
-          {/* Si está cargando pero ya tenemos el Early Fetch en window, evitamos el skeleton */}
-          {cargando && topSlides.length === 0 ? (
+          {cargando ? (
             <div className="carousel-skeleton" style={{ height: "100%", background: "#222" }} />
           ) : topSlides.length === 0 ? (
             <div className="carousel-empty">No hay publicaciones destacadas.</div>
@@ -76,8 +75,7 @@ export default function HomePage() {
               {topSlides.map((post, i) => {
                 let imgSrc = post.portada || post.imagen || post.img || FALLBACK_COVER;
                 
-                // Mismo truco del index.html: si es mobile y viene de Cloudinary, machacamos el string
-                // para que coincida exactamente con la precarga del navegador
+                // Macheo exacto de strings con el index.html para evitar descargas dobles
                 if (i === 0 && window.innerWidth <= 768 && typeof imgSrc === "string") {
                   imgSrc = imgSrc.replace('/w_800/', '/w_450/');
                 }
@@ -86,7 +84,6 @@ export default function HomePage() {
                   <img
                     key={post._id || i}
                     src={imgSrc}
-                    // TRUCO DE RENDIMIENTO: El primer slide se descarga de inmediato, los demás esperan
                     loading={i === 0 ? "eager" : "lazy"}
                     fetchPriority={i === 0 ? "high" : "low"}
                     className={`carousel-image ${i === slideIndex ? "active" : ""}`}
@@ -151,7 +148,6 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Estados del listado inferior */}
           {cargando ? (
             <div className="posts-skeleton">
               {[1, 2, 3, 4, 5, 6].map((n) => (
