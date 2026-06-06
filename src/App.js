@@ -17,7 +17,6 @@ const Descargar       = lazy(() => import('./page/Descargar.js'));
 const Inscription     = lazy(() => import('./page/Inscription.js'));
 const Informacion     = lazy(() => import('./page/Informacion.js'));
 
-
 const Descargo          = lazy(() => import('./components/Descargo.js'));
 const Cursantes         = lazy(() => import('./components/Cursantes.js'));
 const SuperAdminCourses = lazy(() => import('./components/SuperAdminCourses.js'));
