@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap');
+/* FIX CLS PRINCIPAL: font-display=swap en la URL de Google Fonts
+   Antes: el navegador esperaba la fuente → texto invisible → saltaba al aparecer
+   Ahora: muestra fallback inmediatamente → reemplaza sin mover el layout      */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap&display=swap');
 
 /* =============================================
    BASE
@@ -9,6 +12,29 @@
 
 html {
   font-family: 'DM Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* FIX CLS: declara el fallback con métricas similares a DM Sans
+     para que el swap de fuente no mueva el layout               */
+  font-size: 16px;
+}
+
+/* FIX CLS: size-adjust fuerza al fallback a ocupar el mismo espacio
+   que DM Sans, eliminando el salto cuando la webfont carga        */
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  size-adjust: 100%;
+  ascent-override: 94%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Playfair Fallback';
+  src: local('Georgia');
+  size-adjust: 97%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 main {
@@ -23,7 +49,7 @@ main {
   flex-direction: column;
   min-height: 100vh;
   background: #f0f4fa;
-  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  font-family: 'DM Sans', 'DM Sans Fallback', 'Segoe UI', sans-serif;
 }
 
 /* =============================================
@@ -35,6 +61,9 @@ main {
   height: 580px;
   overflow: hidden;
   background: #0d2340;
+  /* FIX CLS: contain evita que el carrusel afecte el layout
+     de los elementos que están debajo mientras carga          */
+  contain: layout size;
 }
 
 .carousel-image {
@@ -46,11 +75,14 @@ main {
   opacity: 0;
   transition: opacity 1.3s ease-in-out;
   z-index: 0;
+  /* FIX CLS: will-change solo en la imagen activa (se aplica con .active)
+     Evita repaints inesperados durante la transición                     */
 }
 
 .carousel-image.active {
   opacity: 1;
   z-index: 1;
+  will-change: opacity;
 }
 
 .carousel-wrapper::after {
@@ -90,13 +122,16 @@ main {
 }
 
 .overlay h1 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Playfair Display', 'Playfair Fallback', Georgia, serif;
   color: #fff;
   font-size: 3.4rem;
   font-weight: 900;
   line-height: 1.08;
   letter-spacing: -0.5px;
   margin: 0 0 28px;
+  /* FIX CLS: min-height reserva espacio para 2 líneas de texto
+     antes de que cargue la fuente, evitando el salto de layout  */
+  min-height: 2lh;
 }
 
 .btn-hero {
@@ -108,7 +143,7 @@ main {
   border: none;
   border-radius: 4px;
   padding: 13px 26px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'DM Sans Fallback', sans-serif;
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.4px;
@@ -214,7 +249,7 @@ main {
 }
 
 .titulo-principal {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Playfair Display', 'Playfair Fallback', Georgia, serif;
   font-size: 1.85rem;
   font-weight: 700;
   color: #1e3a5f;
@@ -264,7 +299,10 @@ main {
 }
 
 .skeleton-card {
-  height: 340px;
+  /* FIX CLS: aspect-ratio en lugar de height fija
+     Cuando el grid cambia de columnas en responsive,
+     la altura se adapta sola sin saltos de layout     */
+  aspect-ratio: 3 / 4;
   border-radius: 12px;
   overflow: hidden;
   background: #e4ebf5;
@@ -306,8 +344,8 @@ main {
    ============================================= */
 .post-card {
   position: relative;
-  height: 340px;                 /* ↑ más altura para que respire */
-  border-radius: 12px;           /* ↑ bordes más redondeados */
+  height: 340px;
+  border-radius: 12px;
   overflow: hidden;
   background-size: cover;
   background-position: center;
@@ -315,9 +353,14 @@ main {
   background-color: #1e3a5f;
   border: none;
   cursor: pointer;
+  /* FIX CLS: transform en lugar de top/left/margin para hover
+     Las transformaciones no disparan reflow → 0 CLS           */
   transition: transform 0.28s ease, box-shadow 0.28s ease;
   outline: none;
   box-shadow: 0 4px 16px rgba(20, 45, 90, 0.10);
+  /* FIX CLS: contain: content evita que el contenido interno
+     afecte el layout de los otros elementos de la grilla       */
+  contain: content;
 }
 
 .post-card:hover,
@@ -348,16 +391,14 @@ main {
   border: 1px solid rgba(107, 179, 240, 0.2);
 }
 
-/* ── Overlay gradiente ──
-   El gradiente ahora es más alto (60%) para dar espacio
-   al avatar + título sin que la imagen los tape           */
+/* ── Overlay gradiente ── */
 .post-content-overlay-home {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to top,
     rgba(6, 16, 42, 0.98) 0%,
-    rgba(6, 16, 42, 0.82) 42%,   /* ↑ más opaco más arriba */
+    rgba(6, 16, 42, 0.82) 42%,
     rgba(6, 16, 42, 0.20) 68%,
     transparent 100%
   );
@@ -368,9 +409,7 @@ main {
   gap: 0;
 }
 
-/* ── Fila avatar + autor ──
-   El avatar ahora tiene un anillo blanco más visible
-   y un fondo sólido para que no se pierda en la imagen  */
+/* ── Fila avatar + autor ── */
 .card-meta {
   display: flex;
   align-items: center;
@@ -384,16 +423,19 @@ main {
   min-width: 32px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.85);   /* ↑ borde más grueso */
+  border: 2px solid rgba(255, 255, 255, 0.85);
   flex-shrink: 0;
-  background: #1e3a5f;                             /* fondo por si la img tarda */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);      /* sombra para separarlo */
+  background: #1e3a5f;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  /* FIX CLS: dimensiones explícitas en CSS además del width/height
+     del HTML — doble garantía de que el espacio está reservado    */
+  aspect-ratio: 1;
 }
 
 .autor {
   font-size: 11.5px;
   font-weight: 500;
-  color: #c8e2f8;                                  /* ↑ más claro para contraste */
+  color: #c8e2f8;
   letter-spacing: 0.2px;
   margin: 0;
   white-space: nowrap;
@@ -405,7 +447,7 @@ main {
 /* ── Título ── */
 .post-content-overlay-home h3 {
   margin: 0 0 14px;
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Playfair Display', 'Playfair Fallback', Georgia, serif;
   font-size: 1.08rem;
   font-weight: 700;
   color: #fff;
@@ -415,6 +457,9 @@ main {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* FIX CLS: min-height para 3 líneas → reserva espacio
+     antes de que cargue Playfair Display                  */
+  min-height: calc(1.08rem * 1.32 * 3);
 }
 
 /* ── Footer ── */
@@ -426,7 +471,7 @@ main {
   justify-content: space-between;
 }
 
-/* ── Botón "Ver más" — más compacto, no full-width ── */
+/* ── Botón "Ver más" ── */
 .btn-ver-mas {
   display: inline-flex;
   align-items: center;
@@ -437,7 +482,7 @@ main {
   border: 1px solid rgba(107, 179, 240, 0.45);
   border-radius: 4px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', 'DM Sans Fallback', sans-serif;
   font-size: 11.5px;
   font-weight: 500;
   letter-spacing: 0.3px;
@@ -520,6 +565,7 @@ main {
 
   .overlay h1 {
     font-size: 2.6rem;
+    min-height: 2lh;
   }
 
   .carousel-dots {
@@ -556,6 +602,7 @@ main {
 
   .overlay h1 {
     font-size: 2.2rem;
+    min-height: 2lh;
   }
 
   .posts-section {
@@ -578,6 +625,7 @@ main {
 
   .skeleton-card {
     height: 310px;
+    aspect-ratio: unset;
   }
 }
 
@@ -601,6 +649,7 @@ main {
   .overlay h1 {
     font-size: 1.85rem;
     margin-bottom: 20px;
+    min-height: 2lh;
   }
 
   .btn-hero {
@@ -638,7 +687,6 @@ main {
     font-size: 1.45rem;
   }
 
-  /* ↑ En mobile: 1 columna con cards más altas para que se vea bien */
   .lista-posts-container,
   .posts-skeleton {
     grid-template-columns: 1fr;
@@ -646,15 +694,17 @@ main {
   }
 
   .post-card {
-    height: 320px;                /* ↑ mucho más espacio en mobile */
+    height: 320px;
   }
 
   .skeleton-card {
     height: 320px;
+    aspect-ratio: unset;
   }
 
   .post-content-overlay-home h3 {
     font-size: 1.05rem;
+    min-height: calc(1.05rem * 1.32 * 3);
   }
 
   .avatar {
@@ -667,7 +717,6 @@ main {
     font-size: 11px;
   }
 
-  /* Botón compacto, NO full-width */
   .btn-ver-mas {
     padding: 7px 14px;
     font-size: 11px;
@@ -684,6 +733,7 @@ main {
 
   .overlay h1 {
     font-size: 1.6rem;
+    min-height: 2lh;
   }
 
   .posts-section {
@@ -696,6 +746,7 @@ main {
 
   .skeleton-card {
     height: 300px;
+    aspect-ratio: unset;
   }
 
   .titulo-principal {
