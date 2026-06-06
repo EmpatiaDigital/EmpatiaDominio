@@ -1,4 +1,4 @@
-// HomePage.js — Optimizado para rendimiento y posts destacados
+// HomePage.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/HomePage.css";
@@ -15,7 +15,7 @@ export default function HomePage() {
   const navigate                = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
 
-  // Fetch de posts
+  // Fetch de posts completo (asincrónico de fondo)
   const fetchPosts = async () => {
     try {
       const res  = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
@@ -28,13 +28,15 @@ export default function HomePage() {
     }
   };
 
-  useEffect(() => { fetchPosts(); }, []);
+  useEffect(() => { 
+    fetchPosts(); 
+  }, []);
 
-  // Obtener los 3 posts más votados. 
-  // NOTA: Ajustá 'b.votos' o 'b.likes' según cómo se llame el contador en tu base de datos.
-  const topSlides = [...posts]
-    .sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0))
-    .slice(0, 3);
+  // OBTENCIÓN DE SLIDES: Si React todavía no terminó su fetch,
+  // usamos los datos del Early Fetch del index.html para no mostrar un bloque vacío.
+  const topSlides = posts.length > 0
+    ? [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0)).slice(0, 3)
+    : (window.__INITIAL_TOP_POSTS__ || []);
 
   // Auto-avance del carrusel (solo si hay slides cargados)
   useEffect(() => {
@@ -64,23 +66,34 @@ export default function HomePage() {
         {/* ── CARRUSEL DINÁMICO DE POSTS MÁS VOTADOS ─────────────────────────────── */}
         <div className="carousel-wrapper">
           
-          {cargando ? (
+          {/* Si está cargando pero ya tenemos el Early Fetch en window, evitamos el skeleton */}
+          {cargando && topSlides.length === 0 ? (
             <div className="carousel-skeleton" style={{ height: "100%", background: "#222" }} />
           ) : topSlides.length === 0 ? (
             <div className="carousel-empty">No hay publicaciones destacadas.</div>
           ) : (
             <>
-              {topSlides.map((post, i) => (
-                <img
-                  key={post._id}
-                  src={post.portada || FALLBACK_COVER}
-                  // TRUCO DE RENDIMIENTO: La primera imagen se descarga de inmediato, las demás esperan
-                  loading={i === 0 ? "eager" : "lazy"}
-                  fetchPriority={i === 0 ? "high" : "low"}
-                  className={`carousel-image ${i === slideIndex ? "active" : ""}`}
-                  alt={post.titulo}
-                />
-              ))}
+              {topSlides.map((post, i) => {
+                let imgSrc = post.portada || post.imagen || post.img || FALLBACK_COVER;
+                
+                // Mismo truco del index.html: si es mobile y viene de Cloudinary, machacamos el string
+                // para que coincida exactamente con la precarga del navegador
+                if (i === 0 && window.innerWidth <= 768 && typeof imgSrc === "string") {
+                  imgSrc = imgSrc.replace('/w_800/', '/w_450/');
+                }
+
+                return (
+                  <img
+                    key={post._id || i}
+                    src={imgSrc}
+                    // TRUCO DE RENDIMIENTO: El primer slide se descarga de inmediato, los demás esperan
+                    loading={i === 0 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : "low"}
+                    className={`carousel-image ${i === slideIndex ? "active" : ""}`}
+                    alt={post.titulo}
+                  />
+                );
+              })}
 
               {/* Overlay dinámico basado en el Post activo */}
               {currentSlidePost && (
@@ -123,7 +136,7 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* ── SECCIÓN DE POSTS (Lógica intacta) ─────────────────────── */}
+        {/* ── SECCIÓN DE POSTS RECIENTES ─────────────────────── */}
         <section className="posts-section">
 
           <div className="posts-section-header">
@@ -138,7 +151,7 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Estados */}
+          {/* Estados del listado inferior */}
           {cargando ? (
             <div className="posts-skeleton">
               {[1, 2, 3, 4, 5, 6].map((n) => (
