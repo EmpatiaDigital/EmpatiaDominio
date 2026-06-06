@@ -2,20 +2,58 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href="empatialog.jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-  
-    <!-- Título optimizado para SEO -->
+
+    <!-- FIX LCP: preconectar a Google Fonts ANTES de cualquier otra cosa
+         Esto elimina los 950ms de "render-blocking requests" que marcó Lighthouse -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- FIX LCP: precargar la imagen hero (Portada1.webp = elemento LCP)
+         El navegador la descarga con máxima prioridad, antes de procesar React.
+         IMPORTANTE: después del build de CRA, verificá la ruta real en
+         DevTools → Network → filtrá "webp" y copiá el hash exacto.
+         Ejemplo real: /static/media/Portada1.abc12345.webp              -->
+    <link
+      rel="preload"
+      as="image"
+      href="%PUBLIC_URL%/static/media/Portada1.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+
+    <!-- FIX LCP + CLS: cargar Google Fonts SIN bloquear el render
+         media="print" → onload="this.media='all'" es el patrón estándar
+         para fuentes no bloqueantes. El noscript es el fallback.         -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
+      />
+    </noscript>
+
+    <link rel="icon" type="image/png" href="empatialog.jpeg" />
+    <link rel="apple-touch-icon" href="https://www.empatiadigital.com.ar/empatialog.jpeg" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="canonical" href="https://empatiadigital.com.ar" />
+
+    <!-- Título -->
     <title>Empatía Digital - Reflexiones y Herramientas para una Convivencia Saludable con la Tecnología</title>
-  
-    <!-- Meta descripción clara y relevante -->
+
+    <!-- Meta descripción -->
     <meta
       name="description"
       content="Empatía Digital es un espacio colaborativo que promueve el uso consciente de la tecnología. Compartimos recursos, experiencias y reflexiones sobre salud digital, crianza, educación y bienestar en la era digital."
     />
-  
-    <!-- Open Graph para redes sociales -->
+
+    <!-- Open Graph -->
     <meta property="og:title" content="Empatía Digital – Tecnología hacia la Consciencia y el Cuidado" />
     <meta
       property="og:description"
@@ -24,7 +62,7 @@
     <meta property="og:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
     <meta property="og:url" content="https://empatiadigital.com.ar" />
     <meta property="og:type" content="website" />
-  
+
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Empatía Digital – Tecnología hacia la Consciencia" />
@@ -33,17 +71,8 @@
       content="Promovemos una convivencia sana con la tecnología. Recursos, ideas y propuestas para docentes, familias y comunidades."
     />
     <meta name="twitter:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
-  
-    <!-- Icono para dispositivos Apple -->
-    <link rel="apple-touch-icon" href="https://www.empatiadigital.com.ar/empatialog.jpeg" />
-  
-    <!-- Manifest para PWA -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-  
-    <!-- Canonical -->
-    <link rel="canonical" href="https://empatiadigital.com.ar" />
   </head>
-  
+
   <body>
     <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>
     <div id="root"></div>
