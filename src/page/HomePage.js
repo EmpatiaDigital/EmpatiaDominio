@@ -15,6 +15,7 @@ export default function HomePage() {
   const navigate                = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
 
+  
   // Fetch de posts
   const fetchPosts = async () => {
     try {
