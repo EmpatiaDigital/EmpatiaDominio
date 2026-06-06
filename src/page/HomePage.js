@@ -86,7 +86,7 @@ export default function HomePage() {
               {currentSlidePost && (
                 <div className="overlay">
                   <span className="overlay-eyebrow">
-                    🔥 Destacado · {Array.isArray(currentSlidePost.categoria) ? currentSlidePost.categoria[0] : currentSlidePost.categoria || "General"}
+                    Destacado · {Array.isArray(currentSlidePost.categoria) ? currentSlidePost.categoria[0] : currentSlidePost.categoria || "General"}
                   </span>
                   <h1>{currentSlidePost.titulo}</h1>
                   
