@@ -5,16 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
 
-    <!-- FIX LCP: preconectar a Google Fonts ANTES de cualquier otra cosa
-         Esto elimina los 950ms de "render-blocking requests" que marcó Lighthouse -->
+    <!-- FIX LCP: preconectar a Google Fonts ANTES de cualquier otra cosa -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- FIX LCP: precargar la imagen hero (Portada1.webp = elemento LCP)
-         El navegador la descarga con máxima prioridad, antes de procesar React.
-         IMPORTANTE: después del build de CRA, verificá la ruta real en
-         DevTools → Network → filtrá "webp" y copiá el hash exacto.
-         Ejemplo real: /static/media/Portada1.abc12345.webp              -->
+    <!-- FIX LCP: precargar la imagen hero (Portada1.webp = elemento LCP) -->
     <link
       rel="preload"
       as="image"
@@ -23,19 +18,17 @@
       fetchpriority="high"
     />
 
-    <!-- FIX LCP + CLS: cargar Google Fonts SIN bloquear el render
-         media="print" → onload="this.media='all'" es el patrón estándar
-         para fuentes no bloqueantes. El noscript es el fallback.         -->
+    <!-- FIX LCP + CLS: cargar Google Fonts SIN bloquear el render (Sincronizado con pesos de CSS) -->
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap"
       media="print"
       onload="this.media='all'"
     />
     <noscript>
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap"
       />
     </noscript>
 
@@ -44,20 +37,20 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <link rel="canonical" href="https://empatiadigital.com.ar" />
 
-    <!-- Título -->
-    <title>Empatía Digital - Reflexiones y Herramientas para una Convivencia Saludable con la Tecnología</title>
+    <!-- Título Optimizado para SEO (Máx 60-70 caracteres con Keywords Fuertes) -->
+    <title>Empatía Digital | Salud Digital, Prevención de Grooming y Crianza</title>
 
-    <!-- Meta descripción -->
+    <!-- Meta descripción mejorada (Keywords: salud digital, grooming, ciberseguridad, crianza, bienestar) -->
     <meta
       name="description"
-      content="Empatía Digital es un espacio colaborativo que promueve el uso consciente de la tecnología. Compartimos recursos, experiencias y reflexiones sobre salud digital, crianza, educación y bienestar en la era digital."
+      content="Recursos y herramientas sobre salud digital, prevención de grooming, ciberseguridad y uso consciente de tecnologías. Talleres para familias, escuelas y comunidades."
     />
 
-    <!-- Open Graph -->
-    <meta property="og:title" content="Empatía Digital – Tecnología hacia la Consciencia y el Cuidado" />
+    <!-- Open Graph (Redes Sociales como WhatsApp, Facebook, LinkedIn) -->
+    <meta property="og:title" content="Empatía Digital – Salud Digital y Prevención de Grooming" />
     <meta
       property="og:description"
-      content="Descubrí cómo promover una relación saludable con la tecnología. Empatía Digital te brinda herramientas y reflexiones sobre bienestar digital, crianza tecnológica y comunidad."
+      content="Promovemos el bienestar digital y la ciberseguridad. Encontrá herramientas y talleres sobre crianza digital, uso de pantallas y prevención de riesgos en línea."
     />
     <meta property="og:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
     <meta property="og:url" content="https://empatiadigital.com.ar" />
@@ -65,10 +58,10 @@
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Empatía Digital – Tecnología hacia la Consciencia" />
+    <meta name="twitter:title" content="Empatía Digital – Convivencia y Salud Digital Consciente" />
     <meta
       name="twitter:description"
-      content="Promovemos una convivencia sana con la tecnología. Recursos, ideas y propuestas para docentes, familias y comunidades."
+      content="Propuestas de ciudadanía digital, prevención de grooming y bienestar tecnológico para docentes, familias y entornos educativos."
     />
     <meta name="twitter:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
   </head>
