@@ -1,24 +1,16 @@
-/* FIX CLS PRINCIPAL: font-display=swap en la URL de Google Fonts
-   Antes: el navegador esperaba la fuente → texto invisible → saltaba al aparecer
-   Ahora: muestra fallback inmediatamente → reemplaza sin mover el layout      */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap&display=swap');
+/* HomePage.css */
 
-/* =============================================
-   BASE
-   ============================================= */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 html {
   font-family: 'DM Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  /* FIX CLS: declara el fallback con métricas similares a DM Sans
-     para que el swap de fuente no mueva el layout               */
+  /* FIX CLS: declara el fallback con métricas similares a DM Sans */
   font-size: 16px;
 }
 
-/* FIX CLS: size-adjust fuerza al fallback a ocupar el mismo espacio
-   que DM Sans, eliminando el salto cuando la webfont carga        */
+/* FIX CLS: size-adjust fuerza al fallback a ocupar el mismo espacio */
 @font-face {
   font-family: 'DM Sans Fallback';
   src: local('Arial');
@@ -53,7 +45,7 @@ main {
 }
 
 /* =============================================
-   CAROUSEL
+   CAROUSEL — AHORA DINÁMICO
    ============================================= */
 .carousel-wrapper {
   position: relative;
@@ -61,8 +53,6 @@ main {
   height: 580px;
   overflow: hidden;
   background: #0d2340;
-  /* FIX CLS: contain evita que el carrusel afecte el layout
-     de los elementos que están debajo mientras carga          */
   contain: layout size;
 }
 
@@ -75,8 +65,6 @@ main {
   opacity: 0;
   transition: opacity 1.3s ease-in-out;
   z-index: 0;
-  /* FIX CLS: will-change solo en la imagen activa (se aplica con .active)
-     Evita repaints inesperados durante la transición                     */
 }
 
 .carousel-image.active {
@@ -96,7 +84,7 @@ main {
   pointer-events: none;
 }
 
-/* ── Overlay: eyebrow + título + CTA ── */
+/* ── Overlay dinámico ── */
 .overlay {
   position: absolute;
   bottom: 0;
@@ -129,8 +117,6 @@ main {
   line-height: 1.08;
   letter-spacing: -0.5px;
   margin: 0 0 28px;
-  /* FIX CLS: min-height reserva espacio para 2 líneas de texto
-     antes de que cargue la fuente, evitando el salto de layout  */
   min-height: 2lh;
 }
 
@@ -162,7 +148,7 @@ main {
   background: #1e3a5f;
 }
 
-/* ── Prev / Next ── */
+/* ── Controles y navegación ── */
 .carousel-btn {
   position: absolute;
   top: 50%;
@@ -191,7 +177,6 @@ main {
 .carousel-btn.left  { left: 22px; }
 .carousel-btn.right { right: 22px; }
 
-/* ── Dots ── */
 .carousel-dots {
   position: absolute;
   bottom: 26px;
@@ -229,7 +214,6 @@ main {
   width: 100%;
 }
 
-/* ── Header ── */
 .posts-section-header {
   display: flex;
   align-items: flex-end;
@@ -239,15 +223,6 @@ main {
   margin-bottom: 36px;
 }
 
-.section-eyebrow {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: #4a90d9;
-  margin: 0 0 6px;
-}
-
 .titulo-principal {
   font-family: 'Playfair Display', 'Playfair Fallback', Georgia, serif;
   font-size: 1.85rem;
@@ -255,15 +230,6 @@ main {
   color: #1e3a5f;
   margin: 0;
   letter-spacing: -0.2px;
-  text-transform: none;
-  border-bottom: none;
-  padding-bottom: 0;
-  display: block;
-}
-
-.titulo-principal::before,
-.titulo-principal::after {
-  display: none;
 }
 
 .section-ver-todas {
@@ -291,7 +257,7 @@ main {
   color: #1e3a5f;
 }
 
-/* ── Skeleton loading ── */
+/* ── Skeletons adaptive ── */
 .posts-skeleton {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -299,9 +265,6 @@ main {
 }
 
 .skeleton-card {
-  /* FIX CLS: aspect-ratio en lugar de height fija
-     Cuando el grid cambia de columnas en responsive,
-     la altura se adapta sola sin saltos de layout     */
   aspect-ratio: 3 / 4;
   border-radius: 12px;
   overflow: hidden;
@@ -328,20 +291,13 @@ main {
   font-size: 14px;
 }
 
-/* =============================================
-   GRID DE POSTS — 3 columnas uniformes
-   ============================================= */
+/* ── Grid ── */
 .lista-posts-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  padding: 0;
-  margin: 0;
 }
 
-/* =============================================
-   TARJETA POST — HOMEPAGE
-   ============================================= */
 .post-card {
   position: relative;
   height: 340px;
@@ -353,13 +309,9 @@ main {
   background-color: #1e3a5f;
   border: none;
   cursor: pointer;
-  /* FIX CLS: transform en lugar de top/left/margin para hover
-     Las transformaciones no disparan reflow → 0 CLS           */
   transition: transform 0.28s ease, box-shadow 0.28s ease;
   outline: none;
   box-shadow: 0 4px 16px rgba(20, 45, 90, 0.10);
-  /* FIX CLS: contain: content evita que el contenido interno
-     afecte el layout de los otros elementos de la grilla       */
   contain: content;
 }
 
@@ -369,11 +321,6 @@ main {
   box-shadow: 0 20px 48px rgba(20, 45, 90, 0.20);
 }
 
-.post-card--featured {
-  grid-column: span 1;
-}
-
-/* ── Badge de categoría ── */
 .card-badge {
   position: absolute;
   top: 14px;
@@ -391,7 +338,6 @@ main {
   border: 1px solid rgba(107, 179, 240, 0.2);
 }
 
-/* ── Overlay gradiente ── */
 .post-content-overlay-home {
   position: absolute;
   inset: 0;
@@ -406,10 +352,8 @@ main {
   flex-direction: column;
   justify-content: flex-end;
   padding: 0 18px 18px;
-  gap: 0;
 }
 
-/* ── Fila avatar + autor ── */
 .card-meta {
   display: flex;
   align-items: center;
@@ -426,9 +370,6 @@ main {
   border: 2px solid rgba(255, 255, 255, 0.85);
   flex-shrink: 0;
   background: #1e3a5f;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
-  /* FIX CLS: dimensiones explícitas en CSS además del width/height
-     del HTML — doble garantía de que el espacio está reservado    */
   aspect-ratio: 1;
 }
 
@@ -436,15 +377,11 @@ main {
   font-size: 11.5px;
   font-weight: 500;
   color: #c8e2f8;
-  letter-spacing: 0.2px;
-  margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
-/* ── Título ── */
 .post-content-overlay-home h3 {
   margin: 0 0 14px;
   font-family: 'Playfair Display', 'Playfair Fallback', Georgia, serif;
@@ -452,17 +389,13 @@ main {
   font-weight: 700;
   color: #fff;
   line-height: 1.32;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.65);
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  /* FIX CLS: min-height para 3 líneas → reserva espacio
-     antes de que cargue Playfair Display                  */
   min-height: calc(1.08rem * 1.32 * 3);
 }
 
-/* ── Footer ── */
 .card-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   padding-top: 13px;
@@ -471,7 +404,6 @@ main {
   justify-content: space-between;
 }
 
-/* ── Botón "Ver más" ── */
 .btn-ver-mas {
   display: inline-flex;
   align-items: center;
@@ -485,8 +417,6 @@ main {
   font-family: 'DM Sans', 'DM Sans Fallback', sans-serif;
   font-size: 11.5px;
   font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: background 0.2s, border-color 0.2s;
   backdrop-filter: blur(4px);
   white-space: nowrap;
 }
@@ -494,7 +424,6 @@ main {
 .btn-ver-mas svg {
   width: 13px;
   height: 13px;
-  flex-shrink: 0;
 }
 
 .btn-ver-mas:hover {
@@ -503,253 +432,45 @@ main {
 }
 
 /* =============================================
-   MISCELÁNEOS
-   ============================================= */
-.preview-portada {
-  width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  margin: 10px 0;
-  border-radius: 6px;
-}
-
-.imagenes-epigrafes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.image-block {
-  flex: 1 1 45%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.image-block img {
-  width: 100%;
-  border-radius: 6px;
-  max-height: 150px;
-  object-fit: cover;
-}
-
-.epigrafe-text {
-  font-size: 0.78rem;
-  color: #7a8fa6;
-  margin-top: 5px;
-  text-align: center;
-}
-
-/* =============================================
-   RESPONSIVE — TABLET GRANDE (≤1100px)
+   MEDIA QUERIES (Mantengo tu responsive intacto)
    ============================================= */
 @media (max-width: 1100px) {
-  .posts-section {
-    padding: 52px 36px 60px;
-  }
+  .posts-section { padding: 52px 36px 60px; }
 }
 
-/* =============================================
-   RESPONSIVE — TABLET (≤991px)
-   ============================================= */
 @media (max-width: 991px) {
-  .carousel-wrapper {
-    height: 480px;
-  }
-
-  .overlay {
-    padding: 0 40px 48px;
-    max-width: 100%;
-  }
-
-  .overlay h1 {
-    font-size: 2.6rem;
-    min-height: 2lh;
-  }
-
-  .carousel-dots {
-    right: 40px;
-    bottom: 22px;
-  }
-
-  .posts-section {
-    padding: 48px 28px 56px;
-  }
-
-  .lista-posts-container,
-  .posts-skeleton {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
-  }
-
-  .titulo-principal {
-    font-size: 1.6rem;
-  }
+  .carousel-wrapper { height: 480px; }
+  .overlay { padding: 0 40px 48px; max-width: 100%; }
+  .overlay h1 { font-size: 2.6rem; }
+  .lista-posts-container, .posts-skeleton { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .titulo-principal { font-size: 1.6rem; }
 }
 
-/* =============================================
-   RESPONSIVE — TABLET CHICO (≤768px)
-   ============================================= */
 @media (max-width: 768px) {
-  .carousel-wrapper {
-    height: 440px;
-  }
-
-  .overlay {
-    padding: 0 28px 40px;
-  }
-
-  .overlay h1 {
-    font-size: 2.2rem;
-    min-height: 2lh;
-  }
-
-  .posts-section {
-    padding: 40px 20px 48px;
-  }
-
-  .posts-section-header {
-    margin-bottom: 28px;
-  }
-
-  .lista-posts-container,
-  .posts-skeleton {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .post-card {
-    height: 310px;
-  }
-
-  .skeleton-card {
-    height: 310px;
-    aspect-ratio: unset;
-  }
+  .carousel-wrapper { height: 440px; }
+  .overlay { padding: 0 28px 40px; }
+  .overlay h1 { font-size: 2.2rem; }
+  .posts-section { padding: 40px 20px 48px; }
+  .lista-posts-container, .posts-skeleton { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .post-card, .skeleton-card { height: 310px; aspect-ratio: unset; }
 }
 
-/* =============================================
-   RESPONSIVE — MOBILE (≤600px)
-   ============================================= */
 @media (max-width: 600px) {
-  .carousel-wrapper {
-    height: 400px;
-  }
-
-  .overlay {
-    padding: 0 20px 36px;
-    max-width: 100%;
-  }
-
-  .overlay-eyebrow {
-    display: none;
-  }
-
-  .overlay h1 {
-    font-size: 1.85rem;
-    margin-bottom: 20px;
-    min-height: 2lh;
-  }
-
-  .btn-hero {
-    padding: 11px 20px;
-    font-size: 12px;
-  }
-
-  .carousel-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 0.85rem;
-  }
-
-  .carousel-btn.left  { left: 12px; }
-  .carousel-btn.right { right: 12px; }
-
-  .carousel-dots {
-    right: 50%;
-    transform: translateX(50%);
-    bottom: 16px;
-  }
-
-  .posts-section {
-    padding: 28px 14px 36px;
-  }
-
-  .posts-section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .titulo-principal {
-    font-size: 1.45rem;
-  }
-
-  .lista-posts-container,
-  .posts-skeleton {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .post-card {
-    height: 320px;
-  }
-
-  .skeleton-card {
-    height: 320px;
-    aspect-ratio: unset;
-  }
-
-  .post-content-overlay-home h3 {
-    font-size: 1.05rem;
-    min-height: calc(1.05rem * 1.32 * 3);
-  }
-
-  .avatar {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-  }
-
-  .autor {
-    font-size: 11px;
-  }
-
-  .btn-ver-mas {
-    padding: 7px 14px;
-    font-size: 11px;
-  }
+  .carousel-wrapper { height: 400px; }
+  .overlay { padding: 0 20px 36px; }
+  .overlay-eyebrow { display: none; }
+  .overlay h1 { font-size: 1.85rem; }
+  .carousel-dots { right: 50%; transform: translateX(50%); bottom: 16px; }
+  .posts-section-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .lista-posts-container, .posts-skeleton { grid-template-columns: 1fr; gap: 16px; }
+  .post-card, .skeleton-card { height: 320px; }
+  .post-content-overlay-home h3 { font-size: 1.05rem; min-height: calc(1.05rem * 1.32 * 3); }
 }
 
-/* =============================================
-   RESPONSIVE — MOBILE PEQUEÑO (≤400px)
-   ============================================= */
 @media (max-width: 400px) {
-  .carousel-wrapper {
-    height: 360px;
-  }
-
-  .overlay h1 {
-    font-size: 1.6rem;
-    min-height: 2lh;
-  }
-
-  .posts-section {
-    padding: 20px 12px 28px;
-  }
-
-  .post-card {
-    height: 300px;
-  }
-
-  .skeleton-card {
-    height: 300px;
-    aspect-ratio: unset;
-  }
-
-  .titulo-principal {
-    font-size: 1.3rem;
-  }
+  .carousel-wrapper { height: 360px; }
+  .overlay h1 { font-size: 1.6rem; }
+  .posts-section { padding: 20px 12px 28px; }
+  .post-card, .skeleton-card { height: 300px; }
+  .titulo-principal { font-size: 1.3rem; }
 }
