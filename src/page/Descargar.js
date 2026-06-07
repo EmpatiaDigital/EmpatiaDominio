@@ -83,10 +83,25 @@ export default function Descargar() {
   const cargarMateriales = async () => {
     try {
       const res = await fetch("https://empatia-dominio-back.vercel.app/api/descarga");
+      
+      // ── BLINDAJE 1: Si el servidor falla (503, 500, etc.), resguardamos el estado como array vacío
+      if (!res.ok) {
+        setMaterialDB([]);
+        return;
+      }
+
       const data = await res.json();
-      setMaterialDB(data);
+      
+      // ── BLINDAJE 2: Verificamos explícitamente que el JSON sea un Array antes de guardarlo
+      if (Array.isArray(data)) {
+        setMaterialDB(data);
+      } else {
+        setMaterialDB([]); 
+      }
     } catch {
-      Swal.fire("Error", "No se pudo cargar contenido", "error");
+      // ── BLINDAJE 3: Ante caídas totales de red, evitamos que rompa el estado
+      setMaterialDB([]);
+      Swal.fire("Aviso", "No se pudieron sincronizar los recursos adicionales de la base de datos.", "warning");
     }
   };
 
@@ -94,7 +109,9 @@ export default function Descargar() {
     cargarMateriales();
   }, []);
 
-  const itemsCombinados = [...destacados, ...materialDB];
+  // ── BLINDAJE 4: Doble escudo por si algún otro proceso altera materialDB
+  const materialDBSeguro = Array.isArray(materialDB) ? materialDB : [];
+  const itemsCombinados = [...destacados, ...materialDBSeguro];
 
   const filtrados =
     tipoFiltro === "todos"
@@ -212,7 +229,7 @@ export default function Descargar() {
       <div className="descargar-section-header">
         <div>
           <span className="section-eyebrow">Recursos gratuitos</span>
-          <h2 className="titulo-principal">Material Recomendado</h2>
+          <h2 className="titulo-principal">Material Recommended</h2>
         </div>
         <span className="contador-materiales">
           {filtrados.length}{" "}
