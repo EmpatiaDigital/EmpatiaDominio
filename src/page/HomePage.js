@@ -9,13 +9,13 @@ const FALLBACK_COVER = "https://images.unsplash.com/photo-1516321318423-f06f85e5
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
 export default function HomePage() {
-  const [posts, setPosts]       = useState(window.__INITIAL_POSTS__ || []);
+  const [posts, setPosts]       = useState(Array.isArray(window.__INITIAL_POSTS__) ? window.__INITIAL_POSTS__ : []);
   const [destacados, setDestacados] = useState([]); // Estado para carrusel optimizado en contingencia
   const [cargando, setCargando] = useState(!window.__INITIAL_POSTS__);
   const navigate                = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
 
-  // Fetch de contingencia optimizado: Pide bloques pequeños y ligeros en paralelo
+  // Fetch de contingencia optimizado: Blindado contra respuestas HTML 503 de Vercel
   const fetchPostsContingencia = async () => {
     try {
       const [resRecientes, resVotados] = await Promise.all([
@@ -23,14 +23,31 @@ export default function HomePage() {
         fetch("https://empatia-dominio-back.vercel.app/api/posts?limit=3&sort=votos")
       ]);
 
+      // Si el backend da 503, res.ok es false. Tiramos error para saltar directo al catch
+      if (!resRecientes.ok || !resVotados.ok) {
+        throw new Error(`Error de red: Recientes (${resRecientes.status}) | Votados (${resVotados.status})`);
+      }
+
       const dataRecientes = await resRecientes.json();
       const dataVotados   = await resVotados.json();
 
-      setPosts(dataRecientes); // Recibe el array directo de 6 posts sin contenido pesado
-      setDestacados(dataVotados); // Recibe el array directo de los 3 más votados
+      // Validación defensiva de formato: detecta si viene array directo o propiedad .posts
+      const finalRecientes = Array.isArray(dataRecientes) 
+        ? dataRecientes 
+        : (dataRecientes && Array.isArray(dataRecientes.posts) ? dataRecientes.posts : []);
+
+      const finalVotados = Array.isArray(dataVotados) 
+        ? dataVotados 
+        : (dataVotados && Array.isArray(dataVotados.posts) ? dataVotados.posts : []);
+
+      setPosts(finalRecientes);
+      setDestacados(finalVotados);
       setCargando(false);
     } catch (error) {
-      console.error("Error al obtener posts en contingencia:", error);
+      console.error("Error controlado al obtener posts en contingencia:", error);
+      // Forzamos a que mantengan el tipo array para que no rompa el renderizado
+      setPosts((prev) => (Array.isArray(prev) ? prev : []));
+      setDestacados([]);
       setCargando(false);
     }
   };
@@ -41,10 +58,10 @@ export default function HomePage() {
     }
   }, []);
 
-  // Si se usó Early Fetch calcula sobre 'posts'. Si entró la contingencia, usa 'destacados'.
-  const topSlides = window.__INITIAL_POSTS__ && window.__INITIAL_POSTS__.length > 0
-    ? [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0)).slice(0, 3)
-    : destacados;
+  // Variables de mapeo aseguradas como arrays legítimos
+  const topSlides = window.__INITIAL_POSTS__ && Array.isArray(window.__INITIAL_POSTS__) && window.__INITIAL_POSTS__.length > 0
+    ? (Array.isArray(posts) ? [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0)).slice(0, 3) : [])
+    : (Array.isArray(destacados) ? destacados : []);
 
   // Auto-avance del carrusel
   useEffect(() => {
@@ -60,8 +77,8 @@ export default function HomePage() {
   const handleNext = () =>
     setSlideIndex((prev) => (prev + 1) % topSlides.length);
 
-  // Como la API ya nos devolvió un máximo de 6 en contingencia, este slice es seguro en cualquier flujo
-  const postsToShow = posts.slice(0, 6);
+  // Garantía absoluta de que hereda un método .slice válido
+  const postsToShow = Array.isArray(posts) ? posts.slice(0, 6) : [];
   const currentSlidePost = topSlides[slideIndex];
 
   return (
