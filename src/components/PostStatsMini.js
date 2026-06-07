@@ -1,5 +1,3 @@
-// src/components/PostStatsMini.jsx
-
 import React, { useEffect, useState } from "react";
 import { FiEye, FiThumbsUp } from "react-icons/fi";
 import "../style/PostStatsMini.css";
@@ -11,18 +9,34 @@ const PostStatsMini = ({ postId }) => {
 
   useEffect(() => {
     if (!postId) return;
+    
+    let isMounted = true; // Control para evitar fugas de memoria
+
     const cargar = async () => {
       try {
         const res = await fetch(`${API}/posts/${postId}/stats`);
+        
+        // ── BLINDAJE 1: Si el servidor devuelve 503, 404 o cae, frena acá en silencio ──
+        if (!res.ok) return;
+
         const data = await res.json();
-        setStats(data);
-      } catch (_) {}
+        
+        // ── BLINDAJE 2: Validar que sea un objeto válido antes de guardar ──
+        if (isMounted && data && typeof data === "object") {
+          setStats(data);
+        }
+      } catch (_) {
+        // Silencio absoluto ante fallos de red o si res.json() procesa el HTML de error de Vercel
+      }
     };
+    
     cargar();
+    return () => { isMounted = false; };
   }, [postId]);
 
   const fmt = (n) => {
-    if (n === undefined || n === null) return "—";
+    // Protección contra valores indefinidos, nulos o que no sean números
+    if (n === undefined || n === null || isNaN(n)) return "—";
     return n >= 1000 ? (n / 1000).toFixed(1) + "k" : n;
   };
 
