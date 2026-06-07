@@ -21,32 +21,59 @@
       />
     </noscript>
 
+    <script>
+      (function() {
+        // Pedimos únicamente la página 1 con el límite real del front
+        const API_URL = 'https://empatia-dominio-back.vercel.app/api/posts?page=1&limit=6'; 
+
+        fetch(API_URL)
+          .then(res => res.json())
+          .then(data => {
+            // Accedemos de forma segura al array 'posts' de tu nueva estructura
+            const posts = data.posts;
+            
+            if (posts && posts.length > 0) {
+              // El primer post de la lista suele ser el LCP en la visualización inicial
+              const firstPost = posts[0];
+              let imageUrl = firstPost ? (firstPost.portada || firstPost.imagen || firstPost.img) : null;
+
+              if (imageUrl && typeof imageUrl === 'string') {
+                // Optimización de tamaño para mobile si es Cloudinary
+                if (window.innerWidth <= 768) {
+                  imageUrl = imageUrl.replace('/w_800/', '/w_450/');
+                }
+
+                // Inyectamos el link de precarga en el HEAD inmediatamente
+                const link = document.createElement('link');
+                link.rel = 'preload';
+                link.as = 'image';
+                link.href = imageUrl;
+                link.fetchPriority = 'high'; // Le dice al navegador: "bajala ya mismo"
+                document.head.appendChild(link);
+              }
+            }
+          })
+          .catch(err => console.error("Early LCP patch error:", err));
+      })();
+    </script>
+
     <link rel="icon" type="image/png" href="empatialog.jpeg" />
     <link rel="apple-touch-icon" href="https://www.empatiadigital.com.ar/empatialog.jpeg" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <link rel="canonical" href="https://empatiadigital.com.ar" />
 
     <title>Empatía Digital | Salud Digital, Prevención de Grooming y Crianza</title>
-    <meta
-      name="description"
-      content="Recursos y herramientas sobre salud digital, prevención de grooming, ciberseguridad y uso consciente de tecnologías. Talleres para familias, escuelas y comunidades."
-    />
+    <meta name="description" content="Recursos y herramientas sobre salud digital, prevención de grooming, ciberseguridad y uso consciente de tecnologías. Talleres para familias, escuelas y comunidades." />
 
     <meta property="og:title" content="Empatía Digital – Salud Digital y Prevención de Grooming" />
-    <meta
-      property="og:description"
-      content="Promovemos el bienestar digital y la ciberseguridad. Encontrá herramientas y talleres sobre crianza digital, uso de pantallas y prevención de riesgos en línea."
-    />
+    <meta property="og:description" content="Promovemos el bienestar digital y la ciberseguridad. Encontrá herramientas y talleres sobre crianza digital, uso de pantallas y prevención de riesgos en línea." />
     <meta property="og:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
     <meta property="og:url" content="https://empatiadigital.com.ar" />
     <meta property="og:type" content="website" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Empatía Digital – Convivencia y Salud Digital Consciente" />
-    <meta
-      name="twitter:description"
-      content="Propuestas de ciudadanía digital, prevención de grooming y bienestar tecnológico para docentes, familias y entornos educativos."
-    />
+    <meta name="twitter:description" content="Propuestas de ciudadanía digital, prevención de grooming y bienestar tecnológico para docentes, familias y entornos educativos." />
     <meta name="twitter:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
   </head>
 
