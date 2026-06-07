@@ -1,3 +1,4 @@
+// Post.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../style/Post.css";
@@ -11,30 +12,37 @@ export default function Post() {
   const [posts, setPosts] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [paginaActual, setPaginaActual] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1); // Controlado ahora por el Servidor
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchPostsPaginados = async () => {
+      setCargando(true); // Activamos el loader en cada transición de página
       try {
-        const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
+        // Le pegamos al nuevo flujo del controlador usando Query Params
+        const res = await fetch(
+          `https://empatia-dominio-back.vercel.app/api/posts?page=${paginaActual}&limit=${POSTS_PER_PAGE}`
+        );
         const data = await res.json();
-        setPosts(data);
+
+        // Mapeamos la respuesta estructurada del Backend
+        setPosts(data.posts || []);
+        setTotalPaginas(data.totalPaginas || 1);
         setCargando(false);
       } catch (error) {
-        console.error("Error al obtener posts:", error);
+        console.error("Error al obtener posts paginados:", error);
         setCargando(false);
       }
     };
-    fetchPosts();
-  }, []);
-  
-  const totalPaginas = Math.ceil(posts.length / POSTS_PER_PAGE);
-  const startIndex = (paginaActual - 1) * POSTS_PER_PAGE;
-  const postsActuales = posts.slice(startIndex, startIndex + POSTS_PER_PAGE);
+
+    fetchPostsPaginados();
+  }, [paginaActual]); // Cada vez que cambie la página, ejecuta el fetch automáticamente
 
   const cambiarPagina = (numero) => {
     if (numero >= 1 && numero <= totalPaginas) {
       setPaginaActual(numero);
+      // Opcional: Hace scroll suave hacia arriba al cambiar de página para mejorar la UX
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -42,44 +50,52 @@ export default function Post() {
     <div className="post-page">
       <h2 className="titulo-principal">Todas las Publicaciones</h2>
 
+      {/* Bloque superior de paginación para facilitar la navegación rápida */}
+      {!cargando && posts.length > 0 && (
+        <div className="post-paginacion">
+          <button
+            onClick={() => cambiarPagina(paginaActual - 1)}
+            disabled={paginaActual === 1}
+            className="paginacion-btn"
+          >
+            {"<"}
+          </button>
+          {Array.from({ length: totalPaginas }, (_, i) => (
+            <button
+              key={i + 1}
+              className={`paginacion-btn ${
+                paginaActual === i + 1 ? "activo" : ""
+              }`}
+              onClick={() => cambiarPagina(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => cambiarPagina(paginaActual + 1)}
+            disabled={paginaActual === totalPaginas}
+            className="paginacion-btn"
+          >
+            {">"}
+          </button>
+        </div>
+      )}
+
       {cargando ? (
-        <p className="post-loading">Cargando posts...</p>
+        <p className="post-loading">Cargando publicaciones...</p>
       ) : posts.length === 0 ? (
-        <p className="post-no-data">No hay posts disponibles.</p>
+        <p className="post-no-data">No hay posts disponibles por el momento.</p>
       ) : (
         <>
-         <div className="post-paginacion">
-            <button
-              onClick={() => cambiarPagina(paginaActual - 1)}
-              disabled={paginaActual === 1}
-              className="paginacion-btn"
-            >
-              {"<"}
-            </button>
-            {Array.from({ length: totalPaginas }, (_, i) => (
-              <button
-                key={i + 1}
-                className={`paginacion-btn ${
-                  paginaActual === i + 1 ? "activo" : ""
-                }`}
-                onClick={() => cambiarPagina(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => cambiarPagina(paginaActual + 1)}
-              disabled={paginaActual === totalPaginas}
-              className="paginacion-btn"
-            >
-              {">"}
-            </button>
-          </div>
           <div className="lista-posts-container">
-            {postsActuales.map((post) => {
-              const categoria = Array.isArray(post.categoria)
-                ? post.categoria[0]
-                : post.categoria || "Sentidos";
+            {posts.map((post) => {
+              // Limpieza y formateo de la categoría antes de renderizar
+              let categoria = "Sentidos";
+              if (Array.isArray(post.categoria) && post.categoria.length > 0 && typeof post.categoria[0] === "string") {
+                categoria = post.categoria[0].trim();
+              } else if (typeof post.categoria === "string" && post.categoria.trim() !== "") {
+                categoria = post.categoria.trim();
+              }
 
               const backgroundImage = post.portada
                 ? `url(${post.portada})`
@@ -89,25 +105,25 @@ export default function Post() {
                 <div
                   key={post._id}
                   className="post-card"
-                  style={{
-                    backgroundImage,
-                  }}
+                  style={{ backgroundImage }}
                 >
                   <div className="post-card-overlay">
                     
                     <div className="post-header">
-                                     {/* Badge categoría */}
-                    <span className="card-badge">{post.categoria}</span>
+                      {/* Corregido: Ahora usa la variable 'categoria' parseada arriba de forma segura */}
+                      <span className="card-badge">{categoria}</span>
                       <img
                         src={post.avatar || DEFAULT_AVATAR}
-                        alt="avatar"
+                        alt={`Avatar de ${post.autor}`}
                         className="avatar"
+                        loading="lazy"
                       />
                       <div className="post-header-content">
                         <h3 className="post-title">{post.titulo}</h3>
                         <p className="post-autor">Por: {post.autor}</p>
                       </div> 
                     </div>
+
                     <div className="card-footer">
                       <button
                         className="btn-ver-mas"
@@ -117,12 +133,14 @@ export default function Post() {
                       </button>
                       <PostStatsMini postId={post._id} />
                     </div>
+
                   </div>
                 </div>
               );
             })}
           </div>
 
+          {/* Bloque inferior de paginación */}
           <div className="post-paginacion">
             <button
               onClick={() => cambiarPagina(paginaActual - 1)}
