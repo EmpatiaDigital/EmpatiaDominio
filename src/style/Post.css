@@ -44,7 +44,7 @@
   width: 56px;
   height: 2px;
   background: #4a90d9;
-  margin: 14px auto 40px;
+  margin: 14px auto 32px; /* Ajustado ligeramente para armonizar espacio superior */
   border-radius: 2px;
 }
 
@@ -62,16 +62,21 @@
 }
 
 /* =============================================
-   PAGINACIÓN
+   PAGINACIÓN (Limpia y autocontenida)
    ============================================= */
 .post-paginacion {
-  margin-top: 0;
-  margin-bottom: 36px;
+  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+/* Margen de seguridad extra al final de la página para la botonera inferior */
+.post-paginacion:last-of-type {
+  margin-top: 0;
+  margin-bottom: 12px;
 }
 
 .paginacion-btn {
@@ -111,14 +116,14 @@
 }
 
 /* =============================================
-   GRID DE POSTS — 3 columnas uniformes
+   GRID DE POSTS — Empuja las barras de paginación
    ============================================= */
 .lista-posts-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   padding: 0;
-  margin: 0;
+  margin: 36px 0; /* Genera separación uniforme arriba y abajo sin choques */
 }
 
 /* =============================================
@@ -129,9 +134,6 @@
   height: 340px;
   border-radius: 12px;
   overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   background-color: #1e3a5f;
   border: none;
   cursor: pointer;
@@ -146,15 +148,32 @@
   box-shadow: 0 20px 48px rgba(20, 45, 90, 0.20);
 }
 
-/* ── Badge de categoría ──
-   Movido a esquina superior DERECHA para no
-   competir con el avatar (inferior izquierda).  */
+/* ── Imagen de fondo nativa (Reemplazo LCP) ── */
+.post-card-background-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 1; /* Al fondo de la tarjeta */
+  transition: transform 0.35s ease;
+}
+
+/* Efecto zoom premium en la imagen cuando pasamos el mouse por la tarjeta */
+.post-card:hover .post-card-background-img,
+.post-card:focus-visible .post-card-background-img {
+  transform: scale(1.04);
+}
+
+/* ── Badge de categoría ── */
 .card-badge {
   position: absolute;
   top: 14px;
   right: 14px;
   left: auto;
-  z-index: 3;
+  z-index: 3; /* Por encima del overlay */
   background: rgba(8, 22, 55, 0.82);
   color: #6bb3f0;
   font-size: 10px;
@@ -172,10 +191,8 @@
 }
 
 /* =============================================
-   OVERLAY
-   El gradiente sube más (70%) para que el avatar
-   y el título siempre tengan fondo oscuro         */
-/* ============================================= */
+   OVERLAY (Capa oscura de lectura)
+   ============================================= */
 .post-card-overlay {
   position: absolute;
   inset: 0;
@@ -191,6 +208,7 @@
   justify-content: flex-end;
   padding: 0 18px 18px;
   gap: 0;
+  z-index: 2; /* Por encima de la etiqueta img */
 }
 
 /* ── Fila avatar + autor ── */
@@ -201,8 +219,6 @@
   margin-bottom: 10px;
 }
 
-/* Avatar con sombra y borde grueso para que
-   nunca se pierda contra la imagen de fondo   */
 .avatar {
   width: 32px;
   height: 32px;
@@ -261,7 +277,7 @@
 }
 
 /* =============================================
-   BOTÓN VER MÁS — compacto, NO full-width
+   BOTÓN VER MÁS
    ============================================= */
 .btn-ver-mas {
   display: inline-flex;
@@ -313,6 +329,7 @@
   .lista-posts-container {
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
+    margin: 28px 0;
   }
 
   .titulo-principal {
@@ -331,6 +348,7 @@
   .lista-posts-container {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
+    margin: 24px 0;
   }
 
   .post-card {
@@ -339,10 +357,6 @@
 
   .titulo-principal {
     font-size: 1.5rem;
-  }
-
-  .post-paginacion {
-    margin-bottom: 28px;
   }
 }
 
@@ -361,6 +375,7 @@
   .lista-posts-container {
     grid-template-columns: 1fr;
     gap: 16px;
+    margin: 20px 0;
   }
 
   .post-card {
