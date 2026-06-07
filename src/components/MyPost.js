@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import fondo from "../assets/Juego.jpg";
 import "../style/MyPost.css";
 
+
 export default function MyPost() {
   const [publicaciones, setPublicaciones] = useState([]);
   const { user } = useAuth();
