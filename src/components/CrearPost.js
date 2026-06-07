@@ -1,13 +1,42 @@
 import React, { useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
+import { Node } from "@tiptap/core"; // Importamos Node para crear el recuadro personalizado
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import "../style/Editor.css";
 import Swal from "sweetalert2";
 
+// ─── 1. EXTENSIÓN PERSONALIZADA TIPTAP: RECUADRO DINÁMICO ────────────────────
+const CalloutBox = Node.create({
+  name: "calloutBox",
+  group: "block",
+  content: "block+", // Permite párrafos, listas o imágenes dentro del recuadro
+  defining: true,
+
+  addAttributes() {
+    return {
+      color: {
+        default: "azul",
+        parseHTML: (element) => element.getAttribute("data-color"),
+        renderHTML: (attributes) => ({
+          "data-color": attributes.color,
+          class: `recuadro-dinamico recuadro-${attributes.color}`,
+        }),
+      },
+    };
+  },
+
+  parseHTML() {
+    return [{ tag: "div.recuadro-dinamico" }];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ["div", HTMLAttributes, 0];
+  },
+});
+
 // ─── Helpers de optimización Cloudinary ───────────────────────────────────────
-// Inserta parámetros de transformación en una URL de Cloudinary.
 const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
   if (!url || !url.includes("res.cloudinary.com")) return url;
   if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) return url;
@@ -32,13 +61,22 @@ const CrearPost = () => {
   const [categoria, setCategoria] = useState("");
   const [cargando, setCargando] = useState(false);
 
-  // 🛠️ MEJORA: Configuración nativa de atributos HTML para extensiones de Tiptap
+  // Opciones de colores disponibles para el operador
+  const coloresRecuadro = [
+    { nombre: "Azul", value: "azul" },
+    { nombre: "Rojo", value: "rojo" },
+    { nombre: "Verde", value: "verde" },
+    { nombre: "Amarillo", value: "amarillo" },
+    { nombre: "Violeta", value: "violeta" },
+  ];
+
   const editor = useEditor({
     extensions: [
       StarterKit,
+      CalloutBox, // <-- Agregamos nuestra extensión acá
       Image.configure({
         HTMLAttributes: {
-          class: "imagen-fija-1200", // Asegura que Tiptap no barra ni elimine tu clase de CSS
+          class: "imagen-fija-1200",
         },
       }),
       Link.configure({
@@ -51,6 +89,25 @@ const CrearPost = () => {
     ],
     content: "",
   });
+
+  // Función controlada para insertar el bloque con el color seleccionado
+  const agregarRecuadroDestacado = (color) => {
+    if (!editor) return;
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "calloutBox",
+        attrs: { color },
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "Escribí el contenido destacado acá..." }],
+          },
+        ],
+      })
+      .run();
+  };
 
   const subirImagenACloudinary = async (file) => {
     const formData = new FormData();
@@ -69,7 +126,6 @@ const CrearPost = () => {
     return data.secure_url;
   };
 
-  // 🛠️ MEJORA: Try/Catch/Finally para prevenir pantallas congeladas si falla la API
   const handleImagenesSeleccionadas = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -87,7 +143,7 @@ const CrearPost = () => {
           editor
             .chain()
             .focus()
-            .insertContent(`<img src="${urlOptimizada}" />`) // Tiptap le inyecta la clase automáticamente
+            .insertContent(`<img src="${urlOptimizada}" />`)
             .run();
         }
       }
@@ -103,11 +159,10 @@ const CrearPost = () => {
         text: "No se pudieron cargar una o más imágenes dentro del contenido.",
       });
     } finally {
-      setCargando(false); // Se ejecuta SIEMPRE, evitando loaders infinitos
+      setCargando(false);
     }
   };
 
-  // 🛠️ MEJORA: Control de errores en la carga de la portada
   const handlePortadaSeleccionada = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -158,7 +213,7 @@ const CrearPost = () => {
       contenido,
       imagenes,
       epigrafes,
-      tamanos, // Nota: Asegúrate de recibir 'tamanos' en la destructuración de tu backend si lo persistís
+      tamanos,
       categoria,
       fecha: new Date().toISOString(),
       avatar,
@@ -221,7 +276,6 @@ const CrearPost = () => {
       });
     }
   };
-  
 
   return (
     <div className="editor-container">
@@ -338,7 +392,6 @@ const CrearPost = () => {
               confirmButtonText: "Insertar",
               cancelButtonText: "Cancelar",
               inputValidator: (value) => {
-                // 🛠️ MEJORA: Se corrigió la Regex cambiándola a https? para admitir enlaces seguros nativamente
                 if (value && !/^https?:\/\/|^\/|^[\w\-]/.test(value)) {
                   return "Ingresá una URL válida o dejala vacía para quitar el enlace";
                 }
@@ -373,6 +426,25 @@ const CrearPost = () => {
           🔗 Link
         </button>
 
+        {/* 🛠️ SELECTOR DINÁMICO DE RECUADROS CON COLORES */}
+        <select
+          onChange={(e) => {
+            if (e.target.value) {
+              agregarRecuadroDestacado(e.target.value);
+              e.target.value = ""; // Resetea el selector tras insertar
+            }
+          }}
+          className="toolbar-select"
+          defaultValue=""
+        >
+          <option value="" disabled>📦 Agregar Recuadro...</option>
+          {coloresRecuadro.map((col) => (
+            <option key={col.value} value={col.value}>
+              🔹 {col.nombre}
+            </option>
+          ))}
+        </select>
+
         <button
           onClick={() => editor.chain().focus().unsetAllMarks().run()}
           type="button"
@@ -400,7 +472,7 @@ const CrearPost = () => {
         onClick={guardarPost} 
         className="publish-button" 
         type="button"
-        disabled={cargando} // 🛠️ MEJORA: Deshabilita el botón de enviar si se están subiendo imágenes
+        disabled={cargando}
       >
         🚀 Publicar
       </button>
