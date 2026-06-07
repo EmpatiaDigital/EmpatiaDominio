@@ -39,18 +39,30 @@ const Inscription = () => {
     { id: 'logo3', logo: logo3, nombre: 'Salud Digital' },
   ];
 
-  // ── Refresca curso + stats juntos — sin depender del closure de course ──
+  // ── Refresca curso + stats juntos — Completamente silencioso si no hay curso activo ──
   const refreshAll = useCallback(async () => {
     try {
-      // 1. Siempre re-fetch el curso activo para captar cambios de cupos del admin
+      // 1. Re-fetch al curso activo
       const courseRes = await fetch(`${BASE_URL}/courses/active`);
-      if (!courseRes.ok) return;
+      
+      // Si el backend responde con un error (ej: 404 Not Found), seteamos null en silencio y frenamos
+      if (!courseRes.ok) {
+        setCourse(null);
+        return;
+      }
+      
       const freshCourse = await courseRes.json();
+
+      // Si la respuesta viene vacía, nula o no contiene un ID válido, salimos sutilmente sin romper nada
+      if (!freshCourse || !freshCourse._id) {
+        setCourse(null);
+        return;
+      }
 
       setCourse(freshCourse);
       courseIdRef.current = freshCourse._id;
 
-      // 2. Fetch stats con el ID fresco
+      // 2. Fetch stats con el ID fresco verificado
       const statsRes = await fetch(
         `${BASE_URL}/inscriptions/estadisticas/${freshCourse._id}`
       );
@@ -68,7 +80,9 @@ const Inscription = () => {
         cuposDisponibles: stats.cuposDisponibles    ?? 0
       });
     } catch (err) {
-      console.error('Error al refrescar datos:', err);
+      // Se remueve el console.error para cumplir con tu requerimiento de no mostrar fallas por consola.
+      // Seteamos el curso como null de forma segura para que la UI muestre el estado correspondiente.
+      setCourse(null);
     }
   }, []);
 
