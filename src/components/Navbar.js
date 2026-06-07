@@ -7,7 +7,6 @@ import logoImg from "../assets/empatialogo.jpg";
 import "../style/Navbar.css";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
-
 export default function Navbar() {
   const { user, logout, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
