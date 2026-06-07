@@ -1,11 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { EditorContent, useEditor } from '@tiptap/react';
+import { Node } from '@tiptap/core'; // Importamos Node para la extensión del recuadro
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
 import Swal from 'sweetalert2';
 import '../style/Editor.css';
+
+// ─── 1. EXTENSIÓN PERSONALIZADA TIPTAP: RECUADRO DINÁMICO ────────────────────
+const CalloutBox = Node.create({
+  name: "calloutBox",
+  group: "block",
+  content: "block+", // Permite que haya párrafos, listas, etc. adentro del recuadro
+  defining: true,
+
+  addAttributes() {
+    return {
+      color: {
+        default: "azul",
+        parseHTML: (element) => element.getAttribute("data-color"),
+        renderHTML: (attributes) => ({
+          "data-color": attributes.color,
+          class: `recuadro-dinamico recuadro-${attributes.color}`,
+        }),
+      },
+    };
+  },
+
+  parseHTML() {
+    return [{ tag: "div.recuadro-dinamico" }];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ["div", HTMLAttributes, 0];
+  },
+});
 
 // ─── Helpers de optimización Cloudinary ───────────────────────────────────────
 const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
@@ -32,10 +62,20 @@ const EditPost = () => {
   const [categoria, setCategoria] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  // 🛠️ MEJORA: Configuración nativa para preservar clases CSS en imágenes de Tiptap
+  // Opciones de colores disponibles para los bloques
+  const coloresRecuadro = [
+    { nombre: "Azul", value: "azul" },
+    { nombre: "Rojo", value: "rojo" },
+    { nombre: "Verde", value: "verde" },
+    { nombre: "Amarillo", value: "amarillo" },
+    { nombre: "Violeta", value: "violeta" },
+  ];
+
+  // 🛠️ MEJORA: Configuración nativa con soporte para la extensión CalloutBox
   const editor = useEditor({
     extensions: [
       StarterKit,
+      CalloutBox, // <-- Registramos el nodo personalizado
       Image.configure({
         HTMLAttributes: {
           class: "imagen-fija-1200",
@@ -52,7 +92,7 @@ const EditPost = () => {
     content: '',
   });
 
-  // 🛠️ MEJORA: Evitamos llamadas innecesarias a la API controlando que el editor esté instanciado
+  // Efecto seguro para setear la data del post existente en los estados y el editor
   useEffect(() => {
     if (!editor || !postId) return;
 
@@ -72,7 +112,7 @@ const EditPost = () => {
         setEpigrafes(data.epigrafes || []);
         setTamanos(data.tamanos || []);
         
-        // Seteamos el contenido de manera segura ahora que sabemos que 'editor' existe
+        // Seteamos el HTML completo. Tiptap va a reconocer automáticamente los divs con clase 'recuadro-dinamico'
         editor.commands.setContent(data.contenido || '');
       } catch (err) {
         console.error(err);
@@ -82,6 +122,25 @@ const EditPost = () => {
 
     fetchPost();
   }, [postId, editor]);
+
+  // Manejador para insertar un nuevo recuadro dinámico
+  const agregarRecuadroDestacado = (color) => {
+    if (!editor) return;
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "calloutBox",
+        attrs: { color },
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: "Escribí el contenido destacado acá..." }],
+          },
+        ],
+      })
+      .run();
+  };
 
   const subirImagenACloudinary = async (file) => {
     const formData = new FormData();
@@ -98,7 +157,6 @@ const EditPost = () => {
     return data.secure_url;
   };
 
-  // 🛠️ MEJORA: Try/Catch/Finally para que no se congele el loader si falla Cloudinary
   const handleImagenesSeleccionadas = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -116,7 +174,7 @@ const EditPost = () => {
           editor
             .chain()
             .focus()
-            .insertContent(`<img src="${urlOptimizada}" />`) // Tiptap inyecta la clase configurada arriba
+            .insertContent(`<img src="${urlOptimizada}" />`)
             .run();
         }
       }
@@ -132,7 +190,6 @@ const EditPost = () => {
     }
   };
 
-  // 🛠️ MEJORA: Resguardo de errores en la edición de portada
   const handlePortadaSeleccionada = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -159,7 +216,7 @@ const EditPost = () => {
         title: 'Faltan datos obligatorios',
         text: 'Completá título, autor, contenido y categoría.',
       });
-      return; // 🛠️ FIJADO: Quitamos el 'navigate' erróneo que echaba al usuario perdiendo sus cambios
+      return;
     }
 
     const avatar = localStorage.getItem('avatar') || '';
@@ -179,7 +236,6 @@ const EditPost = () => {
     };
 
     try {
-      // 🛠️ MEJORA: Agregamos feedback visual de carga para evitar clicks duplicados del usuario
       Swal.fire({
         title: 'Guardando cambios...',
         html: 'Actualizando la información del post.',
@@ -289,7 +345,7 @@ const EditPost = () => {
         <button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? 'active' : ''}>•</button>
         <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={editor?.isActive('heading', { level: 1 }) ? 'active' : ''}>H1</button>
         <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''}>H2</button>
-        <button type="button" onClick={() => editor?.chain().focus().unsetAllMarks().run()}>Limpiar</button>
+        
         <button
           onClick={async () => {
             const previousUrl = editor?.getAttributes('link').href || '';
@@ -329,6 +385,27 @@ const EditPost = () => {
         >
           🔗 Link
         </button>
+
+        {/* 🛠️ SELECTOR DINÁMICO DE RECUADROS CON COLORES EN LA EDICIÓN */}
+        <select
+          onChange={(e) => {
+            if (e.target.value) {
+              agregarRecuadroDestacado(e.target.value);
+              e.target.value = ""; // Resetea el elemento tras inyectar el bloque
+            }
+          }}
+          className="toolbar-select"
+          defaultValue=""
+        >
+          <option value="" disabled>📦 Agregar Recuadro...</option>
+          {coloresRecuadro.map((col) => (
+            <option key={col.value} value={col.value}>
+              🔹 {col.nombre}
+            </option>
+          ))}
+        </select>
+
+        <button type="button" onClick={() => editor?.chain().focus().unsetAllMarks().run()}>Limpiar</button>
       </div>
 
       <EditorContent editor={editor} className="tiptap" />
