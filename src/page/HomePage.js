@@ -5,23 +5,29 @@ import "../style/HomePage.css";
 import ModalActividades from "../components/ModalActividades";
 import PostStatsMini from "../components/PostStatsMini";
 
-// Dejamos un placeholder ligero o color de fondo por si un post no tiene imagen de portada
 const FALLBACK_COVER = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop";
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
 export default function HomePage() {
-  // Sincronizamos los estados iniciales directamente con el Early Fetch del HTML
   const [posts, setPosts]       = useState(window.__INITIAL_POSTS__ || []);
+  const [destacados, setDestacados] = useState([]); // Estado para carrusel optimizado en contingencia
   const [cargando, setCargando] = useState(!window.__INITIAL_POSTS__);
   const navigate                = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
 
-  // Fetch de posts secundario (solo si el script del index de casualidad falló o no terminó)
-  const fetchPosts = async () => {
+  // Fetch de contingencia optimizado: Pide bloques pequeños y ligeros en paralelo
+  const fetchPostsContingencia = async () => {
     try {
-      const res  = await fetch("https://empatia-dominio-back.vercel.app/api/posts");
-      const data = await res.json();
-      setPosts(data);
+      const [resRecientes, resVotados] = await Promise.all([
+        fetch("https://empatia-dominio-back.vercel.app/api/posts?limit=6"),
+        fetch("https://empatia-dominio-back.vercel.app/api/posts?limit=3&sort=votos")
+      ]);
+
+      const dataRecientes = await resRecientes.json();
+      const dataVotados   = await resVotados.json();
+
+      setPosts(dataRecientes); // Recibe el array directo de 6 posts sin contenido pesado
+      setDestacados(dataVotados); // Recibe el array directo de los 3 más votados
       setCargando(false);
     } catch (error) {
       console.error("Error al obtener posts en contingencia:", error);
@@ -31,14 +37,14 @@ export default function HomePage() {
 
   useEffect(() => { 
     if (!window.__INITIAL_POSTS__ || window.__INITIAL_POSTS__.length === 0) {
-      fetchPosts(); 
+      fetchPostsContingencia(); 
     }
   }, []);
 
-  // Obtener los 3 posts más votados basados en los datos activos
-  const topSlides = [...posts]
-    .sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0))
-    .slice(0, 3);
+  // Si se usó Early Fetch calcula sobre 'posts'. Si entró la contingencia, usa 'destacados'.
+  const topSlides = window.__INITIAL_POSTS__ && window.__INITIAL_POSTS__.length > 0
+    ? [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0)).slice(0, 3)
+    : destacados;
 
   // Auto-avance del carrusel
   useEffect(() => {
@@ -54,6 +60,7 @@ export default function HomePage() {
   const handleNext = () =>
     setSlideIndex((prev) => (prev + 1) % topSlides.length);
 
+  // Como la API ya nos devolvió un máximo de 6 en contingencia, este slice es seguro en cualquier flujo
   const postsToShow = posts.slice(0, 6);
   const currentSlidePost = topSlides[slideIndex];
 
@@ -75,7 +82,6 @@ export default function HomePage() {
               {topSlides.map((post, i) => {
                 let imgSrc = post.portada || post.imagen || post.img || FALLBACK_COVER;
                 
-                // Macheo exacto de strings con el index.html para evitar descargas dobles
                 if (i === 0 && window.innerWidth <= 768 && typeof imgSrc === "string") {
                   imgSrc = imgSrc.replace('/w_800/', '/w_450/');
                 }
