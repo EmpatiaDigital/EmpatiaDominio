@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useAuth } from "../context/AuthContext";
-import fondo from "../assets/Juego.jpeg";
+import fondo from "../assets/Juego.jpg";
 import "../style/MyPost.css";
 
 export default function MyPost() {
