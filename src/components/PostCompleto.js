@@ -9,6 +9,7 @@ import PostStats, { getVisitorId } from "./PostStats";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
+
 const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
   if (!url || !url.includes("res.cloudinary.com")) return url;
   if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) return url;
