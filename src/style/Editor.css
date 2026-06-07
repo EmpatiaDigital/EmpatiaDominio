@@ -167,4 +167,67 @@
       height: auto;
     }
   }
-  
+  /* Estilos Base para el Recuadro Dinámico */
+.recuadro-dinamico {
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  background-color: #f9fafb;
+  border-left: 6px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease-in-out;
+}
+
+.recuadro-dinamico p {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.recuadro-dinamico p:last-child {
+  margin-bottom: 0;
+}
+
+/* Variaciones de Color (Línea lateral y sutil fondo temático) */
+.recuadro-azul {
+  border-left-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.recuadro-rojo {
+  border-left-color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.recuadro-verde {
+  border-left-color: #16a34a;
+  background-color: #f0fdf4;
+}
+
+.recuadro-amarillo {
+  border-left-color: #ca8a04;
+  background-color: #fefce8;
+}
+
+.recuadro-violeta {
+  border-left-color: #7c3aed;
+  background-color: #faf5ff;
+}
+
+/* Estilo para el selector del Toolbar */
+.toolbar-select {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  height: 32px;
+  margin-left: 4px;
+}
+
+.toolbar-select:hover {
+  border-color: #888;
+}
