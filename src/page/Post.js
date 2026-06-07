@@ -12,20 +12,18 @@ export default function Post() {
   const [posts, setPosts] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [paginaActual, setPaginaActual] = useState(1);
-  const [totalPaginas, setTotalPaginas] = useState(1); // Controlado ahora por el Servidor
+  const [totalPaginas, setTotalPaginas] = useState(1); // Manejado por el Servidor
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPostsPaginados = async () => {
-      setCargando(true); // Activamos el loader en cada transición de página
+      setCargando(true);
       try {
-        // Le pegamos al nuevo flujo del controlador usando Query Params
         const res = await fetch(
           `https://empatia-dominio-back.vercel.app/api/posts?page=${paginaActual}&limit=${POSTS_PER_PAGE}`
         );
         const data = await res.json();
 
-        // Mapeamos la respuesta estructurada del Backend
         setPosts(data.posts || []);
         setTotalPaginas(data.totalPaginas || 1);
         setCargando(false);
@@ -36,13 +34,12 @@ export default function Post() {
     };
 
     fetchPostsPaginados();
-  }, [paginaActual]); // Cada vez que cambie la página, ejecuta el fetch automáticamente
+  }, [paginaActual]);
 
   const cambiarPagina = (numero) => {
     if (numero >= 1 && numero <= totalPaginas) {
       setPaginaActual(numero);
-      // Opcional: Hace scroll suave hacia arriba al cambiar de página para mejorar la UX
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" }); // Sube suave al cambiar de página
     }
   };
 
@@ -50,7 +47,7 @@ export default function Post() {
     <div className="post-page">
       <h2 className="titulo-principal">Todas las Publicaciones</h2>
 
-      {/* Bloque superior de paginación para facilitar la navegación rápida */}
+      {/* Paginación Superior */}
       {!cargando && posts.length > 0 && (
         <div className="post-paginacion">
           <button
@@ -88,8 +85,8 @@ export default function Post() {
       ) : (
         <>
           <div className="lista-posts-container">
-            {posts.map((post) => {
-              // Limpieza y formateo de la categoría antes de renderizar
+            {posts.map((post, index) => {
+              // Limpieza segura de la categoría
               let categoria = "Sentidos";
               if (Array.isArray(post.categoria) && post.categoria.length > 0 && typeof post.categoria[0] === "string") {
                 categoria = post.categoria[0].trim();
@@ -97,20 +94,25 @@ export default function Post() {
                 categoria = post.categoria.trim();
               }
 
-              const backgroundImage = post.portada
-                ? `url(${post.portada})`
-                : `url(${fondo})`;
+              // Definimos la URL de la imagen de portada
+              const imageSrc = post.portada ? post.portada : fondo;
 
               return (
-                <div
-                  key={post._id}
-                  className="post-card"
-                  style={{ backgroundImage }}
-                >
+                <div key={post._id} className="post-card">
+                  {/* Optimizador LCP: 
+                    Si es el primer post de la página actual (index === 0), se precarga inmediatamente.
+                    Si es cualquiera de los otros (index > 0), se les aplica lazy-load para ahorrar datos.
+                  */}
+                  <img
+                    src={imageSrc}
+                    alt={`Portada de ${post.titulo}`}
+                    className="post-card-background-img"
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
+
                   <div className="post-card-overlay">
-                    
                     <div className="post-header">
-                      {/* Corregido: Ahora usa la variable 'categoria' parseada arriba de forma segura */}
                       <span className="card-badge">{categoria}</span>
                       <img
                         src={post.avatar || DEFAULT_AVATAR}
@@ -133,14 +135,14 @@ export default function Post() {
                       </button>
                       <PostStatsMini postId={post._id} />
                     </div>
-
                   </div>
+
                 </div>
               );
             })}
           </div>
 
-          {/* Bloque inferior de paginación */}
+          {/* Paginación Inferior */}
           <div className="post-paginacion">
             <button
               onClick={() => cambiarPagina(paginaActual - 1)}
