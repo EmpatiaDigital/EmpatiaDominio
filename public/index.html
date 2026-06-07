@@ -21,50 +21,12 @@
       />
     </noscript>
 
-    <script>
-      (function() {
-        const API_URL = 'https://empatia-dominio-back.vercel.app/api/posts'; 
-
-        fetch(API_URL)
-          .then(res => res.json())
-          .then(posts => {
-            // Guardamos todos los posts en el objeto global
-            window.__INITIAL_POSTS__ = posts;
-
-            if (posts && posts.length > 0) {
-              // Replicamos el ordenamiento por votos/likes del front para hallar el Top 1
-              const topPosts = [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0));
-              const firstPost = topPosts[0];
-              
-              let imageUrl = firstPost ? (firstPost.portada || firstPost.imagen || firstPost.img) : null;
-
-              if (imageUrl && typeof imageUrl === 'string') {
-                // Optimización para celulares (w_450 en Cloudinary)
-                if (window.innerWidth <= 768) {
-                  imageUrl = imageUrl.replace('/w_800/', '/w_450/');
-                }
-
-                // Inyectamos la precarga de la imagen real del elemento LCP
-                const link = document.createElement('link');
-                link.rel = 'preload';
-                link.as = 'image';
-                link.href = imageUrl;
-                link.fetchPriority = 'high';
-                document.head.appendChild(link);
-              }
-            }
-          })
-          .catch(err => console.error("Early fetch LCP error:", err));
-      })();
-    </script>
-
     <link rel="icon" type="image/png" href="empatialog.jpeg" />
     <link rel="apple-touch-icon" href="https://www.empatiadigital.com.ar/empatialog.jpeg" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <link rel="canonical" href="https://empatiadigital.com.ar" />
 
     <title>Empatía Digital | Salud Digital, Prevención de Grooming y Crianza</title>
-
     <meta
       name="description"
       content="Recursos y herramientas sobre salud digital, prevención de grooming, ciberseguridad y uso consciente de tecnologías. Talleres para familias, escuelas y comunidades."
