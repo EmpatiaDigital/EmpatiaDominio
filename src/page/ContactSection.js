@@ -1,7 +1,7 @@
 import React from "react";
-import { Mail, Phone, MessageCircle, UserPlus } from "lucide-react";
+import { Mail, MessageCircle, UserPlus } from "lucide-react";
 import "../style/ContactSection.css";
-import contactImage from "../assets/familiaEMPATIA.jpg"; // Ajusta la ruta si hace falta
+import contactImage from "../assets/familiaEMPATIA.jpg"; 
 
 export default function ContactSection() {
   return (
@@ -28,7 +28,9 @@ export default function ContactSection() {
             <div className="line"></div>
             <ul>
               <li>
-                <MessageCircle className="icon" />
+                <div className="icon-wrapper">
+                  <MessageCircle className="contact-icon" size={20} strokeWidth={1.8} />
+                </div>
                 <a
                   href="https://wa.me/5493413559329"
                   target="_blank"
@@ -38,14 +40,18 @@ export default function ContactSection() {
                 </a>
               </li>
               <li>
-                <Mail className="icon" />
+                <div className="icon-wrapper">
+                  <Mail className="contact-icon" size={20} strokeWidth={1.8} />
+                </div>
                 <a href="mailto:empatiadigital2025@gmail.com">
                   empatiadigital2025@gmail.com
                 </a>
               </li>
 
               <li>
-                <UserPlus className="icon" />
+                <div className="icon-wrapper">
+                  <UserPlus className="contact-icon" size={20} strokeWidth={1.8} />
+                </div>
                 <a href="/registro">Suscribite</a>
               </li>
             </ul>
