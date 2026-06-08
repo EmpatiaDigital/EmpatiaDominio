@@ -156,7 +156,7 @@ const handleInscription = () => {
           </div>
           <div className="modality-item">
             <span className="modality-label">Carga total</span>
-            <span className="modality-value">24 horas cátedra</span>
+            <span className="modality-value">30 horas cátedra</span>
           </div>
           <div className="modality-item">
             <span className="modality-label">Modalidad</span>
