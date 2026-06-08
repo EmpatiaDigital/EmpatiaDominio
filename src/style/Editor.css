@@ -1,233 +1,301 @@
+/* ==========================================================================
+   ESTILOS GENERALES DEL CONTENEDOR DEL EDITOR
+   ========================================================================== */
 .editor-container {
-    max-width: 100%;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: #f9f9fc;
-    border-radius: 20px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    font-family: 'Segoe UI', sans-serif;
-    overflow-x: auto;
-  }
-  
-  .editor-title {
-    font-size: 2rem;
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-  
-  .editor-input,
-  .editor-textarea,
-  .epigrafe-input {
-    width: 100%;
-    padding: 0.8rem;
-    margin: 0.5rem 0;
-    border: 2px solid #d0d0e0;
-    border-radius: 12px;
-    font-size: 1rem;
-  }
-  
-  .editor-label {
-    font-weight: bold;
-    display: block;
-    margin-top: 1rem;
-  }
-  
-  .editor-file {
-    margin: 1rem 0;
-  }
-  
-  .preview-portada {
-    width: 100%;
-    max-height: 300px;
-    object-fit: cover;
-    margin-bottom: 1rem;
-    border-radius: 10px;
-  }
-  
-  .toolbar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: white; /* o el fondo que estés usando */
-    padding: 0.5rem;
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  
-  .toolbar button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 8px;
-    background: #e0e0f0;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
-  }
-  
-  .toolbar .active {
-    background: #9aa0f0;
-    color: white;
-  }
-  .custom-box {
-    border-left: 30px solid #42a5f5;
-    background-color: #05676e;
-    border-radius: 6px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
-    font-weight: 500;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-  }
-  .custom-box em,
-  .custom-box i {
-    font-style: italic;
-    border-bottom: 2px solid white;
-  }
-  
-  
-  .tiptap {
-    border: 2px solid #ccc;
-    border-radius: 12px;
-    min-height: 200px;
-    padding: 1rem;
-    background: white;
-    margin-bottom: 1rem;
-    overflow-x: auto; /* permite mostrar scroll si el contenido es más ancho */
-  }
-  
-  /* Mantiene las imágenes a tamaño fijo en pantallas grandes, pero adaptables en móviles */
-  .tiptap img{
-    width: 100%;
-    max-width: 800px;
-    height: auto;
-    object-fit: cover;
-    display: block;
-    margin: 20px auto;
-    border-radius: 8px;
-  }
-  
-  .preview-images {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-  }
-  
-  .image-block {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  
-  .image-block img {
-    width: 100%;
-    border-radius: 10px;
-  }
-  
-  .uploading-text {
-    color: #888;
-    font-style: italic;
-  }
-  
-  .publish-button {
-    margin-top: 1rem;
-    padding: 0.8rem 1.5rem;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .publish-button:hover {
-    background: #218838;
-  }
-  
-  /* Estilos responsivos */
-  @media screen and (max-width: 600px) {
-    .editor-container {
-      padding: 1rem;
-    }
-  
-    .toolbar {
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-  
-    .imagen-fija-1200 {
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-    }
-  }
-  /* Estilos Base para el Recuadro Dinámico */
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.editor-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+/* Campos de entrada e inputs de formulario */
+.editor-input,
+.editor-textarea,
+.editor-select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0 1.2rem 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1rem;
+  color: #334155;
+  background-color: #f8fafc;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.editor-input:focus,
+.editor-textarea:focus,
+.editor-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.editor-textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.editor-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #475569;
+  display: block;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.editor-file {
+  margin: 0.5rem 0 1.5rem 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+/* Bloques de previsualización multimedia */
+.preview-portada-block {
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.preview-portada {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ==========================================================================
+   BARRA DE HERRAMIENTAS (TOOLBAR) Y SWATCHES
+   ========================================================================== */
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #ffffff;
+  padding: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+}
+
+.toolbar button {
+  padding: 0.5rem 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.15s ease-in-out;
+}
+
+.toolbar button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.toolbar button.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* Contenedor estético del Selector Visual de Recuadros */
+.recuadro-picker-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.recuadro-picker-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Botones circulares minimalistas de color */
+.swatch-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  padding: 0;
+}
+
+.swatch-btn:hover {
+  transform: scale(1.2);
+}
+
+.swatch-btn.active {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0f172a;
+  transform: scale(1.1);
+}
+
+/* Mapeo estricto de colores del picker */
+.swatch-azul { background-color: #2563eb; }
+.swatch-rojo { background-color: #dc2626; }
+.swatch-verde { background-color: #16a34a; }
+.swatch-amarillo { background-color: #ca8a04; }
+.swatch-violeta { background-color: #7c3aed; }
+
+/* ==========================================================================
+   ÁREA DE EDICIÓN NATIVA DE TIPTAP Y RECUADROS INTERNOS
+   ========================================================================== */
+.tiptap {
+  border: 1px solid #cbd5e1;
+  border-radius: 0 0 12px 12px;
+  min-height: 320px;
+  padding: 1.5rem;
+  background: #ffffff;
+  margin-bottom: 1.5rem;
+  outline: none;
+  color: #1e293b;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.tiptap p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.tiptap h1, .tiptap h2 {
+  color: #0f172a;
+  font-weight: 700;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.tiptap h1 { font-size: 1.75rem; }
+.tiptap h2 { font-size: 1.4rem; }
+
+.tiptap img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 8px;
+}
+
+.tiptap a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* Renderizado persistente y en vivo de los recuadros dentro de Tiptap */
 .recuadro-dinamico {
   margin: 1.5rem 0;
   padding: 1.25rem 1.5rem;
   border-radius: 12px;
   background-color: #f9fafb;
   border-left: 6px solid #e5e7eb;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-  transition: all 0.2s ease-in-out;
 }
 
-.recuadro-dinamico p {
-  margin: 0 0 0.5rem 0;
-  color: #374151;
-  font-size: 1rem;
-  line-height: 1.6;
+.recuadro-azul { border-left-color: #2563eb; background-color: #eff6ff; color: #1e40af; }
+.recuadro-rojo { border-left-color: #dc2626; background-color: #fef2f2; color: #991b1b; }
+.recuadro-verde { border-left-color: #16a34a; background-color: #f0fdf4; color: #166534; }
+.recuadro-amarillo { border-left-color: #ca8a04; background-color: #fefce8; color: #854d0e; }
+.recuadro-violeta { border-left-color: #7c3aed; background-color: #faf5ff; color: #5b21b6; }
+
+.uploading-text {
+  color: #64748b;
+  font-style: italic;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }
 
-.recuadro-dinamico p:last-child {
-  margin-bottom: 0;
-}
-
-/* Variaciones de Color (Línea lateral y sutil fondo temático) */
-.recuadro-azul {
-  border-left-color: #2563eb;
-  background-color: #eff6ff;
-}
-
-.recuadro-rojo {
-  border-left-color: #dc2626;
-  background-color: #fef2f2;
-}
-
-.recuadro-verde {
-  border-left-color: #16a34a;
-  background-color: #f0fdf4;
-}
-
-.recuadro-amarillo {
-  border-left-color: #ca8a04;
-  background-color: #fefce8;
-}
-
-.recuadro-violeta {
-  border-left-color: #7c3aed;
-  background-color: #faf5ff;
-}
-
-/* Estilo para el selector del Toolbar */
-.toolbar-select {
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: white;
-  font-size: 13px;
+/* ==========================================================================
+   BOTÓN GUARDAR PREMIUM (SIN ÍCONOS)
+   ========================================================================== */
+.publish-button {
+  margin-top: 1rem;
+  padding: 0.9rem 2.5rem;
+  background: #0f172a; /* Slate oscuro elegante */
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  outline: none;
-  height: 32px;
-  margin-left: 4px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1), 0 2px 4px -1px rgba(15, 23, 42, 0.06);
+  display: inline-block;
 }
 
-.toolbar-select:hover {
-  border-color: #888;
+.publish-button:hover:not(:disabled) {
+  background: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.13), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+}
+
+.publish-button:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
+}
+
+.publish-button:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+@media screen and (max-width: 600px) {
+  .editor-container {
+    padding: 1.25rem;
+    margin: 1rem auto;
+  }
+  
+  .toolbar {
+    gap: 0.3rem;
+  }
+  
+  .recuadro-picker-group {
+    width: 100%;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
 }
