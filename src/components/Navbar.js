@@ -114,6 +114,7 @@ export default function Navbar() {
         <li><Link to="/contacto" onClick={handleLinkClick}>Contacto</Link></li>
         <li><Link to="/post" onClick={handleLinkClick}>Post</Link></li>
         <li><Link to="/descargas" onClick={handleLinkClick}>Guía gratis</Link></li>
+        <li><Link to="/trivia" onClick={handleLinkClick}>Trivia</Link></li>
         {user ? (
           <>
             <li>
