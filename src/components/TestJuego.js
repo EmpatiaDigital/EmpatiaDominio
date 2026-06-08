@@ -5,7 +5,7 @@ import preguntasData from '../data/preguntas.json';
 import '../style/TestJuego.css';
 
 const PREGUNTAS_POR_JUEGO = 5;
-const PUNTOS_POR_CORRECTA = 10;
+const PUNTOS_POR_CORRECTA = 20;
 
 const TestJuego = () => {
   const navigate = useNavigate();
@@ -105,8 +105,10 @@ const TestJuego = () => {
       const canvas = await html2canvas(insigniaRef.current, {
         scale: 2,
         useCORS: true,
-        backgroundColor: null,
+        backgroundColor: '#ffffff',
         logging: false,
+        allowTaint: true,
+        foreignObjectRendering: false,
       });
 
       const urlJuego = `${window.location.origin}/trivia`;
@@ -313,53 +315,73 @@ const TestJuego = () => {
           <div className="tj-res-body">
 
             {/* Todo este bloque entra en la captura: insignia + score + barra + stats */}
-            <div ref={insigniaRef}>
+            <div ref={insigniaRef} style={{ backgroundColor: '#ffffff', padding: '8px', borderRadius: '16px', width: '100%' }}>
 
-              <div className={`tj-insignia-card ${configRango.clase}`}>
-                <div className="tj-insignia-layout">
-                  <div className="tj-insignia-asset-container">
-                    <div className="tj-insignia-vector-overlay">
-                      <svg viewBox="0 0 24 24" fill="none" stroke={configRango.color} strokeWidth={2}>
+              <div
+                className={`tj-insignia-card ${configRango.clase}`}
+                style={{
+                  background: configRango.id === 'PRO' ? 'linear-gradient(to right, #f0fdf4, #f8fafc)' :
+                              configRango.id === 'MEDIUM' ? 'linear-gradient(to right, #eff6ff, #f8fafc)' :
+                              'linear-gradient(to right, #fffbeb, #f8fafc)',
+                  border: `2px solid ${configRango.color}`,
+                  borderRadius: '16px',
+                  padding: '20px',
+                  marginBottom: '24px',
+                  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ position: 'relative', width: '70px', height: '70px', flexShrink: 0 }}>
+                    <div style={{
+                      position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(255,255,255,0.15)', borderRadius: '12px', padding: '14px',
+                    }}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke={configRango.color} strokeWidth={2} style={{ width: '100%', height: '100%' }}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                       </svg>
                     </div>
                   </div>
-                  <div className="tj-insignia-content">
-                    <span className="tj-insignia-meta">INSIGNIA OTORGADA</span>
-                    <h5 className="tj-insignia-tier" style={{ color: configRango.color }}>{configRango.texto}</h5>
-                    <p className="tj-insignia-sub">{configRango.subtitulo}</p>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', letterSpacing: '0.05em' }}>INSIGNIA OTORGADA</span>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 800, color: configRango.color, margin: '2px 0', letterSpacing: '-0.01em' }}>{configRango.texto}</span>
+                    <span style={{ fontSize: '0.85rem', color: '#475569' }}>{configRango.subtitulo}</span>
                   </div>
                 </div>
               </div>
 
-              <h4 className="tj-res-titulo">Resultados del Desafio</h4>
+              <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.75rem', fontWeight: 700, color: '#0f172a', margin: '0 0 1rem 0', textAlign: 'center' }}>
+                Resultados del Desafio
+              </h4>
 
-              <div className="tj-res-score-wrap">
-                <span className="tj-res-score">{puntajeFinal}</span>
-                <span className="tj-res-score-max">/ {puntajeMaximo} puntos</span>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '0.4rem', marginBottom: '1rem' }}>
+                <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '3.25rem', fontWeight: 700, color: '#1e3a5f', lineHeight: 1 }}>{puntajeFinal}</span>
+                <span style={{ fontSize: '1.1rem', color: '#94a3b8', fontWeight: 600 }}>/ {puntajeMaximo} puntos</span>
               </div>
 
-              <div className="tj-progress-bar-bg">
-                <div
-                  className="tj-progress-bar-fill"
-                  style={{ width: `${porcentaje}%` }}
-                />
+              <div style={{ width: '100%', maxWidth: '360px', height: '10px', backgroundColor: '#e2e8f0', borderRadius: '50px', overflow: 'hidden', margin: '0 auto 1.5rem auto' }}>
+                <div style={{ height: '100%', width: `${porcentaje}%`, background: 'linear-gradient(90deg, #4a90d9, #1e3a5f)', borderRadius: '50px' }} />
               </div>
 
-              <div className="tj-res-stats">
-                <div className="tj-stat">
-                  <span className="tj-stat-valor tj-stat-correctas">{respuestasCorrectas}</span>
-                  <span className="tj-stat-label">correctas</span>
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: '1.5rem', padding: '1rem 1.5rem',
+                backgroundColor: '#f8fafc', borderRadius: '16px',
+                border: '1px solid #e2e8f0', width: '100%',
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1 }}>
+                  <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.65rem', fontWeight: 700, color: '#059669', lineHeight: 1.2 }}>{respuestasCorrectas}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>correctas</span>
                 </div>
-                <div className="tj-stat-sep" />
-                <div className="tj-stat">
-                  <span className="tj-stat-valor tj-stat-incorrectas">{totalPreguntas - respuestasCorrectas}</span>
-                  <span className="tj-stat-label">incorrectas</span>
+                <div style={{ width: '1px', height: '38px', backgroundColor: '#e2e8f0', flexShrink: 0 }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1 }}>
+                  <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.65rem', fontWeight: 700, color: '#dc2626', lineHeight: 1.2 }}>{totalPreguntas - respuestasCorrectas}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>incorrectas</span>
                 </div>
-                <div className="tj-stat-sep" />
-                <div className="tj-stat">
-                  <span className="tj-stat-valor">{porcentaje}%</span>
-                  <span className="tj-stat-label">aciertos</span>
+                <div style={{ width: '1px', height: '38px', backgroundColor: '#e2e8f0', flexShrink: 0 }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', flex: 1 }}>
+                  <span style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.65rem', fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>{porcentaje}%</span>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>aciertos</span>
                 </div>
               </div>
 
