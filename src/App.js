@@ -50,6 +50,22 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// ── 🚀 NUEVO: Escuchador Dinámico de Rutas para Google Analytics 4 ──────
+const AnalyticsRouteTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Reportamos proactivamente la ruta virtual exacta a GA4 en cada transición de React
+    if (window.gtag) {
+      window.gtag('config', 'G-1PQVGSKJGE', {
+        page_path: location.pathname + location.search,
+      });
+    }
+  }, [location]);
+
+  return null; // Este componente solo ejecuta lógica en segundo plano
+};
+
 function AppContent() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
@@ -80,6 +96,9 @@ function AppContent() {
 
   return (
     <ErrorBoundary>
+      {/* 💡 Agregamos el rastreador dentro del contexto de navegación para escuchar los cambios de rutas */}
+      <AnalyticsRouteTracker />
+
       <Suspense fallback={null}>
         <UserActividad />
       </Suspense>
