@@ -50,7 +50,19 @@ const PostStats = ({ postId, postTitulo }) => {
   const [votando, setVotando] = useState(false);
   const visitorId = getVisitorId();
 
-  // ─── AHORA SÓLO CARGA LAS ESTADÍSTICAS (No registra la vista) ───
+  // Auxiliar interno para enviar interacciones a GA4
+  const emitirGtagVoto = (actionType, valueLabel) => {
+    if (window.gtag) {
+      window.gtag("event", "post_engagement", {
+        interaction_type: actionType, // Ej: "like" o "dislike"
+        interaction_value: valueLabel, // Ej: "added" o "removed"
+        item_id: postId,
+        item_name: postTitulo || "Post sin título"
+      });
+    }
+  };
+
+  // ─── CARGA LAS ESTADÍSTICAS (No registra la vista) ───
   useEffect(() => {
     if (!postId) return;
 
@@ -84,12 +96,26 @@ const PostStats = ({ postId, postTitulo }) => {
     cargarRelacionados();
   }, [postId]);
 
-  // Maneja el voto
+  // Maneja el voto e integra métricas
   const handleVoto = useCallback(
     async (tipo) => {
       if (votando) return;
       setVotando(true);
 
+      // Determinamos el tipo de acción para Google Analytics antes de mutar el estado
+      const esQuitandoVoto = stats.miVoto === tipo;
+      const accionGA = tipo; // "like" o "dislike"
+      const estadoGA = esQuitandoVoto ? "removed" : "added";
+
+      // 1. Enviamos de forma inmediata la métrica a Google Analytics
+      emitirGtagVoto(accionGA, estadoGA);
+
+      // 2. Si el usuario está cambiando de 'like' a 'dislike' (o viceversa), registramos el retiro del voto anterior
+      if (stats.miVoto !== null && stats.miVoto !== tipo) {
+        emitirGtagVoto(stats.miVoto, "removed");
+      }
+
+      // Optimistic UI Update para el usuario de tu front anterior
       setStats((prev) => {
         const quitandoActual = prev.miVoto === tipo;
         const cambiando = prev.miVoto !== null && prev.miVoto !== tipo;
@@ -116,6 +142,7 @@ const PostStats = ({ postId, postTitulo }) => {
         };
       });
 
+      // Petición asincrónica al backend
       try {
         const res = await fetch(`${API}/posts/${postId}/like`, {
           method: "POST",
@@ -130,6 +157,7 @@ const PostStats = ({ postId, postTitulo }) => {
           miVoto: data.miVoto,
         }));
       } catch (_) {
+        // Fallback si la API falla
         try {
           const res = await fetch(
             `${API}/posts/${postId}/stats?visitorId=${encodeURIComponent(visitorId)}`
@@ -141,7 +169,7 @@ const PostStats = ({ postId, postTitulo }) => {
 
       setVotando(false);
     },
-    [postId, visitorId, votando]
+    [postId, visitorId, votando, stats.miVoto, postTitulo]
   );
 
   const formatNum = (n) => (n >= 1000 ? (n / 1000).toFixed(1) + "k" : n);
@@ -159,6 +187,7 @@ const PostStats = ({ postId, postTitulo }) => {
         <div className="ps-divider" />
 
         <button
+          type="button"
           className={`ps-vote-btn ps-like ${stats.miVoto === "like" ? "ps-active" : ""}`}
           onClick={() => handleVoto("like")}
           disabled={votando}
@@ -172,6 +201,7 @@ const PostStats = ({ postId, postTitulo }) => {
         </button>
 
         <button
+          type="button"
           className={`ps-vote-btn ps-dislike ${stats.miVoto === "dislike" ? "ps-active" : ""}`}
           onClick={() => handleVoto("dislike")}
           disabled={votando}
