@@ -31,6 +31,7 @@ const PostCompleto      = lazy(() => import('./components/PostCompleto'));
 const MyPost            = lazy(() => import('./components/MyPost.js'));
 const EditPost          = lazy(() => import('./components/EditPost.js'));
 const CongelarUsuarios  = lazy(() => import('./components/CongelarUsuarios.js'));
+const TestJuego  = lazy(() => import('./components/TestJuego.js'));
 
 // ── ErrorBoundary ─────────────────────────────────────────────────────────
 class ErrorBoundary extends React.Component {
@@ -129,6 +130,7 @@ function AppContent() {
           <Route path="/congelar"                    element={<CongelarUsuarios />} />
           <Route path="/post"                        element={<Post />} />
           <Route path="/descargo-de-responsabilidad" element={<Descargo />} />
+          <Route path="/trivia"                            element={<TestJuego />} />
           <Route path="/"                            element={<HomePage />} />
           <Route path="*"                            element={<Error404 />} />
         </Routes>
