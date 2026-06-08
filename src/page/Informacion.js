@@ -29,7 +29,7 @@ const Informacion = () => {
         if (data && data._id) {
           setCourse(data);
         } else {
-          throw new Error('El curso encontrado no es válido.');
+          throw new Error('El curso encontrado no contiene una estructura válida.');
         }
       } catch (err) {
         setError(err.message);
@@ -52,7 +52,7 @@ const Informacion = () => {
     navigate("/inscription");
   };
 
-  // Ícono SVG según nombre que venga de la base de datos
+  // Ícono SVG según nombre dinámico que venga de la base de datos
   const renderIcono = (nombre) => {
     switch (nombre) {
       case 'lightbulb':
@@ -75,48 +75,26 @@ const Informacion = () => {
     }
   };
 
-  // 1. Estado de Carga
-  if (loading) {
-    return (
-      <div className="informacion-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <p style={{ color: '#64748b', fontStyle: 'italic' }}>Cargando información del curso...</p>
-      </div>
-    );
-  }
-
-  // 2. Estado de Error (Si la API falla o no hay curso, se muestra esto)
-  if (error || !course) {
-    return (
-      <div className="informacion-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '2rem', textAlign: 'center' }}>
-        <svg style={{ width: '48px', height: '48px', color: '#ef4444', marginBottom: '1rem' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <h2 style={{ color: '#1e293b', marginBottom: '0.5rem' }}>Conectando con el servidor</h2>
-        <p style={{ color: '#64748b', maxWidth: '400px' }}>{error || "No hay inscripciones activas disponibles en este momento."}</p>
-      </div>
-    );
-  }
-
-  // 3. Flujo Seguro: Extraemos las propiedades directamente de la API ya validada
+  // Desestructuración segura con fallbacks para evitar roturas si course es null
   const {
-    titulo,
-    descripcion,
-    duracion,
-    clases,
-    duracionClase,
-    cargaTotal,
-    modalidad,
-    nivel,
-    precio,
-    moneda,
-    tieneDescuento,
-    descuentoPorcentaje,
-    contenidos,
-    audiencia,
-    tieneCodigoPromo
-  } = course;
+    titulo = '',
+    descripcion = '',
+    duracion = '',
+    clases = '',
+    duracionClase = '',
+    cargaTotal = '',
+    modalidad = '',
+    nivel = '',
+    precio = 0,
+    moneda = 'ARS',
+    tieneDescuento = false,
+    descuentoPorcentaje = 0,
+    contenidos = [],
+    audiencia = [],
+    tieneCodigoPromo = false
+  } = course || {};
 
-  // Procesamiento del precio dinámico
+  // Procesamiento del precio dinámico seguro
   const precioRaw = precio ? precio.toString().replace(/[^\d.,]/g, '').replace(',', '.') : '0';
   const precioNumero = parseFloat(precioRaw);
   const precioMostrado = !isNaN(precioNumero) ? Math.round(precioNumero).toLocaleString('es-AR') : '0';
@@ -130,7 +108,7 @@ const Informacion = () => {
   return (
     <div className="informacion-container">
 
-      {/* Header con aviso de privacidad */}
+      {/* [SI O SI] Header con aviso de privacidad */}
       <div className="privacy-banner">
         <a href="#privacy-section" onClick={scrollToPrivacy} className="privacy-link">
           <svg className="privacy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -140,130 +118,262 @@ const Informacion = () => {
         </a>
       </div>
 
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <div className="hero-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="badge-icon">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-            </svg>
-            <span>Certificación Avalada</span>
-          </div>
-
-          <h1 className="hero-title">{titulo}</h1>
-
-          {descripcion && <p className="hero-description">{descripcion}</p>}
-
-          <p className="hero-philosophy">
-            Este curso nace con una idea simple:{" "}
-            <strong>acercar el conocimiento a las personas</strong>, sin miedo, sin tecnicismos y con sentido humano.
-          </p>
+      {/* Flujo de la API: Se muestra carga o error localmente sin romper el layout */}
+      {loading ? (
+        <div style={{ padding: '4rem 2rem', textAlign: 'center', color: '#64748b', fontStyle: 'italic' }}>
+          Cargando información detallada del curso...
         </div>
-      </section>
+      ) : error || !course ? (
+        <div style={{ padding: '3rem 2rem', margin: '2rem auto', maxWidth: '500px', backgroundColor: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '12px', textAlign: 'center' }}>
+          <svg style={{ width: '40px', height: '40px', color: '#ef4444', margin: '0 auto 1rem' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <h3 style={{ color: '#991b1b', marginBottom: '0.5rem' }}>Información temporalmente no disponible</h3>
+          <p style={{ color: '#b91c1c', fontSize: '0.9rem' }}>{error || "No pudimos conectar con el servidor de inscripciones."}</p>
+        </div>
+      ) : (
+        <>
+          {/* Hero Section */}
+          <section className="hero-section">
+            <div className="hero-content">
+              <div className="hero-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="badge-icon">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+                <span>Certificación Avalada</span>
+              </div>
 
-      {/* Contenido del curso */}
-      <section className="course-content">
-        {duracion && (
-          <div className="learning-section">
-            <h2 className="section-title">Durante {duracion} vas a aprender</h2>
-            {contenidos && contenidos.length > 0 && (
-              <div className="learning-grid">
-                {contenidos.map((item, index) => (
-                  <div className="learning-card" key={index}>
-                    <div className="card-icon">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        {renderIcono(item.icono || '')}
-                      </svg>
+              <h1 className="hero-title">{titulo}</h1>
+              {descripcion && <p className="hero-description">{descripcion}</p>}
+
+              <p className="hero-philosophy">
+                Este curso nace con una idea simple:{" "}
+                <strong>acercar el conocimiento a las personas</strong>, sin miedo, sin tecnicismos y con sentido humano.
+              </p>
+            </div>
+          </section>
+
+          {/* Contenido del curso */}
+          {duracion && contenidos && contenidos.length > 0 && (
+            <section className="course-content">
+              <div className="learning-section">
+                <h2 className="section-title">Durante {duracion} vas a aprender</h2>
+                <div className="learning-grid">
+                  {contenidos.map((item, index) => (
+                    <div className="learning-card" key={index}>
+                      <div className="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          {renderIcono(item.icono || '')}
+                        </svg>
+                      </div>
+                      <h3>{item.titulo}</h3>
+                      <p>{item.descripcion}</p>
                     </div>
-                    <h3>{item.titulo}</h3>
-                    <p>{item.descripcion}</p>
-                  </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Modalidad */}
+          <section className="modality-section">
+            <h2 className="section-title">Modalidad del Curso</h2>
+            <div className="modality-grid">
+              {duracion && <div className="modality-item"><span className="modality-label">Duración</span><span className="modality-value">{duracion}</span></div>}
+              {clases && <div className="modality-item"><span className="modality-label">Clases</span><span className="modality-value">{clases}</span></div>}
+              {duracionClase && <div className="modality-item"><span className="modality-label">Duración por encuentro</span><span className="modality-value">{duracionClase}</span></div>}
+              {cargaTotal && <div className="modality-item"><span className="modality-label">Carga total</span><span className="modality-value">{cargaTotal}</span></div>}
+              {modalidad && <div className="modality-item"><span className="modality-label">Modalidad</span><span className="modality-value">{modalidad}</span></div>}
+              {nivel && <div className="modality-item"><span className="modality-label">Nivel</span><span className="modality-value">{nivel}</span></div>}
+            </div>
+          </section>
+
+          {/* Para quién */}
+          {audiencia && audiencia.length > 0 && (
+            <section className="audience-section">
+              <h2 className="section-title">¿Para quién es este curso?</h2>
+              <div className="audience-tags">
+                {audiencia.map((item, index) => (
+                  <span className="audience-tag" key={index}>{item}</span>
                 ))}
               </div>
-            )}
-          </div>
-        )}
-      </section>
+            </section>
+          )}
 
-      {/* Modalidad */}
-      <section className="modality-section">
-        <h2 className="section-title">Modalidad del Curso</h2>
-        <div className="modality-grid">
-          {duracion && <div className="modality-item"><span className="modality-label">Duración</span><span className="modality-value">{duracion}</span></div>}
-          {clases && <div className="modality-item"><span className="modality-label">Clases</span><span className="modality-value">{clases}</span></div>}
-          {duracionClase && <div className="modality-item"><span className="modality-label">Duración por encuentro</span><span className="modality-value">{duracionClase}</span></div>}
-          {cargaTotal && <div className="modality-item"><span className="modality-label">Carga total</span><span className="modality-value">{cargaTotal}</span></div>}
-          {modalidad && <div className="modality-item"><span className="modality-label">Modalidad</span><span className="modality-value">{modalidad}</span></div>}
-          {nivel && <div className="modality-item"><span className="modality-label">Nivel</span><span className="modality-value">{nivel}</span></div>}
-        </div>
-      </section>
+          {/* Precio y CTA */}
+          <section className="pricing-section">
+            <div className="pricing-card">
+              <h2 className="pricing-title">Inversión en tu Aprendizaje</h2>
 
-      {/* Para quién */}
-      {audiencia && audiencia.length > 0 && (
-        <section className="audience-section">
-          <h2 className="section-title">¿Para quién es este curso?</h2>
-          <div className="audience-tags">
-            {audiencia.map((item, index) => (
-              <span className="audience-tag" key={index}>{item}</span>
-            ))}
-          </div>
-        </section>
+              {tieneDescuento ? (
+                <>
+                  <div className="price-amount" style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '1.8rem' }}>
+                    <span className="currency">{monedaMostrada}</span>
+                    <span className="amount">{precioMostrado}</span>
+                  </div>
+                  <div className="price-amount">
+                    <span className="currency">{monedaMostrada}</span>
+                    <span className="amount">{precioConDesc?.toLocaleString('es-AR')}</span>
+                  </div>
+                  <p className="price-description">
+                    Precio con {descuentoPct}% de descuento · Valor total por {duracion}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="price-amount">
+                    <span className="currency">{monedaMostrada}</span>
+                    <span className="amount">{precioMostrado}</span>
+                  </div>
+                  <p className="price-description">Valor total por {duracion}</p>
+                </>
+              )}
+
+              {tieneCodigoPromo && (
+                <div className="promo-aviso" style={{ margin: '0.75rem 0 1rem', padding: '0.65rem 1rem', background: '#fef9c3', borderRadius: '8px', fontSize: '0.9rem', color: '#854d0e', borderLeft: '4px solid #ca8a04' }}>
+                  <strong>¡Inscribite y puede que te lleves algo más!</strong>{' '}
+                  Sorteamos códigos de descuento exclusivos entre los participantes.
+                </div>
+              )}
+
+              <button className="cta-button" onClick={handleInscription}>
+                Inscribirme Ahora
+              </button>
+            </div>
+          </section>
+        </>
       )}
 
-      {/* Precio y CTA */}
-      <section className="pricing-section">
-        <div className="pricing-card">
-          <h2 className="pricing-title">Inversión en tu Aprendizaje</h2>
-
-          {tieneDescuento ? (
-            <>
-              <div className="price-amount" style={{ textDecoration: 'line-through', opacity: 0.5, fontSize: '1.8rem' }}>
-                <span className="currency">{monedaMostrada}</span>
-                <span className="amount">{precioMostrado}</span>
-              </div>
-              <div className="price-amount">
-                <span className="currency">{monedaMostrada}</span>
-                <span className="amount">{precioConDesc?.toLocaleString('es-AR')}</span>
-              </div>
-              <p className="price-description">
-                Precio con {descuentoPct}% de descuento · Valor total por {duracion}
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="price-amount">
-                <span className="currency">{monedaMostrada}</span>
-                <span className="amount">{precioMostrado}</span>
-              </div>
-              <p className="price-description">Valor total por {duracion}</p>
-            </>
-          )}
-
-          {tieneCodigoPromo && (
-            <div className="promo-aviso" style={{ margin: '0.75rem 0 1rem', padding: '0.65rem 1rem', background: '#fef9c3', borderRadius: '8px', fontSize: '0.9rem', color: '#854d0e', borderLeft: '4px solid #ca8a04' }}>
-              <strong>¡Inscribite y puede que te lleves algo más!</strong>{' '}
-              Sorteamos códigos de descuento exclusivos entre los participantes.
-            </div>
-          )}
-
-          <button className="cta-button" onClick={handleInscription}>
-            Inscribirme Ahora
-          </button>
-        </div>
-      </section>
-
-      {/* Términos y Condiciones Dinámicos */}
+      {/* [SI O SI] Términos, Condiciones y Contactos Completos (Fuera del render condicional) */}
       <section className="privacy-section" id="privacy-section">
         <div className="privacy-container">
           <h2 className="privacy-title">Términos y Condiciones de Uso de Datos Personales</h2>
+
           <div className="privacy-content">
             <div className="privacy-block">
               <h3>1. Recopilación de Datos</h3>
               <p>
-                Al inscribirte en el curso "{titulo}", recopilamos información personal que incluye: nombre completo, documento de identidad, dirección de correo electrónico y teléfono para gestionar tu participación de forma segura.
+                Al inscribirte en {titulo ? `el curso "${titulo}"` : 'nuestras capacitaciones'},
+                recopilamos información personal que incluye: nombre completo, documento de identidad,
+                dirección de correo electrónico, número de teléfono y cualquier otra información que
+                voluntariamente nos proporciones durante el proceso de inscripción.
               </p>
             </div>
-            {/* El resto de bloques legales se mantienen estables usando la variable {titulo} */}
+
+            <div className="privacy-block">
+              <h3>2. Uso de la Información</h3>
+              <p>Los datos personales recopilados serán utilizados exclusivamente para:</p>
+              <p>• Gestionar tu inscripción y participación en el curso</p>
+              <p>• Emitir el certificado de aprobación al finalizar la capacitación</p>
+              <p>• Comunicarte información relevante sobre el desarrollo del curso</p>
+              <p>• Enviarte material educativo y recursos relacionados con el programa</p>
+              <p>• Mantener registros administrativos y estadísticos del curso</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>3. Protection de Datos</h3>
+              <p>
+                Nos comprometemos a proteger tu información personal mediante medidas de seguridad
+                adecuadas para prevenir el acceso no autorizado, la divulgación, alteración o
+                destrucción de tus datos. La información será almacenada de forma segura y solo
+                tendrá acceso el personal autorizado.
+              </p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>4. Compartición de Datos</h3>
+              <p>
+                Tus datos personales no serán vendidos, alquilados ni compartidos con terceros,
+                excepto en los siguientes casos:
+              </p>
+              <p>• Cuando sea necesario para la emisión del certificado avalado por la Comisión Psicosocial Latinoamericana</p>
+              <p>• Cuando sea requerido por ley o por autoridades competentes</p>
+              <p>• Con tu consentimiento expreso previo</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>5. Derechos del Usuario</h3>
+              <p>Como titular de tus datos personales, tenés derecho a:</p>
+              <p>• Acceder a la información que tenemos sobre vos</p>
+              <p>• Solicitar la corrección de datos incorrectos o desactualizados</p>
+              <p>• Solicitar la eliminación de tus datos personales</p>
+              <p>• Oponerte al tratamiento de tus datos para fines específicos</p>
+              <p>• Revocar tu consentimiento en cualquier momento</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>6. Retención de Datos</h3>
+              <p>
+                Conservaremos tus datos personales durante el tiempo necesario para cumplir con los
+                fines para los cuales fueron recopilados, incluyendo el período requerido para la
+                emisión y verificación de certificados. Posteriormente, los datos serán archivados
+                o eliminados de forma segura.
+              </p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>7. Comunicaciones</h3>
+              <p>
+                Al inscribirte, aceptás recibir comunicaciones relacionadas con el curso a través de
+                correo electrónico, WhatsApp u otros medios de contacto proporcionados. Podés
+                solicitar dejar de recibir comunicaciones promocionales en cualquier momento.
+              </p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>8. Cookies y Tecnologías Similares</h3>
+              <p>
+                Nuestro sitio web puede utilizar cookies y tecnologías similares para mejorar tu
+                experiencia de navegación. Podés configurar tu navegador para rechazar las cookies,
+                aunque esto puede afectar algunas funcionalidades del sitio.
+              </p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>9. Menores de Edad</h3>
+              <p>
+                Este curso está dirigido a personas mayores de 18 años. Si sos menor de edad,
+                necesitás el consentimiento de un padre, madre o tutor legal para participar.
+              </p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>10. Modificaciones</h3>
+              <p>
+                Nos reservamos el derecho de modificar estos términos y condiciones en cualquier momento.
+                Las modificaciones entrarán en vigor una vez publicadas en nuestro sitio web. Te
+                recomendamos revisar periódicamente esta sección.
+              </p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>11. Consentimiento</h3>
+              <p>
+                Al inscribirte en el curso, declarás haber leído, comprendido y aceptado estos
+                Términos y Condiciones de Uso de Datos Personales.
+              </p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>12. Contacto Completo</h3>
+              <p>
+                Para ejercer tus derechos o realizar consultas sobre el tratamiento de tus datos
+                personales, podés contactarnos a través de los siguientes medios institucionales:
+              </p>
+              <p style={{ marginTop: '0.5rem' }}>
+                • <strong>Email Directo:</strong>{" "}
+                <a className="linkCel" href="mailto:empatiadigital2025@gmail.com">
+                  empatiadigital2025@gmail.com
+                </a>
+              </p>
+              <p>
+                • <strong>WhatsApp de Atención:</strong>{" "}
+                <a className="linkCel" href="https://wa.me/5493413559329" target="_blank" rel="noopener noreferrer">
+                  +54 3413 55-9329
+                </a>
+              </p>
+            </div>
+
             <div className="privacy-footer">
               <p>Última actualización: Febrero 2026</p>
               <p>Empatía Digital</p>
@@ -272,10 +382,12 @@ const Informacion = () => {
         </div>
       </section>
 
-      {/* Botón flotante de inscripción */}
-      <button className="floating-inscription-btn" onClick={handleInscription}>
-        Inscribirme Ahora
-      </button>
+      {/* Botón flotante condicional (solo aparece si el curso cargó bien) */}
+      {!loading && !error && course && (
+        <button className="floating-inscription-btn" onClick={handleInscription}>
+          Inscribirme Ahora
+        </button>
+      )}
 
     </div>
   );
