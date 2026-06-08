@@ -112,7 +112,7 @@ const TestJuego = () => {
       });
 
       const urlJuego = `${window.location.origin}/trivia`;
-      const texto = `Mira lo que obtuve en el Desafio Empatia Digital\nJuga la trivia aca: ${urlJuego}`;
+      const texto = `Mira la insignia que obtuve en el Desafio Empatia Digital\nIntentalo en el link: ${urlJuego}`;
 
       // Convertir canvas a Blob
       const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
