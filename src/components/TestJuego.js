@@ -312,22 +312,57 @@ const TestJuego = () => {
 
           <div className="tj-res-body">
 
-            {/* Solo este div entra en la captura */}
-            <div ref={insigniaRef} className={`tj-insignia-card ${configRango.clase}`}>
-              <div className="tj-insignia-layout">
-                <div className="tj-insignia-asset-container">
-                  <div className="tj-insignia-vector-overlay">
-                    <svg viewBox="0 0 24 24" fill="none" stroke={configRango.color} strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
+            {/* Todo este bloque entra en la captura: insignia + score + barra + stats */}
+            <div ref={insigniaRef}>
+
+              <div className={`tj-insignia-card ${configRango.clase}`}>
+                <div className="tj-insignia-layout">
+                  <div className="tj-insignia-asset-container">
+                    <div className="tj-insignia-vector-overlay">
+                      <svg viewBox="0 0 24 24" fill="none" stroke={configRango.color} strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="tj-insignia-content">
+                    <span className="tj-insignia-meta">INSIGNIA OTORGADA</span>
+                    <h5 className="tj-insignia-tier" style={{ color: configRango.color }}>{configRango.texto}</h5>
+                    <p className="tj-insignia-sub">{configRango.subtitulo}</p>
                   </div>
                 </div>
-                <div className="tj-insignia-content">
-                  <span className="tj-insignia-meta">INSIGNIA OTORGADA</span>
-                  <h5 className="tj-insignia-tier" style={{ color: configRango.color }}>{configRango.texto}</h5>
-                  <p className="tj-insignia-sub">{configRango.subtitulo}</p>
+              </div>
+
+              <h4 className="tj-res-titulo">Resultados del Desafio</h4>
+
+              <div className="tj-res-score-wrap">
+                <span className="tj-res-score">{puntajeFinal}</span>
+                <span className="tj-res-score-max">/ {puntajeMaximo} puntos</span>
+              </div>
+
+              <div className="tj-progress-bar-bg">
+                <div
+                  className="tj-progress-bar-fill"
+                  style={{ width: `${porcentaje}%` }}
+                />
+              </div>
+
+              <div className="tj-res-stats">
+                <div className="tj-stat">
+                  <span className="tj-stat-valor tj-stat-correctas">{respuestasCorrectas}</span>
+                  <span className="tj-stat-label">correctas</span>
+                </div>
+                <div className="tj-stat-sep" />
+                <div className="tj-stat">
+                  <span className="tj-stat-valor tj-stat-incorrectas">{totalPreguntas - respuestasCorrectas}</span>
+                  <span className="tj-stat-label">incorrectas</span>
+                </div>
+                <div className="tj-stat-sep" />
+                <div className="tj-stat">
+                  <span className="tj-stat-valor">{porcentaje}%</span>
+                  <span className="tj-stat-label">aciertos</span>
                 </div>
               </div>
+
             </div>
 
             {/* Boton fuera del ref: no aparece en la imagen */}
@@ -341,37 +376,6 @@ const TestJuego = () => {
               </svg>
               <span>{capturando ? 'Generando imagen...' : 'Compartir Logro en WhatsApp'}</span>
             </button>
-
-            <h4 className="tj-res-titulo">Resultados del Desafio</h4>
-
-            <div className="tj-res-score-wrap">
-              <span className="tj-res-score">{puntajeFinal}</span>
-              <span className="tj-res-score-max">/ {puntajeMaximo} puntos</span>
-            </div>
-
-            <div className="tj-progress-bar-bg">
-              <div
-                className="tj-progress-bar-fill"
-                style={{ width: `${porcentaje}%` }}
-              />
-            </div>
-
-            <div className="tj-res-stats">
-              <div className="tj-stat">
-                <span className="tj-stat-valor tj-stat-correctas">{respuestasCorrectas}</span>
-                <span className="tj-stat-label">correctas</span>
-              </div>
-              <div className="tj-stat-sep" />
-              <div className="tj-stat">
-                <span className="tj-stat-valor tj-stat-incorrectas">{totalPreguntas - respuestasCorrectas}</span>
-                <span className="tj-stat-label">incorrectas</span>
-              </div>
-              <div className="tj-stat-sep" />
-              <div className="tj-stat">
-                <span className="tj-stat-valor">{porcentaje}%</span>
-                <span className="tj-stat-label">aciertos</span>
-              </div>
-            </div>
 
             <div className="tj-res-feedback">
               <p>Gracias por participar y por tu interes en aprender sobre estos temas. Mas alla del resultado, informarse y reflexionar es el primer paso para construir entornos digitales mas humanos.</p>
