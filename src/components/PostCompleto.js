@@ -9,7 +9,6 @@ import PostStats, { getVisitorId } from "./PostStats";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
-
 const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
   if (!url || !url.includes("res.cloudinary.com")) return url;
   if (url.includes("/upload/f_auto") || url.includes("/upload/q_auto")) return url;
@@ -59,7 +58,7 @@ const PostCompleto = () => {
       try {
         setCargando(true);
 
-        // ─── REGISTRO DE VISTA ÚNICA (Se ejecuta 1 sola vez por carga de página) ───
+        // ─── REGISTRO DE VISTA ÚNICA ───
         const visitorId = getVisitorId();
         try {
           await fetch(`https://empatia-dominio-back.vercel.app/api/posts/${id}/vista`, {
@@ -171,7 +170,6 @@ const PostCompleto = () => {
       </div>
 
       <div className="share-section">
-        {/* LIKES Y VISTAS ARRIBA */}
         <PostStats postId={id} postTitulo={post?.titulo} />
 
         <h3>Compartir en redes:</h3>
@@ -210,27 +208,37 @@ const PostCompleto = () => {
 
       <p><i>{post.epigrafe}</i></p>
 
+      {/* RENDERIZADO DEL CONTENIDO PRINCIPAL DEL POST */}
       <div className="imagen-fija-1200" dangerouslySetInnerHTML={{ __html: contenidoOptimizado }} />
 
-      {/* LIKES Y VISTAS ABAJO */}
-      <PostStats postId={id} postTitulo={post?.titulo} />
+      {/* ─── RECUADRO DINÁMICO Y PERSISTENTE DESDE EL EDITOR (BASE DE DATOS) ─── */}
+      {post.recuadro ? (
+        <div 
+          className="recuadro-dinamico-container"
+          style={{ backgroundColor: "#fff3cd", borderLeft: "6px solid #ffc107", padding: "1rem", borderRadius: "8px", fontFamily: "sans-serif", color: "#856404", marginBottom: "1.5rem", marginTop: "2rem" }}
+          dangerouslySetInnerHTML={{ __html: optimizarImagenesEnHtml(post.recuadro) }}
+        />
+      ) : (
+        /* Si no creaste un recuadro personalizado en la BD, muestra el aviso informativo por defecto */
+        <div style={{ backgroundColor: "#fff3cd", borderLeft: "6px solid #ffc107", padding: "1rem", borderRadius: "8px", fontFamily: "sans-serif", color: "#856404", marginBottom: "1.5rem", marginTop: "2rem" }}>
+          <p style={{ margin: "0 0 0.5rem 0" }}>
+            <strong style={{ display: "block", fontSize: "1.1rem", marginBottom: "0.5rem" }}>⚠️ Aviso importante:</strong>
+            Este contenido es informativo y refleja la experiencia desde el acompañamiento terapéutico. No reemplaza la consulta con profesionales de la salud mental. Si experimentás síntomas persistentes o preocupantes, te recomendamos buscar ayuda especializada.
+          </p>
+          <p style={{ margin: "0.5rem 0 0 0" }}>
+            Si conocés a alguien que le pueda interesar este tema, compartile este post. Además, te invito a descargar la guía gratuita en PDF sobre la introducción de IA en la parte de abajo 👇
+          </p>
+        </div>
+      )}
 
-      <div style={{ backgroundColor: "#fff3cd", borderLeft: "6px solid #ffc107", padding: "1rem", borderRadius: "8px", fontFamily: "sans-serif", color: "#856404", marginBottom: "1.5rem", marginTop: "2rem" }}>
-        <p style={{ margin: "0 0 0.5rem 0" }}>
-          <strong style={{ display: "block", fontSize: "1.1rem", marginBottom: "0.5rem" }}>⚠️ Aviso importante:</strong>
-          Este contenido es informativo y refleja la experiencia desde el acompañamiento terapéutico. No reemplaza la consulta con profesionales de la salud mental. Si experimentás síntomas persistentes o preocupantes, te recomendamos buscar ayuda especializada.
-        </p>
-        <p style={{ margin: "0.5rem 0 0 0" }}>
-          Si conocés a alguien que le pueda interesar este tema, compartile este post. Además, te invito a descargar la guía gratuita en PDF sobre la introducción de IA en la parte de abajo 👇
-        </p>
-      </div>
-
+      {/* BOTÓN DE DESCARGA */}
       <div style={{ borderLeft: "30px solid #42a5f5", backgroundColor: " #194542", justifyContent: "center", alignItems: "center", borderRadius: "6px", padding: "0.75rem 1rem", marginBottom: "3rem", fontSize: "1.5rem", fontWeight: "500", display: "flex" }}>
         <a style={{ borderBottom: "2px solid white", borderRadius: "6px", padding: "0.75rem 1rem", marginBottom: "0.5rem", fontSize: "1.5rem", fontWeight: "500", display: "flex", textDecoration: "none", color: "white", backgroundColor: "transparent", cursor: "pointer" }} href={`https://empatiadigital.com.ar/descargas`}>
           Descarga la guía PDF GRATIS
         </a>
       </div>
 
+      {/* SECCIÓN DE POSTS RELACIONADOS */}
       {postsRelacionados.length > 0 && (
         <div className="contenido-interes-section" style={{ marginTop: "3rem", borderTop: "2px solid #eaeaea", paddingTop: "2rem" }}>
           <h3 style={{ fontSize: "1.5rem", fontWeight: "700", marginBottom: "1.5rem", color: "#1a1a1a" }}>
