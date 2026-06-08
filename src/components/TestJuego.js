@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import html2canvas from 'html2canvas';
 import preguntasData from '../data/preguntas.json';
 import '../style/TestJuego.css';
 
@@ -8,6 +9,7 @@ const PUNTOS_POR_CORRECTA = 10;
 
 const TestJuego = () => {
   const navigate = useNavigate();
+  const insigniaRef = useRef(null);
 
   const preguntasSeleccionadas = useMemo(() => {
     if (!preguntasData || preguntasData.length === 0) return [];
@@ -20,6 +22,7 @@ const TestJuego = () => {
   const [respondido, setRespondido] = useState(false);
   const [respuestasCorrectas, setRespuestasCorrectas] = useState(0);
   const [historial, setHistorial] = useState([]);
+  const [capturando, setCapturando] = useState(false);
 
   const totalPreguntas = preguntasSeleccionadas.length;
   const itemActivo = preguntasSeleccionadas[preguntaActual];
@@ -27,7 +30,6 @@ const TestJuego = () => {
   const puntajeMaximo = totalPreguntas * PUNTOS_POR_CORRECTA;
   const porcentaje = puntajeMaximo > 0 ? Math.round((puntajeFinal / puntajeMaximo) * 100) : 0;
 
-  // Lógica de cálculo de rango e insignias sin emojis
   const configRango = useMemo(() => {
     if (porcentaje >= 80) {
       return {
@@ -43,7 +45,7 @@ const TestJuego = () => {
         texto: 'NIVEL DIGITAL MEDIUM',
         clase: 'tj-rango-medium',
         color: '#2563eb',
-        subtitulo: 'Criterio sólido con herramientas de protección'
+        subtitulo: 'Criterio solido con herramientas de proteccion'
       };
     } else {
       return {
@@ -56,9 +58,7 @@ const TestJuego = () => {
     }
   }, [porcentaje]);
 
-  const handleIniciar = () => {
-    setPantalla('juego');
-  };
+  const handleIniciar = () => setPantalla('juego');
 
   const handleSeleccionarOpcion = (index) => {
     if (respondido) return;
@@ -97,27 +97,50 @@ const TestJuego = () => {
     setPantalla('inicio');
   };
 
-  // Función para disparar la API de WhatsApp compartiendo los logros estructurados
-  const handleCompartirWhatsApp = () => {
-    const urlJuego = window.location.origin; // Toma la URL actual del despliegue automaticamente
-    const mensaje = 
-      `*¡Desafío Empatía Digital Completado!* 🚀\n\n` +
-      `He obtenido mi insignia oficial en la plataforma.\n` +
-      `🏆 Rango: *${configRango.texto}*\n` +
-      `📊 Puntaje: *${puntajeFinal} / ${puntajeMaximo} puntos* (${porcentaje}% de aciertos)\n\n` +
-      `¿Te animás a medir tus conocimientos sobre seguridad y convivencia en entornos digitales? \n` +
-      `Jugá la trivia acá mismo 👇\n${urlJuego}`;
+  const handleCompartirWhatsApp = async () => {
+    if (!insigniaRef.current || capturando) return;
 
-    const urlBase = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`;
-    window.open(urlBase, '_blank');
+    setCapturando(true);
+    try {
+      const canvas = await html2canvas(insigniaRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+        logging: false,
+      });
+
+      // Descargar la imagen automaticamente
+      const link = document.createElement('a');
+      link.download = 'mi-insignia-empatia.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+
+      // Pausa para que el download se dispare antes de abrir WhatsApp
+      await new Promise(resolve => setTimeout(resolve, 400));
+
+      // Abrir WhatsApp con mensaje simple + URL (sin puntos ni rango en el texto)
+      const urlJuego = `${window.location.origin}/trivia`;
+      const mensaje =
+        `Mira lo que obtuve en el Desafio Empatia Digital\n` +
+        `Juga la trivia aca: ${urlJuego}`;
+
+      window.open(
+        `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`,
+        '_blank'
+      );
+    } catch (err) {
+      console.error('Error al capturar la insignia:', err);
+    } finally {
+      setCapturando(false);
+    }
   };
 
   const getFeedbackFinal = () => {
-    if (porcentaje === 100) return 'Resultado perfecto. Demostrás un dominio excepcional sobre seguridad y bienestar digital.';
-    if (porcentaje >= 80) return 'Excelente nivel de conocimiento. Tenés criterios sólidos para proteger y acompañar a tu comunidad.';
-    if (porcentaje >= 60) return 'Buen desempeño. Conocés los conceptos clave; seguir explorando estos temas te dará aún más herramientas.';
+    if (porcentaje === 100) return 'Resultado perfecto. Demostras un dominio excepcional sobre seguridad y bienestar digital.';
+    if (porcentaje >= 80) return 'Excelente nivel de conocimiento. Tenes criterios solidos para proteger y acompanar a tu comunidad.';
+    if (porcentaje >= 60) return 'Buen desempeno. Conoces los conceptos clave; seguir explorando estos temas te dara aun mas herramientas.';
     if (porcentaje >= 40) return 'Vas por buen camino. Te invitamos a revisar nuestros recursos gratuitos para reforzar lo aprendido.';
-    return 'Este es un buen punto de partida. Descubrí nuestras guías y talleres para seguir creciendo en este tema.';
+    return 'Este es un buen punto de partida. Descubri nuestras guias y talleres para seguir creciendo en este tema.';
   };
 
   return (
@@ -278,10 +301,9 @@ const TestJuego = () => {
           </div>
 
           <div className="tj-res-body">
-            
-                  
-            {/* INSIGNIA PROFESIONAL EXCLUSIVA <img src="../assets/trivia.webp" alt="Insignia Background" className="tj-insignia-img" /> */}
-            <div className={`tj-insignia-card ${configRango.clase}`}>
+
+            {/* Solo este div se captura con html2canvas — el boton queda afuera */}
+            <div ref={insigniaRef} className={`tj-insignia-card ${configRango.clase}`}>
               <div className="tj-insignia-layout">
                 <div className="tj-insignia-asset-container">
                   <div className="tj-insignia-vector-overlay">
@@ -296,15 +318,19 @@ const TestJuego = () => {
                   <p className="tj-insignia-sub">{configRango.subtitulo}</p>
                 </div>
               </div>
-              
-              {/* Botón de acción para Compartir en WhatsApp */}
-              <button onClick={handleCompartirWhatsApp} className="tj-btn-compartir-wa">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397 0 11.948 0c3.176.001 6.165 1.24 8.407 3.485 2.242 2.246 3.476 5.237 3.475 8.417-.004 6.598-5.342 11.946-11.893 11.946-1.999-.001-3.965-.51-5.708-1.479L0 24zm6.59-4.846c1.62.962 3.376 1.47 5.291 1.47 5.274 0 9.563-4.307 9.566-9.607.002-2.569-1.002-4.985-2.827-6.812C16.8 2.376 14.39 1.373 11.83 1.373c-5.278 0-9.567 4.31-9.57 9.61-.001 1.925.499 3.805 1.447 5.463L2.73 21.08l4.814-1.26c-.46-.24-.46-.24 0 0z" />
-                </svg>
-                <span>Compartir Logro en WhatsApp</span>
-              </button>
             </div>
+
+            {/* Boton FUERA del ref: no aparece en la imagen capturada */}
+            <button
+              onClick={handleCompartirWhatsApp}
+              disabled={capturando}
+              className="tj-btn-compartir-wa"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397 0 11.948 0c3.176.001 6.165 1.24 8.407 3.485 2.242 2.246 3.476 5.237 3.475 8.417-.004 6.598-5.342 11.946-11.893 11.946-1.999-.001-3.965-.51-5.708-1.479L0 24zm6.59-4.846c1.62.962 3.376 1.47 5.291 1.47 5.274 0 9.563-4.307 9.566-9.607.002-2.569-1.002-4.985-2.827-6.812C16.8 2.376 14.39 1.373 11.83 1.373c-5.278 0-9.567 4.31-9.57 9.61-.001 1.925.499 3.805 1.447 5.463L2.73 21.08l4.814-1.26c-.46-.24-.46-.24 0 0z" />
+              </svg>
+              <span>{capturando ? 'Generando imagen...' : 'Compartir Logro en WhatsApp'}</span>
+            </button>
 
             <h4 className="tj-res-titulo">Resultados del Desafio</h4>
 
