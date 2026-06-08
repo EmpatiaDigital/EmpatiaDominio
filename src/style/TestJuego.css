@@ -772,3 +772,104 @@
     padding: 0.9rem 1.25rem;
   }
 }
+
+.tj-insignia-card {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: left;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.tj-insignia-layout {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.tj-insignia-asset-container {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.tj-insignia-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.tj-insignia-vector-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.tj-insignia-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.tj-insignia-meta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.05em;
+}
+
+.tj-insignia-tier {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 2px 0;
+  letter-spacing: -0.01em;
+}
+
+.tj-insignia-sub {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0;
+}
+
+/* Modificadores por Rango */
+.tj-rango-pro { border-color: #10b981; background: linear-gradient(to right, #f0fdf4, #f8fafc); }
+.tj-rango-medium { border-color: #3b82f6; background: linear-gradient(to right, #eff6ff, #f8fafc); }
+.tj-rango-aprendiz { border-color: #f59e0b; background: linear-gradient(to right, #fffbeb, #f8fafc); }
+
+/* Botón de WhatsApp Estilo Premium */
+.tj-btn-compartir-wa {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #25d366;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.tj-btn-compartir-wa:hover {
+  background-color: #128c7e;
+}
+
+.tj-btn-compartir-wa:active {
+  transform: scale(0.98);
+}
