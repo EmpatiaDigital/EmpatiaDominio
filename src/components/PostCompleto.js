@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import fondo from "../assets/Juego.jpeg";
 import "../style/PostCompleto.css";
 import { FaFacebook, FaWhatsapp, FaInstagram } from "react-icons/fa";
 import Swal from "sweetalert2";
-// Importamos el componente y el extractor de ID de visitante
 import PostStats, { getVisitorId } from "./PostStats";
 
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
@@ -45,6 +44,9 @@ const PostCompleto = () => {
   const [postsRelacionados, setPostsRelacionados] = useState([]);
   const [cargando, setCargando] = useState(true);
 
+  // Referencia para medir el tiempo de retención en el artículo
+  const startTimeRef = useRef(null);
+
   const shareUrl = `https://empatia-dominio-back.vercel.app/api/posts/${id}/preview`;
   const currentUrl = `${window.location.origin}/post/${id}`;
 
@@ -52,13 +54,20 @@ const PostCompleto = () => {
     ? encodeURIComponent(`${post.titulo} – Leé este post en Empatía Digital este es lo nuevo: ${shareUrl} `)
     : "";
 
+  // Auxiliar para enviar eventos personalizados a Google Analytics de forma segura
+  const emitirGtagEvent = (eventName, params) => {
+    if (window.gtag) {
+      window.gtag("event", eventName, params);
+    }
+  };
+
   // 1. Carga del post principal + Registro de vista unificado
   useEffect(() => {
     const fetchPostYRegistrarVista = async () => {
       try {
         setCargando(true);
 
-        // ─── REGISTRO DE VISTA ÚNICA ───
+        // ─── REGISTRO DE VISTA ÚNICA EN BACKEND ───
         const visitorId = getVisitorId();
         try {
           await fetch(`https://empatia-dominio-back.vercel.app/api/posts/${id}/vista`, {
@@ -113,9 +122,12 @@ const PostCompleto = () => {
     fetchRelacionados();
   }, [post, id]);
 
-  // 3. Modificaciones sobre HTML inyectado
+  // 3. Modificaciones sobre HTML inyectado + Inicialización y Cierre de Retención en GA4
   useEffect(() => {
     if (!post) return;
+
+    // Guardamos la marca de tiempo exacta en la que el usuario empieza a leer el post cargado
+    startTimeRef.current = performance.now();
 
     const enlaces = document.querySelectorAll(".imagen-fija-1200 a, .post-content a");
     enlaces.forEach((a) => {
@@ -131,7 +143,25 @@ const PostCompleto = () => {
       img.setAttribute("loading", "lazy");
       img.setAttribute("decoding", "async");
     });
-  }, [post]);
+
+    // Evento de limpieza: cuando el usuario cambia de post o sale de la pantalla, calculamos los segundos retenido
+    return () => {
+      if (startTimeRef.current && post) {
+        const endTime = performance.now();
+        const segundosLectura = Math.round((endTime - startTimeRef.current) / 1000);
+
+        // Emitimos el evento personalizado de retención con el tiempo exacto en segundos
+        if (window.gtag) {
+          window.gtag("event", "post_reading_time", {
+            item_id: id,
+            item_name: post.titulo,
+            category: resolverCategoria(post.categoria),
+            reading_time_seconds: segundosLectura
+          });
+        }
+      }
+    };
+  }, [post, id]);
 
   if (cargando) return <p>Cargando post...</p>;
   if (!post) return <p>No se encontró el post.</p>;
@@ -140,6 +170,40 @@ const PostCompleto = () => {
   const portadaOptimizada = optimizarPortada(post.portada);
   const avatarOptimizado = post.avatar ? optimizarAvatar(post.avatar) : DEFAULT_AVATAR;
   const categoriaFormateada = resolverCategoria(post.categoria);
+
+  // Manejadores de tracking para redes sociales
+  const handleShareClick = (platform) => {
+    emitirGtagEvent("share", {
+      method: platform,
+      content_type: "Post de Blog",
+      item_id: id,
+      item_name: post.titulo
+    });
+  };
+
+  // Manejador de tracking para descarga de PDF
+  const handlePdfDownloadClick = () => {
+    emitirGtagEvent("file_download", {
+      file_extension: "pdf",
+      file_name: "guia_gratuita_introduccion_ia",
+      link_url: "https://empatiadigital.com.ar/descargas",
+      item_id: id,
+      item_name: post.titulo
+    });
+  };
+
+  // Manejador de tracking para navegación a artículos relacionados
+  const handleRelatedPostClick = (relPost) => {
+    emitirGtagEvent("select_content", {
+      content_type: "Articulo Relacionado",
+      item_id: relPost._id,
+      item_name: relPost.titulo,
+      origin_item_id: id
+    });
+    
+    navigate(`/post/${relPost._id}`);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <div className="post-detalle">
@@ -170,21 +234,35 @@ const PostCompleto = () => {
       </div>
 
       <div className="share-section">
+        {/* Tu componente PostStats ya maneja internamente la lógica visual de Likes/Vistas contra la BD */}
         <PostStats postId={id} postTitulo={post?.titulo} />
 
         <h3>Compartir en redes:</h3>
         <div className="share-buttons">
-          <a href={`https://api.whatsapp.com/send?text=${mensaje}`} target="_blank" rel="noopener noreferrer" className="share-btn whatsapp">
+          <a 
+            href={`https://api.whatsapp.com/send?text=${mensaje}`} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="share-btn whatsapp"
+            onClick={() => handleShareClick("WhatsApp")}
+          >
             <FaWhatsapp size={30} />
           </a>
 
-          <a href={`https://www.facebook.com/sharer/sharer.php?u=${mensaje}`} target="_blank" rel="noopener noreferrer" className="share-btn facebook">
+          <a 
+            href={`https://www.facebook.com/sharer/sharer.php?u=${mensaje}`} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="share-btn facebook"
+            onClick={() => handleShareClick("Facebook")}
+          >
             <FaFacebook size={30} />
           </a>
 
           <a
             onClick={() => {
               navigator.clipboard.writeText(currentUrl);
+              handleShareClick("Instagram Stories (Link Copiado)");
               Swal.fire({
                 icon: "success",
                 title: "¡Link copiado!",
@@ -208,10 +286,8 @@ const PostCompleto = () => {
 
       <p><i>{post.epigrafe}</i></p>
 
-      {/* RENDERIZADO DEL CONTENIDO PRINCIPAL DEL POST */}
       <div className="imagen-fija-1200" dangerouslySetInnerHTML={{ __html: contenidoOptimizado }} />
 
-      {/* ─── RECUADRO DINÁMICO Y PERSISTENTE DESDE EL EDITOR (BASE DE DATOS) ─── */}
       {post.recuadro ? (
         <div 
           className="recuadro-dinamico-container"
@@ -219,7 +295,6 @@ const PostCompleto = () => {
           dangerouslySetInnerHTML={{ __html: optimizarImagenesEnHtml(post.recuadro) }}
         />
       ) : (
-        /* Si no creaste un recuadro personalizado en la BD, muestra el aviso informativo por defecto */
         <div style={{ backgroundColor: "#fff3cd", borderLeft: "6px solid #ffc107", padding: "1rem", borderRadius: "8px", fontFamily: "sans-serif", color: "#856404", marginBottom: "1.5rem", marginTop: "2rem" }}>
           <p style={{ margin: "0 0 0.5rem 0" }}>
             <strong style={{ display: "block", fontSize: "1.1rem", marginBottom: "0.5rem" }}>⚠️ Aviso importante:</strong>
@@ -231,9 +306,13 @@ const PostCompleto = () => {
         </div>
       )}
 
-      {/* BOTÓN DE DESCARGA */}
+      {/* BOTÓN DE DESCARGA DE GUÍA PDF */}
       <div style={{ borderLeft: "30px solid #42a5f5", backgroundColor: " #194542", justifyContent: "center", alignItems: "center", borderRadius: "6px", padding: "0.75rem 1rem", marginBottom: "3rem", fontSize: "1.5rem", fontWeight: "500", display: "flex" }}>
-        <a style={{ borderBottom: "2px solid white", borderRadius: "6px", padding: "0.75rem 1rem", marginBottom: "0.5rem", fontSize: "1.5rem", fontWeight: "500", display: "flex", textDecoration: "none", color: "white", backgroundColor: "transparent", cursor: "pointer" }} href={`https://empatiadigital.com.ar/descargas`}>
+        <a 
+          style={{ borderBottom: "2px solid white", borderRadius: "6px", padding: "0.75rem 1rem", marginBottom: "0.5rem", fontSize: "1.5rem", fontWeight: "500", display: "flex", textDecoration: "none", color: "white", backgroundColor: "transparent", cursor: "pointer" }} 
+          href={`https://empatiadigital.com.ar/descargas`}
+          onClick={handlePdfDownloadClick}
+        >
           Descarga la guía PDF GRATIS
         </a>
       </div>
@@ -248,10 +327,7 @@ const PostCompleto = () => {
             {postsRelacionados.map((relPost) => (
               <div
                 key={relPost._id}
-                onClick={() => {
-                  navigate(`/post/${relPost._id}`);
-                  window.scrollTo(0, 0);
-                }}
+                onClick={() => handleRelatedPostClick(relPost)}
                 style={{ cursor: "pointer", border: "1px solid #e2e8f0", borderRadius: "10px", overflow: "hidden", backgroundColor: "#fff", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", transition: "transform 0.2s ease", display: "flex", flexDirection: "column" }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-4px)"}
                 onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
