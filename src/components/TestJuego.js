@@ -27,6 +27,35 @@ const TestJuego = () => {
   const puntajeMaximo = totalPreguntas * PUNTOS_POR_CORRECTA;
   const porcentaje = puntajeMaximo > 0 ? Math.round((puntajeFinal / puntajeMaximo) * 100) : 0;
 
+  // Lógica de cálculo de rango e insignias sin emojis
+  const configRango = useMemo(() => {
+    if (porcentaje >= 80) {
+      return {
+        id: 'PRO',
+        texto: 'CIUDADANO DIGITAL PRO',
+        clase: 'tj-rango-pro',
+        color: '#059669',
+        subtitulo: 'Dominio excepcional de seguridad y convivencia'
+      };
+    } else if (porcentaje >= 40) {
+      return {
+        id: 'MEDIUM',
+        texto: 'NIVEL DIGITAL MEDIUM',
+        clase: 'tj-rango-medium',
+        color: '#2563eb',
+        subtitulo: 'Criterio sólido con herramientas de protección'
+      };
+    } else {
+      return {
+        id: 'APRENDIZ',
+        texto: 'NIVEL APRENDIZ DIGITAL',
+        clase: 'tj-rango-aprendiz',
+        color: '#d97706',
+        subtitulo: 'Explorando las bases del bienestar web'
+      };
+    }
+  }, [porcentaje]);
+
   const handleIniciar = () => {
     setPantalla('juego');
   };
@@ -66,6 +95,21 @@ const TestJuego = () => {
     setRespuestasCorrectas(0);
     setHistorial([]);
     setPantalla('inicio');
+  };
+
+  // Función para disparar la API de WhatsApp compartiendo los logros estructurados
+  const handleCompartirWhatsApp = () => {
+    const urlJuego = window.location.origin; // Toma la URL actual del despliegue automaticamente
+    const mensaje = 
+      `*¡Desafío Empatía Digital Completado!* 🚀\n\n` +
+      `He obtenido mi insignia oficial en la plataforma.\n` +
+      `🏆 Rango: *${configRango.texto}*\n` +
+      `📊 Puntaje: *${puntajeFinal} / ${puntajeMaximo} puntos* (${porcentaje}% de aciertos)\n\n` +
+      `¿Te animás a medir tus conocimientos sobre seguridad y convivencia en entornos digitales? \n` +
+      `Jugá la trivia acá mismo 👇\n${urlJuego}`;
+
+    const urlBase = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`;
+    window.open(urlBase, '_blank');
   };
 
   const getFeedbackFinal = () => {
@@ -234,10 +278,32 @@ const TestJuego = () => {
           </div>
 
           <div className="tj-res-body">
-            <div className="tj-res-badge">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width="34" height="34">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
+            
+            {/* INSIGNIA PROFESIONAL EXCLUSIVA */}
+            <div className={`tj-insignia-card ${configRango.clase}`}>
+              <div className="tj-insignia-layout">
+                <div className="tj-insignia-asset-container">
+                  <img src="assets/trivia.webp" alt="Insignia Background" className="tj-insignia-img" />
+                  <div className="tj-insignia-vector-overlay">
+                    <svg viewBox="0 0 24 24" fill="none" stroke={configRango.color} strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="tj-insignia-content">
+                  <span className="tj-insignia-meta">INSIGNIA OTORGADA</span>
+                  <h5 className="tj-insignia-tier" style={{ color: configRango.color }}>{configRango.texto}</h5>
+                  <p className="tj-insignia-sub">{configRango.subtitulo}</p>
+                </div>
+              </div>
+              
+              {/* Botón de acción para Compartir en WhatsApp */}
+              <button onClick={handleCompartirWhatsApp} className="tj-btn-compartir-wa">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397 0 11.948 0c3.176.001 6.165 1.24 8.407 3.485 2.242 2.246 3.476 5.237 3.475 8.417-.004 6.598-5.342 11.946-11.893 11.946-1.999-.001-3.965-.51-5.708-1.479L0 24zm6.59-4.846c1.62.962 3.376 1.47 5.291 1.47 5.274 0 9.563-4.307 9.566-9.607.002-2.569-1.002-4.985-2.827-6.812C16.8 2.376 14.39 1.373 11.83 1.373c-5.278 0-9.567 4.31-9.57 9.61-.001 1.925.499 3.805 1.447 5.463L2.73 21.08l4.814-1.26c-.46-.24-.46-.24 0 0z" />
+                </svg>
+                <span>Compartir Logro en WhatsApp</span>
+              </button>
             </div>
 
             <h4 className="tj-res-titulo">Resultados del Desafio</h4>
