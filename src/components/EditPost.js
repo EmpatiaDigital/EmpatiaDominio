@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { EditorContent, useEditor } from '@tiptap/react';
-import { Node } from '@tiptap/core'; // Importamos Node para la extensión del recuadro
+import { Node } from '@tiptap/core'; 
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Image from '@tiptap/extension-image';
@@ -12,7 +12,7 @@ import '../style/Editor.css';
 const CalloutBox = Node.create({
   name: "calloutBox",
   group: "block",
-  content: "block+", // Permite que haya párrafos, listas, etc. adentro del recuadro
+  content: "block+", 
   defining: true,
 
   addAttributes() {
@@ -46,6 +46,7 @@ const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
 
 const optimizarPortada = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_800");
 const optimizarContenido = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_1200");
+
 // ──────────────────────────────────────────────────────────────────────────────
 
 const EditPost = () => {
@@ -62,7 +63,7 @@ const EditPost = () => {
   const [categoria, setCategoria] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  // Opciones de colores disponibles para los bloques
+  // Paleta controlada para los selectores visuales individuales
   const coloresRecuadro = [
     { nombre: "Azul", value: "azul" },
     { nombre: "Rojo", value: "rojo" },
@@ -71,11 +72,10 @@ const EditPost = () => {
     { nombre: "Violeta", value: "violeta" },
   ];
 
-  // 🛠️ MEJORA: Configuración nativa con soporte para la extensión CalloutBox
   const editor = useEditor({
     extensions: [
       StarterKit,
-      CalloutBox, // <-- Registramos el nodo personalizado
+      CalloutBox, 
       Image.configure({
         HTMLAttributes: {
           class: "imagen-fija-1200",
@@ -92,7 +92,6 @@ const EditPost = () => {
     content: '',
   });
 
-  // Efecto seguro para setear la data del post existente en los estados y el editor
   useEffect(() => {
     if (!editor || !postId) return;
 
@@ -112,7 +111,6 @@ const EditPost = () => {
         setEpigrafes(data.epigrafes || []);
         setTamanos(data.tamanos || []);
         
-        // Seteamos el HTML completo. Tiptap va a reconocer automáticamente los divs con clase 'recuadro-dinamico'
         editor.commands.setContent(data.contenido || '');
       } catch (err) {
         console.error(err);
@@ -123,7 +121,6 @@ const EditPost = () => {
     fetchPost();
   }, [postId, editor]);
 
-  // Manejador para insertar un nuevo recuadro dinámico
   const agregarRecuadroDestacado = (color) => {
     if (!editor) return;
     editor
@@ -235,6 +232,7 @@ const EditPost = () => {
       avatar,
     };
 
+  // Resto de la lógica del componente igual...
     try {
       Swal.fire({
         title: 'Guardando cambios...',
@@ -276,7 +274,7 @@ const EditPost = () => {
 
   return (
     <div className="editor-container">
-      <h2 className="editor-title">✏️ Editar post</h2>
+      <h2 className="editor-title">Editar Publicación</h2>
 
       <input
         type="text"
@@ -305,7 +303,7 @@ const EditPost = () => {
         className="editor-textarea"
       />
 
-      <label className="editor-label">Categoría:</label>
+      <label className="editor-label">Categoría</label>
       <select
         value={categoria}
         onChange={(e) => setCategoria(e.target.value)}
@@ -319,7 +317,7 @@ const EditPost = () => {
         <option value="Sociedad Digital">Sociedad Digital</option>
       </select>
 
-      <label className="editor-label">📷 Imagen de portada:</label>
+      <label className="editor-label">Imagen de portada</label>
       <input
         type="file"
         accept="image/*"
@@ -340,11 +338,11 @@ const EditPost = () => {
       )}
 
       <div className="toolbar">
-        <button type="button" onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? 'active' : ''}>B</button>
-        <button type="button" onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? 'active' : ''}>I</button>
-        <button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? 'active' : ''}>•</button>
-        <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={editor?.isActive('heading', { level: 1 }) ? 'active' : ''}>H1</button>
-        <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''}>H2</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? 'active' : ''}>Negrita</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? 'active' : ''}>Itálica</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? 'active' : ''}>Lista</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} className={editor?.isActive('heading', { level: 1 }) ? 'active' : ''}>Título 1</button>
+        <button type="button" onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading', { level: 2 }) ? 'active' : ''}>Título 2</button>
         
         <button
           onClick={async () => {
@@ -383,34 +381,31 @@ const EditPost = () => {
           className={editor?.isActive('link') ? 'active' : ''}
           type="button"
         >
-          🔗 Link
+          Enlace
         </button>
 
-        {/* 🛠️ SELECTOR DINÁMICO DE RECUADROS CON COLORES EN LA EDICIÓN */}
-        <select
-          onChange={(e) => {
-            if (e.target.value) {
-              agregarRecuadroDestacado(e.target.value);
-              e.target.value = ""; // Resetea el elemento tras inyectar el bloque
-            }
-          }}
-          className="toolbar-select"
-          defaultValue=""
-        >
-          <option value="" disabled>📦 Agregar Recuadro...</option>
+        {/* ─── CONTROLES VISUALES MINIATURA PARA RECUADROS ─── */}
+        <div className="recuadro-picker-group">
+          <span className="recuadro-picker-label">Recuadro</span>
           {coloresRecuadro.map((col) => (
-            <option key={col.value} value={col.value}>
-              🔹 {col.nombre}
-            </option>
+            <button
+              key={col.value}
+              type="button"
+              title={`Insertar bloque ${col.nombre}`}
+              className={`swatch-btn swatch-${col.value} ${
+                editor?.isActive('calloutBox', { color: col.value }) ? 'active' : ''
+              }`}
+              onClick={() => agregarRecuadroDestacado(col.value)}
+            />
           ))}
-        </select>
+        </div>
 
         <button type="button" onClick={() => editor?.chain().focus().unsetAllMarks().run()}>Limpiar</button>
       </div>
 
       <EditorContent editor={editor} className="tiptap" />
 
-      <label className="editor-label">🖼️ Agregar nuevas imágenes:</label>
+      <label className="editor-label">Añadir imágenes al cuerpo del post</label>
       <input type="file" multiple accept="image/*" onChange={handleImagenesSeleccionadas} className="editor-file" />
 
       {cargando && <p className="uploading-text">Procesando archivos multimedia...</p>}
@@ -421,7 +416,7 @@ const EditPost = () => {
         type="button"
         disabled={cargando}
       >
-        💾 Guardar cambios
+        Guardar cambios
       </button>
     </div>
   );
