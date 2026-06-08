@@ -3,28 +3,33 @@ import { useNavigate } from 'react-router-dom';
 import preguntasData from '../data/preguntas.json';
 import '../style/TestJuego.css';
 
+const PREGUNTAS_POR_JUEGO = 5;
+const PUNTOS_POR_CORRECTA = 10;
+
 const TestJuego = () => {
   const navigate = useNavigate();
 
-  // Seleccionamos 5 preguntas aleatorias del total disponible en el JSON
   const preguntasSeleccionadas = useMemo(() => {
     if (!preguntasData || preguntasData.length === 0) return [];
-    return [...preguntasData].sort(() => 0.5 - Math.random()).slice(0, 5);
+    return [...preguntasData].sort(() => 0.5 - Math.random()).slice(0, PREGUNTAS_POR_JUEGO);
   }, []);
 
-  // Estados de control del juego
+  const [pantalla, setPantalla] = useState('inicio');
   const [preguntaActual, setPreguntaActual] = useState(0);
   const [opcionSeleccionada, setOpcionSeleccionada] = useState(null);
   const [respondido, setRespondido] = useState(false);
   const [respuestasCorrectas, setRespuestasCorrectas] = useState(0);
-  const [mostrarResultadoFinal, setMostrarResultadoFinal] = useState(false);
+  const [historial, setHistorial] = useState([]);
 
   const totalPreguntas = preguntasSeleccionadas.length;
   const itemActivo = preguntasSeleccionadas[preguntaActual];
-  
-  // Cálculo de puntaje (10 puntos por respuesta correcta)
-  const puntajeFinal = respuestasCorrectas * 10;
-  const puntajeMaximo = totalPreguntas * 10;
+  const puntajeFinal = respuestasCorrectas * PUNTOS_POR_CORRECTA;
+  const puntajeMaximo = totalPreguntas * PUNTOS_POR_CORRECTA;
+  const porcentaje = puntajeMaximo > 0 ? Math.round((puntajeFinal / puntajeMaximo) * 100) : 0;
+
+  const handleIniciar = () => {
+    setPantalla('juego');
+  };
 
   const handleSeleccionarOpcion = (index) => {
     if (respondido) return;
@@ -33,175 +38,265 @@ const TestJuego = () => {
 
   const handleValidarRespuesta = () => {
     if (opcionSeleccionada === null) return;
-    if (opcionSeleccionada === itemActivo.respuestaCorrecta) {
-      setRespuestasCorrectas(prev => prev + 1);
-    }
+    const esCorrecta = opcionSeleccionada === itemActivo.respuestaCorrecta;
+    if (esCorrecta) setRespuestasCorrectas(prev => prev + 1);
+    setHistorial(prev => [...prev, {
+      pregunta: itemActivo.pregunta,
+      correcta: esCorrecta,
+      seleccionada: opcionSeleccionada,
+      correctaIndex: itemActivo.respuestaCorrecta,
+    }]);
     setRespondido(true);
   };
 
   const handleSiguientePregunta = () => {
     setOpcionSeleccionada(null);
     setRespondido(false);
-
     if (preguntaActual + 1 < totalPreguntas) {
       setPreguntaActual(prev => prev + 1);
     } else {
-      setMostrarResultadoFinal(true);
+      setPantalla('resultados');
     }
   };
 
-  const handleReiniciarJuego = () => {
+  const handleReiniciar = () => {
     setPreguntaActual(0);
     setOpcionSeleccionada(null);
     setRespondido(false);
     setRespuestasCorrectas(0);
-    setMostrarResultadoFinal(false);
+    setHistorial([]);
+    setPantalla('inicio');
+  };
+
+  const getFeedbackFinal = () => {
+    if (porcentaje === 100) return 'Resultado perfecto. Demostrás un dominio excepcional sobre seguridad y bienestar digital.';
+    if (porcentaje >= 80) return 'Excelente nivel de conocimiento. Tenés criterios sólidos para proteger y acompañar a tu comunidad.';
+    if (porcentaje >= 60) return 'Buen desempeño. Conocés los conceptos clave; seguir explorando estos temas te dará aún más herramientas.';
+    if (porcentaje >= 40) return 'Vas por buen camino. Te invitamos a revisar nuestros recursos gratuitos para reforzar lo aprendido.';
+    return 'Este es un buen punto de partida. Descubrí nuestras guías y talleres para seguir creciendo en este tema.';
   };
 
   return (
     <div className="tj-container">
-      {/* Encabezado */}
-      <div className="tj-header">
-        <div className="tj-header-title-wrap">
-          <svg className="tj-icon-status" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{width: '24px', height: '24px'}}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-          <h3>Desafío Empatía Digital</h3>
-        </div>
-        {!mostrarResultadoFinal && (
-          <span className="tj-counter">
-            Pregunta {preguntaActual + 1} de {totalPreguntas}
-          </span>
-        )}
-      </div>
 
-      {/* Pantalla Final de Resultados */}
-      {mostrarResultadoFinal ? (
-        <div className="tj-resultados">
-          <div className="tj-badge-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} style={{width: '36px', height: '36px'}}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      {/* Pantalla de Inicio */}
+      {pantalla === 'inicio' && (
+        <div className="tj-inicio">
+          <div className="tj-inicio-header">
+            <svg className="tj-inicio-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
+            <span className="tj-inicio-eyebrow">Trivia interactiva</span>
           </div>
-          
-          <h4>Resultados del Desafío</h4>
-          <p className="tj-res-texto">
-            Obtuviste un puntaje de <span className="tj-res-destaque">{puntajeFinal}</span> sobre {puntajeMaximo} puntos posibles.
+
+          <h2 className="tj-inicio-titulo">Desafio Empatia Digital</h2>
+          <p className="tj-inicio-descripcion">
+            Pone a prueba tus conocimientos sobre seguridad, bienestar y convivencia en entornos digitales. Cinco preguntas, respuestas inmediatas y explicaciones detalladas.
           </p>
 
-          <div className="tj-progress-bar-bg">
-            <div 
-              className="tj-progress-bar-fill" 
-              style={{ width: `${(puntajeFinal / puntajeMaximo) * 100}%` }}
-            ></div>
-          </div>
-
-          {/* Mensajes de feedback psicológico según el puntaje */}
-          <div className="tj-feedback-final" style={{ marginBottom: '2rem', textAlign: 'center', maxWidth: '500px' }}>
-            <p style={{ color: '#334155', fontSize: '1.05rem', lineHeight: '1.6', margin: '0 0 1rem 0' }}>
-              Queremos felicitarte por tu compromiso e interés en aprender sobre estos temas clave. Más allá del resultado numérico, el verdadero valor radica en informarse, reflexionar y promover entornos digitales más humanos y conscientes.
-            </p>
-            {puntajeFinal >= 40 && (
-              <p style={{ color: '#0f172a', fontWeight: '600', fontSize: '1.05rem', lineHeight: '1.6' }}>
-                Demostrás un excelente nivel de conocimiento y criterio sobre seguridad y bienestar digital. Te invitamos a mantener este rol activo y seguir adquiriendo nuevas herramientas prácticas para acompañar y proteger a tu comunidad.
-              </p>
-            )}
-          </div>
-
-          {/* Bloque de Navegación e Inscripciones */}
-          <div className="tj-action-layout" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '360px' }}>
-            <button 
-              onClick={() => navigate('/descargas')} 
-              className="tj-btn-primary" 
-              style={{ background: '#2563eb', color: '#ffffff', justifyContent: 'center' }}
-            >
-              Descargar guías y recursos gratuitos
-            </button>
-            
-            <button 
-              onClick={() => navigate('/inscription')} 
-              className="tj-btn-primary" 
-              style={{ background: '#0f172a', color: '#ffffff', justifyContent: 'center' }}
-            >
-              Inscribirse a los próximos talleres
-            </button>
-
-            <button 
-              onClick={handleReiniciarJuego} 
-              className="tj-btn-secondary"
-              style={{ background: 'transparent', border: '2px solid #e2e8f0', color: '#475569', padding: '0.85rem', borderRadius: '12px', cursor: 'pointer', fontWeight: '500', transition: 'all 0.2s' }}
-            >
-              Volver a jugar
-            </button>
-          </div>
-        </div>
-      ) : (
-        /* Pantalla Activa de Preguntas */
-        <div className="tj-body">
-          <h4 className="tj-pregunta">{itemActivo.pregunta}</h4>
-
-          <div className="tj-opciones-list">
-            {itemActivo.opciones.map((opcion, index) => {
-              let claseDinamica = "";
-              
-              if (opcionSeleccionada === index && !respondido) claseDinamica = "tj-selected";
-              
-              if (respondido) {
-                if (index === itemActivo.respuestaCorrecta) {
-                  claseDinamica = "tj-correcta";
-                } else if (opcionSeleccionada === index) {
-                  claseDinamica = "tj-incorrecta";
-                } else {
-                  claseDinamica = "tj-opaca";
-                }
-              }
-
-              return (
-                <button
-                  key={index}
-                  disabled={respondido}
-                  onClick={() => handleSeleccionarOpcion(index)}
-                  className={`tj-opcion-btn ${claseDinamica}`}
-                >
-                  <span>{opcion}</span>
-                  {respondido && index === itemActivo.respuestaCorrecta && (
-                    <svg className="tj-icon-status" fill="none" viewBox="0 0 24 24" stroke="#10b981" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                  {respondido && opcionSeleccionada === index && index !== itemActivo.respuestaCorrecta && (
-                    <svg className="tj-icon-status" fill="none" viewBox="0 0 24 24" stroke="#ef4444" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {respondido && (
-            <div className="tj-feedback-box">
-              <p>{itemActivo.feedback}</p>
+          <div className="tj-inicio-chips">
+            <div className="tj-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} width="15" height="15">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {PREGUNTAS_POR_JUEGO} preguntas
             </div>
-          )}
+            <div className="tj-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} width="15" height="15">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+              {PUNTOS_POR_CORRECTA} puntos por acierto
+            </div>
+            <div className="tj-chip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} width="15" height="15">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Feedback en cada respuesta
+            </div>
+          </div>
 
-          <div className="tj-footer-actions">
-            {!respondido ? (
-              <button
-                disabled={opcionSeleccionada === null}
-                onClick={handleValidarRespuesta}
-                className="tj-btn-primary tj-comprobar"
-              >
-                Comprobar respuesta
-              </button>
-            ) : (
-              <button onClick={handleSiguientePregunta} className="tj-btn-primary tj-siguiente">
-                <span>{preguntaActual + 1 === totalPreguntas ? 'Ver resultados' : 'Siguiente'}</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} style={{width: '16px', height: '16px'}}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </button>
+          <button onClick={handleIniciar} className="tj-btn-iniciar">
+            <span>Comenzar desafio</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} width="17" height="17">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+
+          <p className="tj-inicio-aviso">
+            Las preguntas se seleccionan aleatoriamente en cada partida.
+          </p>
+        </div>
+      )}
+
+      {/* Pantalla de Juego */}
+      {pantalla === 'juego' && itemActivo && (
+        <>
+          <div className="tj-header">
+            <div className="tj-header-title-wrap">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{ width: '20px', height: '20px' }}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <h3>Desafio Empatia Digital</h3>
+            </div>
+            <span className="tj-counter">
+              {preguntaActual + 1} / {totalPreguntas}
+            </span>
+          </div>
+
+          <div className="tj-progreso-barra-wrap">
+            <div
+              className="tj-progreso-barra-fill"
+              style={{ width: `${((preguntaActual + (respondido ? 1 : 0)) / totalPreguntas) * 100}%` }}
+            />
+          </div>
+
+          <div className="tj-body">
+            <div className="tj-pregunta-numero">Pregunta {preguntaActual + 1}</div>
+            <h4 className="tj-pregunta">{itemActivo.pregunta}</h4>
+
+            <div className="tj-opciones-list">
+              {itemActivo.opciones.map((opcion, index) => {
+                let claseDinamica = '';
+                if (opcionSeleccionada === index && !respondido) claseDinamica = 'tj-selected';
+                if (respondido) {
+                  if (index === itemActivo.respuestaCorrecta) claseDinamica = 'tj-correcta';
+                  else if (opcionSeleccionada === index) claseDinamica = 'tj-incorrecta';
+                  else claseDinamica = 'tj-opaca';
+                }
+
+                return (
+                  <button
+                    key={index}
+                    disabled={respondido}
+                    onClick={() => handleSeleccionarOpcion(index)}
+                    className={`tj-opcion-btn ${claseDinamica}`}
+                  >
+                    <span className="tj-opcion-letra">{String.fromCharCode(65 + index)}</span>
+                    <span className="tj-opcion-texto">{opcion}</span>
+                    {respondido && index === itemActivo.respuestaCorrecta && (
+                      <svg className="tj-icon-estado" fill="none" viewBox="0 0 24 24" stroke="#059669" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                    {respondido && opcionSeleccionada === index && index !== itemActivo.respuestaCorrecta && (
+                      <svg className="tj-icon-estado" fill="none" viewBox="0 0 24 24" stroke="#dc2626" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {respondido && (
+              <div className={`tj-feedback-box ${opcionSeleccionada === itemActivo.respuestaCorrecta ? 'tj-feedback-ok' : 'tj-feedback-error'}`}>
+                <div className="tj-feedback-label">
+                  {opcionSeleccionada === itemActivo.respuestaCorrecta ? 'Correcto' : 'Incorrecto'}
+                </div>
+                <p>{itemActivo.feedback}</p>
+              </div>
             )}
+
+            <div className="tj-footer-actions">
+              {!respondido ? (
+                <button
+                  disabled={opcionSeleccionada === null}
+                  onClick={handleValidarRespuesta}
+                  className="tj-btn-primary tj-comprobar"
+                >
+                  Comprobar respuesta
+                </button>
+              ) : (
+                <button onClick={handleSiguientePregunta} className="tj-btn-primary tj-siguiente">
+                  <span>{preguntaActual + 1 === totalPreguntas ? 'Ver resultados' : 'Siguiente'}</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} width="16" height="16">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Pantalla de Resultados */}
+      {pantalla === 'resultados' && (
+        <div className="tj-resultados">
+          <div className="tj-res-header">
+            <div className="tj-header">
+              <div className="tj-header-title-wrap">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} style={{ width: '20px', height: '20px' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <h3>Desafio Empatia Digital</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="tj-res-body">
+            <div className="tj-res-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} width="34" height="34">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+            </div>
+
+            <h4 className="tj-res-titulo">Resultados del Desafio</h4>
+
+            <div className="tj-res-score-wrap">
+              <span className="tj-res-score">{puntajeFinal}</span>
+              <span className="tj-res-score-max">/ {puntajeMaximo} puntos</span>
+            </div>
+
+            <div className="tj-progress-bar-bg">
+              <div
+                className="tj-progress-bar-fill"
+                style={{ width: `${porcentaje}%` }}
+              />
+            </div>
+
+            <div className="tj-res-stats">
+              <div className="tj-stat">
+                <span className="tj-stat-valor tj-stat-correctas">{respuestasCorrectas}</span>
+                <span className="tj-stat-label">correctas</span>
+              </div>
+              <div className="tj-stat-sep" />
+              <div className="tj-stat">
+                <span className="tj-stat-valor tj-stat-incorrectas">{totalPreguntas - respuestasCorrectas}</span>
+                <span className="tj-stat-label">incorrectas</span>
+              </div>
+              <div className="tj-stat-sep" />
+              <div className="tj-stat">
+                <span className="tj-stat-valor">{porcentaje}%</span>
+                <span className="tj-stat-label">aciertos</span>
+              </div>
+            </div>
+
+            <div className="tj-res-feedback">
+              <p>Gracias por participar y por tu interes en aprender sobre estos temas. Mas alla del resultado, informarse y reflexionar es el primer paso para construir entornos digitales mas humanos.</p>
+              <p className="tj-res-feedback-personalizado">{getFeedbackFinal()}</p>
+            </div>
+
+            <div className="tj-res-historial">
+              <p className="tj-historial-titulo">Resumen de respuestas</p>
+              {historial.map((item, i) => (
+                <div key={i} className={`tj-historial-item ${item.correcta ? 'tj-hist-ok' : 'tj-hist-mal'}`}>
+                  <div className={`tj-hist-dot ${item.correcta ? 'tj-dot-ok' : 'tj-dot-mal'}`} />
+                  <span className="tj-hist-texto">{item.pregunta}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="tj-res-acciones">
+              <button onClick={() => navigate('/descargas')} className="tj-btn-accion tj-btn-accion-primary">
+                Descargar guias y recursos gratuitos
+              </button>
+              <button onClick={() => navigate('/inscription')} className="tj-btn-accion tj-btn-accion-dark">
+                Inscribirse a los proximos talleres
+              </button>
+              <button onClick={handleReiniciar} className="tj-btn-accion tj-btn-accion-ghost">
+                Volver a jugar
+              </button>
+            </div>
           </div>
         </div>
       )}
