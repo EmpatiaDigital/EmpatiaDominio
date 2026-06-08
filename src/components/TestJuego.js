@@ -97,10 +97,10 @@ const TestJuego = () => {
     setPantalla('inicio');
   };
 
-  const handleCompartirWhatsApp = async () => {
+  const handleCompartir = async () => {
     if (!insigniaRef.current || capturando) return;
-
     setCapturando(true);
+
     try {
       const canvas = await html2canvas(insigniaRef.current, {
         scale: 2,
@@ -109,27 +109,37 @@ const TestJuego = () => {
         logging: false,
       });
 
-      // Descargar la imagen automaticamente
-      const link = document.createElement('a');
-      link.download = 'mi-insignia-empatia.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-
-      // Pausa para que el download se dispare antes de abrir WhatsApp
-      await new Promise(resolve => setTimeout(resolve, 400));
-
-      // Abrir WhatsApp con mensaje simple + URL (sin puntos ni rango en el texto)
       const urlJuego = `${window.location.origin}/trivia`;
-      const mensaje =
-        `Mira lo que obtuve en el Desafio Empatia Digital\n` +
-        `Juga la trivia aca: ${urlJuego}`;
+      const texto = `Mira lo que obtuve en el Desafio Empatia Digital\nJuga la trivia aca: ${urlJuego}`;
 
-      window.open(
-        `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`,
-        '_blank'
-      );
+      // Convertir canvas a Blob
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      const file = new File([blob], 'mi-insignia-empatia.png', { type: 'image/png' });
+
+      // Web Share API — permite compartir imagen directamente (funciona en movil)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          text: texto,
+        });
+      } else {
+        // Fallback desktop: descarga la imagen y abre WhatsApp con el texto
+        const link = document.createElement('a');
+        link.download = 'mi-insignia-empatia.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+
+        await new Promise(resolve => setTimeout(resolve, 400));
+
+        window.open(
+          `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`,
+          '_blank'
+        );
+      }
     } catch (err) {
-      console.error('Error al capturar la insignia:', err);
+      if (err.name !== 'AbortError') {
+        console.error('Error al compartir la insignia:', err);
+      }
     } finally {
       setCapturando(false);
     }
@@ -302,7 +312,7 @@ const TestJuego = () => {
 
           <div className="tj-res-body">
 
-            {/* Solo este div se captura con html2canvas — el boton queda afuera */}
+            {/* Solo este div entra en la captura */}
             <div ref={insigniaRef} className={`tj-insignia-card ${configRango.clase}`}>
               <div className="tj-insignia-layout">
                 <div className="tj-insignia-asset-container">
@@ -320,9 +330,9 @@ const TestJuego = () => {
               </div>
             </div>
 
-            {/* Boton FUERA del ref: no aparece en la imagen capturada */}
+            {/* Boton fuera del ref: no aparece en la imagen */}
             <button
-              onClick={handleCompartirWhatsApp}
+              onClick={handleCompartir}
               disabled={capturando}
               className="tj-btn-compartir-wa"
             >
