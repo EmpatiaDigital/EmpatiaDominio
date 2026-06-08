@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { Node } from "@tiptap/core"; // Importamos Node para crear el recuadro personalizado
+import { Node } from "@tiptap/core"; 
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
@@ -11,7 +11,7 @@ import Swal from "sweetalert2";
 const CalloutBox = Node.create({
   name: "calloutBox",
   group: "block",
-  content: "block+", // Permite párrafos, listas o imágenes dentro del recuadro
+  content: "block+", 
   defining: true,
 
   addAttributes() {
@@ -45,6 +45,7 @@ const optimizarCloudinary = (url, params = "f_auto,q_auto,w_1200") => {
 
 const optimizarPortada = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_800");
 const optimizarContenido = (url) => optimizarCloudinary(url, "f_auto,q_auto,w_1200");
+
 // ──────────────────────────────────────────────────────────────────────────────
 
 const CrearPost = () => {
@@ -61,7 +62,7 @@ const CrearPost = () => {
   const [categoria, setCategoria] = useState("");
   const [cargando, setCargando] = useState(false);
 
-  // Opciones de colores disponibles para el operador
+  // Paleta controlada para los selectores visuales individuales
   const coloresRecuadro = [
     { nombre: "Azul", value: "azul" },
     { nombre: "Rojo", value: "rojo" },
@@ -73,7 +74,7 @@ const CrearPost = () => {
   const editor = useEditor({
     extensions: [
       StarterKit,
-      CalloutBox, // <-- Agregamos nuestra extensión acá
+      CalloutBox, 
       Image.configure({
         HTMLAttributes: {
           class: "imagen-fija-1200",
@@ -90,7 +91,6 @@ const CrearPost = () => {
     content: "",
   });
 
-  // Función controlada para insertar el bloque con el color seleccionado
   const agregarRecuadroDestacado = (color) => {
     if (!editor) return;
     editor
@@ -279,7 +279,7 @@ const CrearPost = () => {
 
   return (
     <div className="editor-container">
-      <h2 className="editor-title">📝 Crear nuevo post</h2>
+      <h2 className="editor-title">Crear nuevo post</h2>
 
       <input
         type="text"
@@ -308,7 +308,7 @@ const CrearPost = () => {
         className="editor-textarea"
       />
 
-      <label className="editor-label">Categoría:</label>
+      <label className="editor-label">Categoría</label>
       <select
         value={categoria}
         onChange={(e) => setCategoria(e.target.value)}
@@ -322,7 +322,7 @@ const CrearPost = () => {
         <option value="Sociedad Digital">Sociedad Digital</option>
       </select>
 
-      <label className="editor-label">📷 Imagen de portada:</label>
+      <label className="editor-label">Imagen de portada</label>
       <input
         type="file"
         accept="image/*"
@@ -344,44 +344,44 @@ const CrearPost = () => {
 
       <div className="toolbar">
         <button
-          onClick={() => editor.chain().focus().toggleBold().run()}
+          onClick={() => editor?.chain().focus().toggleBold().run()}
           className={editor?.isActive("bold") ? "active" : ""}
           type="button"
         >
-          B
+          Negrita
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleItalic().run()}
+          onClick={() => editor?.chain().focus().toggleItalic().run()}
           className={editor?.isActive("italic") ? "active" : ""}
           type="button"
         >
-          I
+          Itálica
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          onClick={() => editor?.chain().focus().toggleBulletList().run()}
           className={editor?.isActive("bulletList") ? "active" : ""}
           type="button"
         >
-          •
+          Lista
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
           className={editor?.isActive("heading", { level: 1 }) ? "active" : ""}
           type="button"
         >
-          H1
+          Título 1
         </button>
         <button
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
           className={editor?.isActive("heading", { level: 2 }) ? "active" : ""}
           type="button"
         >
-          H2
+          Título 2
         </button>
 
         <button
           onClick={async () => {
-            const previousUrl = editor.getAttributes("link").href || "";
+            const previousUrl = editor?.getAttributes("link").href || "";
 
             const { value: url } = await Swal.fire({
               title: "Insertar enlace",
@@ -389,8 +389,8 @@ const CrearPost = () => {
               inputLabel: "URL del enlace",
               inputValue: previousUrl,
               showCancelButton: true,
-              confirmButtonText: "Insertar",
-              cancelButtonText: "Cancelar",
+              confirmButtonText: 'Insertar',
+              cancelButtonText: 'Cancelar',
               inputValidator: (value) => {
                 if (value && !/^https?:\/\/|^\/|^[\w\-]/.test(value)) {
                   return "Ingresá una URL válida o dejala vacía para quitar el enlace";
@@ -402,7 +402,7 @@ const CrearPost = () => {
             if (url === undefined) return;
 
             if (url === "") {
-              editor.chain().focus().unsetLink().run();
+              editor?.chain().focus().unsetLink().run();
               return;
             }
 
@@ -413,40 +413,32 @@ const CrearPost = () => {
               cleanedUrl = url.replace("http://localhost:3000", "");
             }            
 
-            editor
-              .chain()
-              .focus()
-              .extendMarkRange("link")
-              .setLink({ href: cleanedUrl })
-              .run();
+            editor?.chain().focus().extendMarkRange("link").setLink({ href: cleanedUrl }).run();
           }}
           className={editor?.isActive("link") ? "active" : ""}
           type="button"
         >
-          🔗 Link
+          Enlace
         </button>
 
-        {/* 🛠️ SELECTOR DINÁMICO DE RECUADROS CON COLORES */}
-        <select
-          onChange={(e) => {
-            if (e.target.value) {
-              agregarRecuadroDestacado(e.target.value);
-              e.target.value = ""; // Resetea el selector tras insertar
-            }
-          }}
-          className="toolbar-select"
-          defaultValue=""
-        >
-          <option value="" disabled>📦 Agregar Recuadro...</option>
+        {/* ─── CONTROLES VISUALES MINIATURA PARA RECUADROS ─── */}
+        <div className="recuadro-picker-group">
+          <span className="recuadro-picker-label">Recuadro</span>
           {coloresRecuadro.map((col) => (
-            <option key={col.value} value={col.value}>
-              🔹 {col.nombre}
-            </option>
+            <button
+              key={col.value}
+              type="button"
+              title={`Insertar bloque ${col.nombre}`}
+              className={`swatch-btn swatch-${col.value} ${
+                editor?.isActive('calloutBox', { color: col.value }) ? 'active' : ''
+              }`}
+              onClick={() => agregarRecuadroDestacado(col.value)}
+            />
           ))}
-        </select>
+        </div>
 
         <button
-          onClick={() => editor.chain().focus().unsetAllMarks().run()}
+          onClick={() => editor?.chain().focus().unsetAllMarks().run()}
           type="button"
         >
           Limpiar
@@ -455,9 +447,7 @@ const CrearPost = () => {
 
       <EditorContent editor={editor} className="tiptap" />
 
-      <label className="editor-label">
-        🖼️ Agregar imágenes dentro del contenido:
-      </label>
+      <label className="editor-label">Añadir imágenes al cuerpo del post</label>
       <input
         type="file"
         multiple
@@ -474,7 +464,7 @@ const CrearPost = () => {
         type="button"
         disabled={cargando}
       >
-        🚀 Publicar
+        Publicar
       </button>
     </div>
   );
