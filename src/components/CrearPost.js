@@ -64,11 +64,11 @@ const CrearPost = () => {
 
   // Paleta controlada para los selectores visuales individuales
   const coloresRecuadro = [
-    { nombre: "Azul", value: "azul" },
-    { nombre: "Rojo", value: "rojo" },
-    { nombre: "Verde", value: "verde" },
+    { nombre: "Azul",     value: "azul"     },
+    { nombre: "Rojo",     value: "rojo"     },
+    { nombre: "Verde",    value: "verde"    },
     { nombre: "Amarillo", value: "amarillo" },
-    { nombre: "Violeta", value: "violeta" },
+    { nombre: "Violeta",  value: "violeta"  },
   ];
 
   const editor = useEditor({
@@ -429,8 +429,8 @@ const CrearPost = () => {
               key={col.value}
               type="button"
               title={`Insertar bloque ${col.nombre}`}
-              className={`swatch-btn swatch-${col.value} ${
-                editor?.isActive('calloutBox', { color: col.value }) ? 'active' : ''
+              className={`swatch-btn swatch-${col.value}${
+                editor?.isActive('calloutBox', { color: col.value }) ? ' active' : ''
               }`}
               onClick={() => agregarRecuadroDestacado(col.value)}
             />
