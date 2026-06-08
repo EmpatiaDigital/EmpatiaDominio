@@ -241,19 +241,72 @@ const Informacion = () => {
         </>
       )}
 
-      {/* Términos, Condiciones y Contactos Estructurados (Inmutables) */}
+      {/* Términos, Condiciones y Contactos Completos */}
       <section className="privacy-section" id="privacy-section">
         <div className="privacy-container">
           <h2 className="privacy-title">Términos y Condiciones de Uso de Datos Personales</h2>
 
           <div className="privacy-content">
-            {/* Bloques 1 al 11 omitidos aquí en pos de la brevedad de lectura, permanecen intactos en tu archivo */}
             <div className="privacy-block">
               <h3>1. Recopilación de Datos</h3>
-              <p>Al inscribirte en {titulo ? `el curso "${titulo}"` : 'nuestras capacitaciones'}, recopilamos información personal básica...</p>
+              <p>Al inscribirte en {titulo ? `el curso "${titulo}"` : 'nuestras capacitaciones'}, recopilamos información personal básica como tu nombre completo, número de documento, correo electrónico, número de teléfono o WhatsApp y país de residencia, con el fin único de gestionar el acceso, la facturación y la comunicación directa del trayecto formativo.</p>
             </div>
-            
-            {/* [... Bloques del 2 al 11 sin alteraciones de texto ...] */}
+
+            <div className="privacy-block">
+              <h3>2. Consentimiento Informado</h3>
+              <p>Al completar de forma voluntaria el formulario de inscripción y aceptar las presentes condiciones, nos otorgás tu consentimiento expreso para que procesemos tus datos estrictamente dentro de los límites aquí descritos, cumpliendo con la normativa vigente sobre el cuidado de la información.</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>3. Finalidad del Tratamiento</h3>
+              <p>Tus datos personales recolectados serán utilizados únicamente para los siguientes propósitos específicos:</p>
+              <ul>
+                <li>Validar la identidad del alumno y tramitar su inscripción formal.</li>
+                <li>Enviar confirmaciones de pago, accesos técnicos al aula virtual y material complementario.</li>
+                <li>Establecer canales de comunicación grupal o individual de soporte mediante correo o plataformas de mensajería (como WhatsApp).</li>
+                <li>Confeccionar y emitir la certificación final del curso una vez cumplidos los requisitos académicos.</li>
+              </ul>
+            </div>
+
+            <div className="privacy-block">
+              <h3>4. Confidencialidad y Custodia</h3>
+              <p>Nos comprometemos de manera ineludible a no vender, alquilar, transferir, ceder, ni divulgar bajo ningún concepto tus datos personales a terceros comerciales, empresas externas o agencias de marketing sin tu autorización explícita previa.</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>5. Seguridad del Almacenamiento</h3>
+              <p>La información recopilada se almacena en bases de datos protegidas mediante firewalls, protocolos seguros de transferencia de datos y restricciones estrictas de acceso. Solo personal autorizado tiene acceso físico o digital a tus registros.</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>6. Comunicaciones Académicas y Promocionales</h3>
+              <p>Podremos utilizar tu dirección de correo electrónico o número de WhatsApp para notificarte sobre avisos urgentes de clases, actualizaciones críticas de contenido o avisos puntuales de nuevas convocatorias formativas organizadas por nosotros, contando siempre con la posibilidad de solicitar la baja de dichos envíos.</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>7. Retención de la Información</h3>
+              <p>Conservaremos tus datos de alumno y la constancia de tu cursada por un período prudencial para garantizar la validez a largo plazo del certificado emitido y permitirte solicitar duplicados en el futuro si así lo requirieras.</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>8. Uso de Cookies y Tecnologías de Terceros</h3>
+              <p>Nuestra plataforma puede emplear cookies técnicas y herramientas analíticas internas estándar para optimizar el rendimiento del proceso de inscripción y mejorar la experiencia de usuario dentro de la web, sin perfilar de forma invasiva tus hábitos de navegación.</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>9. Limitación de Responsabilidad Técnica</h3>
+              <p>Si bien implementamos las mejores prácticas de seguridad digital, no nos hacemos responsables por filtraciones maliciosas fortuitas derivadas de ciberataques imprevisibles que escapen a las capacidades de control técnico estándar del mercado actual.</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>10. Menores de Edad</h3>
+              <p>Nuestras capacitaciones están orientadas a mayores de edad o a menores que cuenten con la expresa supervisión y autorización formal de sus progenitores o tutores legales al momento de enviar el formulario.</p>
+            </div>
+
+            <div className="privacy-block">
+              <h3>11. Modificaciones en la Política</h3>
+              <p>Nos reservamos el derecho de actualizar o modificar estas cláusulas para adaptarlas a nuevas exigencias legales o estructurales del servicio. Cualquier cambio sustancial se notificará de forma transparente a través de los canales de contacto provistos o mediante la actualización de la fecha de cabecera de este documento.</p>
+            </div>
 
             <div className="privacy-block">
               <h3>12. Canales de Contacto Oficiales</h3>
@@ -283,7 +336,7 @@ const Informacion = () => {
             </div>
 
             <div className="privacy-footer">
-              <p>Última actualización: Febrero 2026</p>
+              <p>Última actualización: Junio 2026</p>
               <p>Empatía Digital</p>
             </div>
           </div>
