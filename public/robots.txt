@@ -1,3 +1,17 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /login
+Disallow: /registro
+Disallow: /reestablecer
+Disallow: /data-user
+Disallow: /socio/dashboard
+Disallow: /superadmin/dashboard
+Disallow: /admin/dashboard
+Disallow: /crear
+Disallow: /editar-publicaciones
+Disallow: /crear-actividades
+Disallow: /superadmincourses
+Disallow: /cursantes
+Disallow: /congelar
+
+Sitemap: https://empatiadigital.com.ar/sitemap.xml
