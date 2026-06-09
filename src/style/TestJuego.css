@@ -873,3 +873,135 @@
 .tj-btn-compartir-wa:active {
   transform: scale(0.98);
 }
+/* ── Agregar al final de TestJuego.css ─────────────────────────────────────── */
+
+/* Top 3 */
+.tj-top3 {
+  width: 100%;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 1.25rem 0 0.5rem;
+}
+.tj-top3-compact {
+  margin: 1rem 0 0;
+}
+.tj-top3-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.tj-top3-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fff;
+}
+.tj-top3-row:last-child { border-bottom: none; }
+.tj-top3-pos   { font-size: 1.1rem; min-width: 26px; text-align: center; }
+.tj-top3-nombre { flex: 1; font-size: 0.9rem; font-weight: 600; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tj-top3-pts   { font-size: 1rem; font-weight: 700; }
+.tj-top3-tiempo { font-size: 0.78rem; color: #94a3b8; font-weight: 500; white-space: nowrap; }
+.tj-top3-empty { padding: 1rem; text-align: center; color: #94a3b8; font-size: 0.88rem; margin: 0; }
+
+/* Inscripción al ranking */
+.tj-inscripcion-box {
+  width: 100%;
+  padding: 1.1rem 1.25rem;
+  background: #f0f7ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 14px;
+  margin-top: 1rem;
+}
+.tj-inscripcion-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin-bottom: 0.35rem;
+}
+.tj-inscripcion-desc {
+  font-size: 0.83rem;
+  color: #475569;
+  margin: 0 0 0.85rem;
+}
+.tj-inscripcion-form {
+  display: flex;
+  gap: 0.5rem;
+}
+.tj-inscripcion-input {
+  flex: 1;
+  padding: 0.55rem 0.85rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: 'DM Sans', sans-serif;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.tj-inscripcion-input:focus { border-color: #4a90d9; }
+.tj-inscripcion-btn {
+  padding: 0.55rem 1.1rem;
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.tj-inscripcion-btn:hover:not(:disabled) { background: #4a90d9; }
+.tj-inscripcion-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.tj-inscripcion-error {
+  margin: 0.5rem 0 0;
+  font-size: 0.82rem;
+  color: #dc2626;
+}
+
+/* Confirmación inscripción */
+.tj-inscripcion-ok {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  color: #065f46;
+  margin-top: 1rem;
+}
+
+/* Botón ranking completo */
+.tj-btn-ver-ranking {
+  width: 100%;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.15s;
+}
+.tj-btn-ver-ranking:hover { background: #f1f5f9; }
