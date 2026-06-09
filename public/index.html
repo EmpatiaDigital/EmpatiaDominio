@@ -3,15 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#1e3a5f" />
 
-    <!-- Preconnect al backend para reducir latencia en el primer fetch de React -->
-    <link rel="preconnect" href="https://empatia-dominio-back.vercel.app" />
+    <!-- Canonical y dominio consolidado en www -->
+    <link rel="canonical" href="https://www.empatiadigital.com.ar" />
+
+    <!-- Preconnect: abre TCP antes de que React haga el primer fetch -->
+    <link rel="preconnect" href="https://empatia-dominio-back.vercel.app" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://res.cloudinary.com" />
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
 
-    <!-- Fuentes: carga diferida sin bloquear render -->
+    <!-- Fuentes: no bloquean render, noscript como fallback -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap"
@@ -19,39 +22,51 @@
       onload="this.media='all'"
     />
     <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap"
-      />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap" />
     </noscript>
 
     <link rel="icon" type="image/png" href="empatialog.jpeg" />
     <link rel="apple-touch-icon" href="https://www.empatiadigital.com.ar/empatialog.jpeg" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="canonical" href="https://empatiadigital.com.ar" />
 
     <title>Empatía Digital | Salud Digital, Prevención de Grooming y Crianza</title>
     <meta name="description" content="Recursos y herramientas sobre salud digital, prevención de grooming, ciberseguridad y uso consciente de tecnologías. Talleres para familias, escuelas y comunidades." />
 
+    <!-- Open Graph -->
     <meta property="og:title" content="Empatía Digital – Salud Digital y Prevención de Grooming" />
     <meta property="og:description" content="Promovemos el bienestar digital y la ciberseguridad. Encontrá herramientas y talleres sobre crianza digital, uso de pantallas y prevención de riesgos en línea." />
     <meta property="og:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
-    <meta property="og:url" content="https://empatiadigital.com.ar" />
+    <meta property="og:url" content="https://www.empatiadigital.com.ar" />
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:site_name" content="Empatía Digital" />
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Empatía Digital – Convivencia y Salud Digital Consciente" />
     <meta name="twitter:description" content="Propuestas de ciudadanía digital, prevención de grooming y bienestar tecnológico para docentes, familias y entornos educativos." />
     <meta name="twitter:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
 
-    <!-- Skeleton CSS: reserva espacio visual antes de que React monte
-         Elimina el CLS de las cards de posts que aparecen después del JS -->
+    <!-- Skeleton CSS inline: reserva espacio ANTES de que React monte
+         Ataca directamente el CLS y el Speed Index -->
     <style>
-      /* Reserva altura del navbar para evitar shift al montar */
-      #root > nav, .navbar { min-height: 64px; }
+      /* Reset mínimo para evitar flashes */
+      *, *::before, *::after { box-sizing: border-box; }
+      body { margin: 0; background: #ffffff; font-family: 'DM Sans', sans-serif; }
 
-      /* Skeleton de cards en homepage — evita el layout shift principal */
-      .skeleton-grid {
+      /* Navbar: reserva altura fija antes del JS para evitar shift */
+      #root > nav,
+      .navbar { min-height: 64px; }
+
+      /* Skeleton del carrusel hero — misma altura que CAROUSEL_STYLE en HomePage */
+      .sk-hero {
+        width: 100%;
+        height: clamp(320px, 55vw, 600px);
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      }
+
+      /* Skeleton de cards de posts */
+      .sk-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 1.5rem;
@@ -59,48 +74,48 @@
         max-width: 1200px;
         margin: 0 auto;
       }
-      .skeleton-card {
+      .sk-card {
         border-radius: 16px;
-        overflow: hidden;
         background: #f1f5f9;
-        /* Reserva la altura exacta de una card antes de que carguen */
         aspect-ratio: 3 / 4;
         animation: skPulse 1.4s ease-in-out infinite;
       }
       @keyframes skPulse {
         0%, 100% { opacity: 1; }
-        50%       { opacity: 0.5; }
+        50%       { opacity: 0.45; }
       }
 
-      /* Ocultar skeleton cuando React ya montó */
-      #root:not(:empty) + #sk-home { display: none !important; }
+      /* Se oculta en cuanto React monta contenido en #root */
+      #root:not(:empty) ~ #sk-shell { display: none !important; }
     </style>
   </head>
 
   <body>
     <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>
+
     <div id="root"></div>
 
-    <!-- Skeleton visible SOLO mientras React no montó todavía.
-         Se oculta automáticamente en cuanto #root tiene contenido. -->
-    <div id="sk-home" aria-hidden="true">
-      <div class="skeleton-grid">
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
-        <div class="skeleton-card"></div>
+    <!-- Skeleton visible solo mientras React no montó.
+         Replica la estructura visual real: hero + grid de cards -->
+    <div id="sk-shell" aria-hidden="true">
+      <div class="sk-hero"></div>
+      <div class="sk-grid">
+        <div class="sk-card"></div>
+        <div class="sk-card"></div>
+        <div class="sk-card"></div>
+        <div class="sk-card"></div>
+        <div class="sk-card"></div>
+        <div class="sk-card"></div>
       </div>
     </div>
 
-    <!-- GA4: movido al final del body para no bloquear render -->
+    <!-- GA4 al final del body: no bloquea el render del HTML -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-1PQVGSKJGE"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-1PQVGSKJGE');
+      gtag('config', 'G-1PQVGSKJGE', { send_page_view: false });
     </script>
   </body>
 </html>
