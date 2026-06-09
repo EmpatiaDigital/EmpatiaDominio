@@ -1,10 +1,89 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+// sitemap.js — Ejecutar con: node sitemap.js
+// Genera public/sitemap.xml combinando rutas estáticas + posts dinámicos del backend
+// Sin dependencias externas — usa fetch nativo (Node 18+)
 
+const fs   = require('fs');
+const path = require('path');
+
+const DOMAIN   = 'https://empatiadigital.com.ar';
+const API_URL  = 'https://empatiadigital.com.ar/api/posts';
+const OUT_PATH = path.join(__dirname, 'public', 'sitemap.xml');
+
+// ── Rutas estáticas (extraídas de App.js) ─────────────────────────────────
+const STATIC_ROUTES = [
+  { path: '/',                              priority: '1.0', changefreq: 'daily'   },
+  { path: '/post',                          priority: '0.9', changefreq: 'daily'   },
+  { path: '/actividades',                   priority: '0.8', changefreq: 'weekly'  },
+  { path: '/informacion',                   priority: '0.8', changefreq: 'weekly'  },
+  { path: '/inscription',                   priority: '0.8', changefreq: 'monthly' },
+  { path: '/descargas',                     priority: '0.7', changefreq: 'monthly' },
+  { path: '/contacto',                      priority: '0.7', changefreq: 'monthly' },
+  { path: '/trivia',                        priority: '0.7', changefreq: 'monthly' },
+  { path: '/descargo-de-responsabilidad',   priority: '0.4', changefreq: 'yearly'  },
+];
+
+// Rutas privadas/admin que NO deben indexarse — no se incluyen:
+// /login, /registro, /reestablecer, /data-user, /socio/dashboard,
+// /superadmin/dashboard, /admin/dashboard, /crear, /editar-publicaciones,
+// /editar/:id, /crear-actividades, /superadmincourses, /cursantes, /congelar
+
+function toXmlDate(dateStr) {
+  try {
+    return new Date(dateStr).toISOString().split('T')[0];
+  } catch {
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
+function buildUrl(loc, lastmod, changefreq, priority) {
+  return `
   <url>
-    <loc>https://www.empatiadigital.com.ar/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+    <loc>${DOMAIN}${loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+}
 
-</urlset>
+async function generateSitemap() {
+  const today = new Date().toISOString().split('T')[0];
+  let urls = '';
+
+  // 1. Rutas estáticas
+  for (const route of STATIC_ROUTES) {
+    urls += buildUrl(route.path, today, route.changefreq, route.priority);
+  }
+
+  // 2. Posts dinámicos
+  try {
+    const res  = await fetch(API_URL, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    // Acepta tanto array directo como { posts: [] }
+    const posts = Array.isArray(data) ? data : (data.posts || []);
+
+    console.log(`✓ ${posts.length} posts obtenidos del backend`);
+
+    for (const post of posts) {
+      const id      = post._id || post.id;
+      const lastmod = toXmlDate(post.updatedAt || post.createdAt);
+      if (!id) continue;
+      urls += buildUrl(`/post/${id}`, lastmod, 'weekly', '0.6');
+    }
+  } catch (err) {
+    console.error('✗ Error al obtener posts:', err.message);
+    console.warn('  El sitemap se generó solo con rutas estáticas.');
+  }
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`;
+
+  fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
+  fs.writeFileSync(OUT_PATH, xml.trim(), 'utf8');
+  console.log(`✓ Sitemap generado en: ${OUT_PATH}`);
+}
+
+generateSitemap();
