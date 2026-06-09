@@ -7,7 +7,7 @@ import '../style/TestJuego.css';
 const PREGUNTAS_POR_JUEGO = 5;
 const PUNTOS_POR_CORRECTA = 20;
 const API = 'https://empatia-dominio-back.vercel.app/api';
-const STORAGE_KEY = 'empatia_trivia_vistas'; // IDs de preguntas ya jugadas
+const STORAGE_KEY = 'empatia_trivia_vistas'; 
 
 // ─── Fingerprint (igual que PostStats) ───────────────────────────────────────
 const getVisitorId = () => {
