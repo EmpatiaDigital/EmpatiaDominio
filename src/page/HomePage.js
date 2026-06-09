@@ -8,62 +8,57 @@ import PostStatsMini from "../components/PostStatsMini";
 const FALLBACK_COVER = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop";
 const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/64/64572.png";
 
+// ── Dimensiones fijas del carrusel reservadas antes de cualquier fetch ────────
+// Esto elimina el CLS del hero: el browser reserva el espacio exacto desde el inicio
+const CAROUSEL_STYLE = {
+  height: "clamp(320px, 55vw, 600px)",
+  minHeight: "320px",
+  background: "#111827",
+  position: "relative",
+  overflow: "hidden",
+};
+
 export default function HomePage() {
-  const [posts, setPosts]       = useState(Array.isArray(window.__INITIAL_POSTS__) ? window.__INITIAL_POSTS__ : []);
-  const [destacados, setDestacados] = useState([]); // Estado para carrusel optimizado en contingencia
-  const [cargando, setCargando] = useState(!window.__INITIAL_POSTS__);
-  const navigate                = useNavigate();
+  const [posts, setPosts]           = useState(Array.isArray(window.__INITIAL_POSTS__) ? window.__INITIAL_POSTS__ : []);
+  const [destacados, setDestacados] = useState([]);
+  const [cargando, setCargando]     = useState(!window.__INITIAL_POSTS__);
+  const navigate                    = useNavigate();
   const [slideIndex, setSlideIndex] = useState(0);
 
-  // Fetch de contingencia optimizado: Blindado contra respuestas HTML 503 de Vercel
   const fetchPostsContingencia = async () => {
     try {
-      const [resRecientes, resVotados] = await Promise.all([
-        fetch("https://empatia-dominio-back.vercel.app/api/posts?limit=6"),
-        fetch("https://empatia-dominio-back.vercel.app/api/posts?limit=3&sort=votos")
-      ]);
+      // Un solo fetch con los 6 posts — los 3 más votados los derivamos localmente
+      // Evita el cold start doble de Vercel que costaba ~2-3s extra en LCP
+      const res = await fetch("https://empatia-dominio-back.vercel.app/api/posts?limit=6");
 
-      // Si el backend da 503, res.ok es false. Tiramos error para saltar directo al catch
-      if (!resRecientes.ok || !resVotados.ok) {
-        throw new Error(`Error de red: Recientes (${resRecientes.status}) | Votados (${resVotados.status})`);
-      }
+      if (!res.ok) throw new Error(`Error de red: ${res.status}`);
 
-      const dataRecientes = await resRecientes.json();
-      const dataVotados   = await resVotados.json();
+      const data = await res.json();
+      const final = Array.isArray(data) ? data : (data && Array.isArray(data.posts) ? data.posts : []);
 
-      // Validación defensiva de formato: detecta si viene array directo o propiedad .posts
-      const finalRecientes = Array.isArray(dataRecientes) 
-        ? dataRecientes 
-        : (dataRecientes && Array.isArray(dataRecientes.posts) ? dataRecientes.posts : []);
-
-      const finalVotados = Array.isArray(dataVotados) 
-        ? dataVotados 
-        : (dataVotados && Array.isArray(dataVotados.posts) ? dataVotados.posts : []);
-
-      setPosts(finalRecientes);
-      setDestacados(finalVotados);
+      setPosts(final);
+      // Derivamos los destacados localmente sin un segundo fetch
+      const votados = [...final].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0)).slice(0, 3);
+      setDestacados(votados);
       setCargando(false);
     } catch (error) {
-      console.error("Error controlado al obtener posts en contingencia:", error);
-      // Forzamos a que mantengan el tipo array para que no rompa el renderizado
+      console.error("Error controlado al obtener posts:", error);
       setPosts((prev) => (Array.isArray(prev) ? prev : []));
       setDestacados([]);
       setCargando(false);
     }
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     if (!window.__INITIAL_POSTS__ || window.__INITIAL_POSTS__.length === 0) {
-      fetchPostsContingencia(); 
+      fetchPostsContingencia();
     }
   }, []);
 
-  // Variables de mapeo aseguradas como arrays legítimos
   const topSlides = window.__INITIAL_POSTS__ && Array.isArray(window.__INITIAL_POSTS__) && window.__INITIAL_POSTS__.length > 0
-    ? (Array.isArray(posts) ? [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0)).slice(0, 3) : [])
-    : (Array.isArray(destacados) ? destacados : []);
+    ? [...posts].sort((a, b) => (b.votos || b.likes || 0) - (a.votos || a.likes || 0)).slice(0, 3)
+    : destacados;
 
-  // Auto-avance del carrusel
   useEffect(() => {
     if (topSlides.length <= 1) return;
     const interval = setInterval(() => {
@@ -72,13 +67,10 @@ export default function HomePage() {
     return () => clearInterval(interval);
   }, [topSlides.length]);
 
-  const handlePrev = () =>
-    setSlideIndex((prev) => (prev - 1 + topSlides.length) % topSlides.length);
-  const handleNext = () =>
-    setSlideIndex((prev) => (prev + 1) % topSlides.length);
+  const handlePrev = () => setSlideIndex((prev) => (prev - 1 + topSlides.length) % topSlides.length);
+  const handleNext = () => setSlideIndex((prev) => (prev + 1) % topSlides.length);
 
-  // Garantía absoluta de que hereda un método .slice válido
-  const postsToShow = Array.isArray(posts) ? posts.slice(0, 6) : [];
+  const postsToShow      = Array.isArray(posts) ? posts.slice(0, 6) : [];
   const currentSlidePost = topSlides[slideIndex];
 
   return (
@@ -87,44 +79,48 @@ export default function HomePage() {
 
       <div className="homepage">
 
-        {/* ── CARRUSEL DINÁMICO DE POSTS MÁS VOTADOS ─────────────────────────────── */}
-        <div className="carousel-wrapper">
-          
+        {/* ── CARRUSEL ─────────────────────────────────────────────────────────── */}
+        {/* style inline garantiza que el espacio está reservado ANTES del JS     */}
+        <div className="carousel-wrapper" style={CAROUSEL_STYLE}>
+
           {cargando ? (
-            <div className="carousel-skeleton" style={{ height: "100%", background: "#222" }} />
+            // Skeleton con altura heredada del padre — sin colapso ni re-expansión
+            <div style={{ position: "absolute", inset: 0, background: "#1e293b" }} />
           ) : topSlides.length === 0 ? (
             <div className="carousel-empty">No hay publicaciones destacadas.</div>
           ) : (
             <>
               {topSlides.map((post, i) => {
                 let imgSrc = post.portada || post.imagen || post.img || FALLBACK_COVER;
-                
                 if (i === 0 && window.innerWidth <= 768 && typeof imgSrc === "string") {
                   imgSrc = imgSrc.replace('/w_800/', '/w_450/');
                 }
-
                 return (
                   <img
                     key={post._id || i}
                     src={imgSrc}
+                    // width/height explícitos para que el browser calcule aspect-ratio
+                    // sin esperar a que descargue la imagen → elimina CLS
+                    width={1200}
+                    height={600}
                     loading={i === 0 ? "eager" : "lazy"}
                     fetchPriority={i === 0 ? "high" : "low"}
+                    decoding={i === 0 ? "sync" : "async"}
                     className={`carousel-image ${i === slideIndex ? "active" : ""}`}
-                    alt={post.titulo}
+                    alt={post.titulo || "Publicación destacada"}
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 );
               })}
 
-              {/* Overlay dinámico basado en el Post activo */}
               {currentSlidePost && (
                 <div className="overlay">
                   <span className="overlay-eyebrow">
                     Destacado · {Array.isArray(currentSlidePost.categoria) ? currentSlidePost.categoria[0] : currentSlidePost.categoria || "General"}
                   </span>
                   <h1>{currentSlidePost.titulo}</h1>
-                  
-                  <button 
-                    className="btn-hero" 
+                  <button
+                    className="btn-hero"
                     onClick={() => navigate(`/post/${currentSlidePost._id}`)}
                   >
                     Leer artículo completo
@@ -135,11 +131,9 @@ export default function HomePage() {
                 </div>
               )}
 
-              {/* Controles */}
               <button className="carousel-btn left"  onClick={handlePrev} aria-label="Anterior">❮</button>
               <button className="carousel-btn right" onClick={handleNext} aria-label="Siguiente">❯</button>
 
-              {/* Dots */}
               <div className="carousel-dots" role="tablist">
                 {topSlides.map((_, i) => (
                   <button
@@ -156,7 +150,7 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* ── SECCIÓN DE POSTS RECIENTES ─────────────────────── */}
+        {/* ── POSTS RECIENTES ──────────────────────────────────────────────────── */}
         <section className="posts-section">
 
           <div className="posts-section-header">
@@ -192,20 +186,39 @@ export default function HomePage() {
                   categoria = post.categoria.trim();
                 }
 
-                const backgroundImage = post.portada
-                  ? `url(${post.portada})`
-                  : `url(${FALLBACK_COVER})`;
+                const bgUrl = post.portada || FALLBACK_COVER;
 
                 return (
                   <div
                     key={post._id}
                     className={`post-card${idx === 0 ? " post-card--featured" : ""}`}
-                    style={{ backgroundImage, backgroundSize: "cover", backgroundPosition: "center", backgroundRepeat: "no-repeat" }}
                     onClick={() => navigate(`/post/${post._id}`)}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => e.key === "Enter" && navigate(`/post/${post._id}`)}
                   >
+                    {/* ── Imagen como <img> en vez de backgroundImage ────────────────
+                        El browser puede calcular dimensiones y reservar espacio
+                        antes de descargar → elimina el CLS de las cards           */}
+                    <img
+                      src={bgUrl}
+                      alt={post.titulo || "Portada del artículo"}
+                      className="post-card-img"
+                      loading={idx === 0 ? "eager" : "lazy"}
+                      fetchPriority={idx === 0 ? "high" : "low"}
+                      width={600}
+                      height={400}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        objectPosition: "center",
+                        zIndex: 0,
+                      }}
+                    />
+
                     <span className="card-badge">{categoria}</span>
 
                     <div className="post-content-overlay-home">
@@ -215,6 +228,8 @@ export default function HomePage() {
                           alt={`Avatar de ${post.autor}`}
                           className="avatar"
                           loading="lazy"
+                          width={32}
+                          height={32}
                         />
                         <span className="autor">Por {post.autor}</span>
                       </div>
