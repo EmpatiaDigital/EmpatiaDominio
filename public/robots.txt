@@ -14,4 +14,4 @@ Disallow: /superadmincourses
 Disallow: /cursantes
 Disallow: /congelar
 
-Sitemap: https://empatiadigital.com.ar/sitemap.xml
+Sitemap: https://empatia-dominio-back.vercel.app/sitemap.xml
