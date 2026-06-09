@@ -6,7 +6,6 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Error404 from "./components/Error404.js";
-
 // ── Lazy loading ──────────────────────────────────────────────────────────
 const HomePage        = lazy(() => import('./page/HomePage.js'));
 const Post            = lazy(() => import('./page/Post.js'));
