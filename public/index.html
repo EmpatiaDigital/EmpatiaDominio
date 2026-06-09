@@ -5,18 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
 
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1PQVGSKJGE"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-1PQVGSKJGE');
-    </script>
-
+    <!-- Preconnect al backend para reducir latencia en el primer fetch de React -->
+    <link rel="preconnect" href="https://empatia-dominio-back.vercel.app" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://res.cloudinary.com" />
 
+    <!-- Fuentes: carga diferida sin bloquear render -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap"
@@ -29,42 +24,6 @@
         href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap"
       />
     </noscript>
-
-    <script>
-      (function() {
-        // Pedimos únicamente la página 1 con el límite real del front
-        const API_URL = 'https://empatia-dominio-back.vercel.app/api/posts?page=1&limit=6'; 
-
-        fetch(API_URL)
-          .then(res => res.json())
-          .then(data => {
-            // Accedemos de forma segura al array 'posts' de tu nueva estructura
-            const posts = data.posts;
-            
-            if (posts && posts.length > 0) {
-              // El primer post de la lista suele ser el LCP en la visualización inicial
-              const firstPost = posts[0];
-              let imageUrl = firstPost ? (firstPost.portada || firstPost.imagen || firstPost.img) : null;
-
-              if (imageUrl && typeof imageUrl === 'string') {
-                // Optimización de tamaño para mobile si es Cloudinary
-                if (window.innerWidth <= 768) {
-                  imageUrl = imageUrl.replace('/w_800/', '/w_450/');
-                }
-
-                // Inyectamos el link de precarga en el HEAD inmediatamente
-                const link = document.createElement('link');
-                link.rel = 'preload';
-                link.as = 'image';
-                link.href = imageUrl;
-                link.fetchPriority = 'high'; // Le dice al navegador: "bajala ya mismo"
-                document.head.appendChild(link);
-              }
-            }
-          })
-          .catch(err => console.error("Early LCP patch error:", err));
-      })();
-    </script>
 
     <link rel="icon" type="image/png" href="empatialog.jpeg" />
     <link rel="apple-touch-icon" href="https://www.empatiadigital.com.ar/empatialog.jpeg" />
@@ -84,10 +43,64 @@
     <meta name="twitter:title" content="Empatía Digital – Convivencia y Salud Digital Consciente" />
     <meta name="twitter:description" content="Propuestas de ciudadanía digital, prevención de grooming y bienestar tecnológico para docentes, familias y entornos educativos." />
     <meta name="twitter:image" content="https://www.empatiadigital.com.ar/empatialog.jpeg" />
+
+    <!-- Skeleton CSS: reserva espacio visual antes de que React monte
+         Elimina el CLS de las cards de posts que aparecen después del JS -->
+    <style>
+      /* Reserva altura del navbar para evitar shift al montar */
+      #root > nav, .navbar { min-height: 64px; }
+
+      /* Skeleton de cards en homepage — evita el layout shift principal */
+      .skeleton-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .skeleton-card {
+        border-radius: 16px;
+        overflow: hidden;
+        background: #f1f5f9;
+        /* Reserva la altura exacta de una card antes de que carguen */
+        aspect-ratio: 3 / 4;
+        animation: skPulse 1.4s ease-in-out infinite;
+      }
+      @keyframes skPulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.5; }
+      }
+
+      /* Ocultar skeleton cuando React ya montó */
+      #root:not(:empty) + #sk-home { display: none !important; }
+    </style>
   </head>
 
   <body>
     <noscript>Necesitas habilitar JavaScript para ejecutar esta aplicación.</noscript>
     <div id="root"></div>
+
+    <!-- Skeleton visible SOLO mientras React no montó todavía.
+         Se oculta automáticamente en cuanto #root tiene contenido. -->
+    <div id="sk-home" aria-hidden="true">
+      <div class="skeleton-grid">
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+    </div>
+
+    <!-- GA4: movido al final del body para no bloquear render -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-1PQVGSKJGE"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1PQVGSKJGE');
+    </script>
   </body>
 </html>
